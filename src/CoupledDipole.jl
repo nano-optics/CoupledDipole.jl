@@ -41,7 +41,7 @@ function alpha_blocks!(AlphaBlocks, Alpha, Angles)
     # loop over N_dip particles
     for ii = 1:N_dip
         Rm = euler_passive(Angles[ii]...)
-        AlphaBlocks[ii] = Rm' * (Alpha[ii] .* Rm)
+        AlphaBlocks[ii] = Rm' * (Alpha[ii] * Rm)
     end
 
     return AlphaBlocks

@@ -22,7 +22,7 @@ function extinction!(Cext, kn, P, Ein)
     N_inc = size(P,2)
 
     for jj in 1:N_inc
-        Cext[jj] = 4*π*kn*imag(dot(Ein[:,jj], P[:,jj])) # E^* P
+        Cext[jj] = 4π*kn*imag(dot(Ein[:,jj], P[:,jj])) # E^* P
     end
 
     return  Cext
@@ -44,7 +44,7 @@ function absorption!(Cabs, kn, P, E)
     N_inc = size(P, 2)
 
     for jj in 1:N_inc
-        Cabs[jj] = 4*π*kn*imag(dot(E[:,jj], P[:,jj]) -
+        Cabs[jj] = 4π*kn*imag(dot(E[:,jj], P[:,jj]) -
         kn^3 * 2/3 * real(dot(P[:,jj],P[:,jj])))
     end
 

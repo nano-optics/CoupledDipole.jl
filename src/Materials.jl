@@ -17,7 +17,7 @@ Drude model for the dielectric function of silver in the visible region
    epsilon_Ag(632.8)
 """
 function epsilon_Ag(λ)
-    4 * (1.0 - 1.0 / (282.0^2 * (1 / λ^2 + im / (17000 * λ))))
+    4 * (1.0 - 1.0 / (282.0^2 * (1 / λ^2 + 1im / (17000 * λ))))
 end
 
 """
@@ -181,8 +181,8 @@ Principal polarisability components of a spheroidal particle
 """
 function alpha_kuwata(λ, ε, Size, ε_m)
 
-    V = 4 / 3 * π * prod(Size)
-    x_0 = @. 2 * π * Size / λ
+    V = 4π / 3  * prod(Size)
+    x_0 = @. 2π * Size / λ
     χ = depolarisation_spheroid(Size...)
 
     A = @. -0.4865 * χ - 1.046 * χ^2 + 0.8481 * χ^3
@@ -191,7 +191,7 @@ function alpha_kuwata(λ, ε, Size, ε_m)
     denom = @. (χ + ε_m / (ε - ε_m)) + A * ε_m * x_0^2 + B * ε_m^2 * x_0^4 -
        1im / 3 * 4 * π^2 * ε_m^(3 / 2) * V / λ^3
 
-    return ((V / (4 * π)) ./ denom)
+    return ((V / (4π)) ./ denom)
 end
 
 

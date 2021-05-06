@@ -56,7 +56,7 @@ function spectrum_dispersion(
     for ii = 1:N_lam
         λ = mat.wavelength[ii]
         n_medium = mat.medium["medium"](λ)
-        kn = n_medium * 2 * π / λ
+        kn = n_medium * 2π / λ
 
         if cl.type == "point"
 
@@ -166,7 +166,7 @@ function spectrum_oa(
     for ii = 1:N_lam
         λ = mat.wavelength[ii]
         n_medium = mat.medium["medium"](λ)
-        kn = n_medium * 2 * π / λ
+        kn = n_medium * 2π / λ
 
         if cl.type == "point"
 
