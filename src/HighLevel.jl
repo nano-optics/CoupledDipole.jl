@@ -20,7 +20,12 @@ function spectrum_dispersion(
     N_sca::Int = 36,
 )
 
-    T = typeof(cl.positions[1][1]) # type used for array inits below
+    # what is the type of arrays to initialise?
+    proto_r = cl.positions[1][1]
+    proto_k = 2π / mat.wavelength[1]
+    T = typeof(proto_k * proto_r)
+    # note: cross-sections are typeof(imag(P*E)), which boils down to T, hopefully
+
     N_dip = length(cl.positions)
     N_lam = length(mat.wavelength)
     N_inc = length(Incidence)
@@ -35,7 +40,7 @@ function spectrum_dispersion(
     E = similar(Ein)
     P = similar(Ein)
 
-    AlphaBlocks = [@SMatrix zeros(Complex{T}, 3, 3) for ii = 1:N_dip]
+    # AlphaBlocks = [@SMatrix zeros(Complex{T}, 3, 3) for ii = 1:N_dip]
 
     # incident field
     Ejones = [
@@ -43,6 +48,9 @@ function spectrum_dispersion(
         SVector{2}(0.0, 1.0 + 0im), # Jones vector, second polar
     ]
 
+    # store all rotation matrices
+    ParticleRotations = map(euler_passive, cl.angles)
+    IncidenceRotations = map(euler_active, Incidence)
 
     ## loop over wavelengths
 
@@ -74,15 +82,20 @@ function spectrum_dispersion(
         end
 
         # update the rotated blocks
-        # TODO the rotation matrices should be computed only once and stored
-        # since wavelength-independent
-        # (if we don't care about memory)
-        alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
+        # Remark: if we cared about memory more than speed
+        # we'd compute rotation matrices on the fly
+        # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
+        # but instead we've prestored them, since wavelength-independent
+        AlphaBlocks = map((R, A) -> R' * (A .* R), ParticleRotations, Alpha)
 
         # Interaction matrix (A = I - G0 alpha_eff)
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 
-        incident_field!(Ein, Ejones, kn, cl.positions, Incidence)
+                # update the incident field
+                # Remark: similarly, pre-computed rotations
+                # incident_field!(Ein, Ejones, kn, cl.positions, Incidence)
+                # but instead we've prestored them, since wavelength-independent
+        incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
         # solve
         # TODO provide iterative solver alternative
@@ -126,7 +139,13 @@ function spectrum_oa(
     quad_sca = cubature_sphere(N_sca, cubature)
 
     # setting up constants
-    T = typeof(cl.positions[1][1]) # type used for array inits below
+
+    # what is the type of arrays to initialise?
+    proto_r = cl.positions[1][1]
+    proto_k = 2π / mat.wavelength[1]
+    T = typeof(proto_k * proto_r)
+    # note: cross-sections are typeof(imag(P*E)), which boils down to T, hopefully
+
     N_dip = length(cl.positions)
     N_lam = length(mat.wavelength)
     N_inc = length(quad_inc.weights) # update with actual number of angles
@@ -146,6 +165,10 @@ function spectrum_oa(
         SVector{2}(1im, 1.0), # Jones vector, first polar
         SVector{2}(1.0, 1im), # Jones vector, second polar
     ]
+
+    # store all rotation matrices
+    ParticleRotations = map(euler_passive, cl.angles)
+    IncidenceRotations = map(euler_active, quad_inc.nodes)
 
     # average both polarisations, so divide by two
     weights1 = 0.5 * vcat(quad_inc.weights, quad_inc.weights) #  standard cross sections
@@ -184,14 +207,13 @@ function spectrum_oa(
         end
 
         # update the rotated blocks
-        # TODO the rotation matrices should be computed only once and stored
-        # since wavelength-independent
-        # (if we don't care about memory)
-        alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
+        # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
+        AlphaBlocks = map((R, A) -> R' * (A .* R), ParticleRotations, Alpha)
 
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 
-        incident_field!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)
+        # incident_field!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)
+        incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
         # solve
         # TODO provide iterative solver alternative

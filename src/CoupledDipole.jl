@@ -22,6 +22,21 @@ include("HighLevel.jl")
 
 ## core functions
 
+
+# this is not needed, just broadcast
+function rotation_matrices!(Rotations, Angles)
+
+    N_dip = length(Angles)
+
+    # loop over N_dip particles
+    for ii = 1:N_dip
+        Rotations[ii] = euler_passive(Angles[ii]...)
+    end
+
+    return Rotations
+end
+
+
 """
     alpha_blocks(AlphaBlocks::Vector{SMatrix{3,3}},
                  Alpha::Vector{SVector{3}},
@@ -41,7 +56,7 @@ function alpha_blocks!(AlphaBlocks, Alpha, Angles)
     # loop over N_dip particles
     for ii = 1:N_dip
         Rm = euler_passive(Angles[ii]...)
-        AlphaBlocks[ii] = Rm' * (Alpha[ii] * Rm)
+        AlphaBlocks[ii] = Rm' * (Alpha[ii] .* Rm) # R^t * diag(A) * R
     end
 
     return AlphaBlocks
@@ -98,11 +113,33 @@ end
 
 
 
+# function incident_field!(Ein, Ejones, kn, R, Incidence)
+#
+#     N_inc = length(Incidence)
+#     N_dip = length(R)
+#
+#     Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
+#     Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
+#     Evec_r = similar(Evec1)
+#
+#     for jj in eachindex(Incidence)
+#         Rm = euler_active(Incidence[jj]...)
+#         # Rot * [0;0;1] == 3rd column
+#         k_hat = kn * transpose(Rm[:, 3])
+#         for kk = 1:N_dip
+#             Ein[kk*3-2:kk*3, jj] = (Rm * (Evec1 * exp(im * k_hat * R[kk])))
+#             Ein[kk*3-2:kk*3, jj+N_inc] = (Rm * (Evec2 * exp(im * k_hat * R[kk])))
+#         end
+#     end
+#     return Ein
+# end
+
+
 """
     incident_field(Ein,
         Ejones,
         kn, R::Vector{SVector{3}},
-        Incidence)
+        IncidenceRotations)
 
 Incident field at particle positions
 
@@ -110,29 +147,30 @@ Incident field at particle positions
 - Ejones: tuple of 2 2-Svectors defining 2 orthogonal Jones polarisations
 - kn: wavenumber in incident medium
 - R: N_dip-vector of 3-Svectors of particle positions
-- Incidence: N_inc-vector of 3-Svectors of incidence angles
+- IncidenceRotations: N_inc-vector of 3-Smatrices of rotations
 
 """
-function incident_field!(Ein, Ejones, kn, R, Incidence)
+function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
 
-    N_inc = length(Incidence)
+    N_inc = length(IncidenceRotations)
     N_dip = length(R)
 
     Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
     Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
-    Evec_r = similar(Evec1)
 
     for jj in eachindex(Incidence)
-        Rm = euler_active(Incidence[jj]...)
+        Rm = IncidenceRotations[jj]
         # Rot * [0;0;1] == 3rd column
-        k_hat = kn * transpose(Rm[:, 3])
+        k_hat = kn * Rm[:, 3]
         for kk = 1:N_dip
-            Ein[kk*3-2:kk*3, jj] = (Rm * (Evec1 * exp(im * k_hat * R[kk])))
-            Ein[kk*3-2:kk*3, jj+N_inc] = (Rm * (Evec2 * exp(im * k_hat * R[kk])))
+            kR = dot(k_hat, R[kk])
+            Ein[kk*3-2:kk*3, jj] = (Rm * (Evec1 * exp(im * kR)))
+            Ein[kk*3-2:kk*3, jj+N_inc] = (Rm * (Evec2 * exp(im * kR)))
         end
     end
     return Ein
 end
+
 
 
 """
