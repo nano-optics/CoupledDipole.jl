@@ -39,6 +39,8 @@ function euler_active(φ, θ, ψ = 0)
 
 end
 
+euler_active(v::SVector) = euler_passive(v...)
+
 """
     euler_passive(φ::Real, θ::Real, ψ::Real)
 
@@ -77,6 +79,7 @@ function euler_passive(φ, θ, ψ = 0)
 
 end
 
+euler_passive(v::SVector) = euler_passive(v...)
 
 ## orientation-averaging
 

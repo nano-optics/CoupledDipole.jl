@@ -19,6 +19,33 @@ include("Utils.jl")
 include("CrossSections.jl")
 include("HighLevel.jl")
 
+export rotation_matrices!
+export alpha_blocks!
+export propagator_freespace_labframe!
+export incident_field!
+export polarisation!
+export Cluster
+export cluster_single
+export cluster_dimer
+export extinction!
+export absorption!
+export Material
+export epsilon_Ag
+export epsilon_Au
+export lorentzian
+export alpha_bare
+export alpha_kuwata
+export alpha_blocks!
+export alpha_embedded
+export alpha_spheroids
+export alpha_rescale_molecule
+export depolarisation_spheroid
+export quadrature_lgwt
+export euler_active
+export euler_passive
+export cubature_sphere
+export spectrum_dispersion
+export spectrum_oa
 
 ## core functions
 
