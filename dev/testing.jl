@@ -7,7 +7,7 @@ using StaticArrays
 using FastGaussQuadrature
 using DataFrames
 using VegaLite
-using Gadfly
+# using Gadfly
 
 
 N_dip = 5
@@ -87,7 +87,6 @@ typeof(mat)
 
 testdisp = spectrum_dispersion(cl, mat, Incidence,12)
 
-using DataFrames
 a = DataFrame(testdisp.extinction)
 a[!,:wavelength] = mat.wavelength
 d = stack(a, Not(:wavelength))
@@ -108,30 +107,21 @@ quad_inc = cubature_sphere(3, "gl")
 testoa = spectrum_oa(cl, mat, "gl", 300)
 
 clref = cluster_single(20,20,40,0,0,0)
-clref = cluster_single(20,20,40,0,π/2,0)
+ clref = cluster_single(20,20,40,0,π/2,0)
 
 ref = spectrum_oa(clref, mat, "gl", 300)
 
 
-# plotly()
-# pyplot()
-
-# using Plots
-# plot(mat.wavelength, hcat(testoa.extinction,ref.extinction))
-
-
-# a = DataFrame(hcat(testoa.extinction,ref.extinction))
-# rename!(a, [:dimer, :reference])
-# a = DataFrame("a" => testoa.extinction, "b" => ref.extinction)
-
 a = DataFrame(dimer = testoa.average.extinction, single =  ref.average.extinction)
-a = DataFrame(dimer = testoa.dichroism.extinction, single =  ref.dichroism.extinction)
+# a = DataFrame(dimer = testoa.dichroism.extinction, single =  ref.dichroism.extinction)
 a[!,:wavelength] = mat.wavelength
 d = stack(a, Not(:wavelength))
 
-plot(d, x=:wavelength, y=:value, colour=:variable, Geom.line)
+# plot(d, x=:wavelength, y=:value, colour=:variable, Geom.line)
 
 d |> @vlplot(
     mark = :line,
-    encoding = {x = "wavelength:q", y = "value", color = "variable:n"}
+    encoding = {x = "wavelength:q", y = "value", color = "variable:n"},
+  width= 400,
+  height =  300,
 )
