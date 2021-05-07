@@ -70,13 +70,15 @@ wavelength = collect(450:2:850.0)
 medium = Dict([("Au", CoupledDipole.epsilon_Au), ("medium", x -> 1.33)])
 
 mat = Material(wavelength, medium)
+
 cl = cluster_dimer(100, 20, 20, 40, π/4)
-
-Alpha = alpha_spheroids(500, -10+1im, 1.33^2, cl.sizes)
-
-AlphaBlocks = [@SMatrix zeros(Complex{Real},3,3) for ii=1:N_dip]
-
-Ni=2
+cl = cluster_single(20, 20, 40)
+#
+# Alpha = alpha_spheroids(500, -10+1im, 1.33^2, cl.sizes)
+#
+# AlphaBlocks = [@SMatrix zeros(Complex{Real},3,3) for ii=1:N_dip]
+#
+# Ni=2
 Incidence = [SVector(0,0,0),SVector(0,π/2,0)]
 
 
@@ -85,12 +87,18 @@ typeof(mat)
 # Juno.@enter spectrum_dispersion(cl, mat, Incidence)
 
 
-testdisp = spectrum_dispersion(cl, mat, Incidence,12)
+testdisp = spectrum_dispersion(cl, mat, Incidence)
 
 a = DataFrame(testdisp.extinction)
 a[!,:wavelength] = mat.wavelength
 d = stack(a, Not(:wavelength))
-plot(d, x=:wavelength, y=:value, colour=:variable, Geom.line)
+d |> @vlplot(
+    mark = :line,
+    encoding = {x = "wavelength:q", y = "value", color = "variable:n"},
+           tooltip={field="value", typ="quantitative"},
+  width= 400,
+  height =  300,
+)
 
 
 
@@ -107,7 +115,7 @@ quad_inc = cubature_sphere(3, "gl")
 testoa = spectrum_oa(cl, mat, "gl", 300)
 
 clref = cluster_single(20,20,40,0,0,0)
- clref = cluster_single(20,20,40,0,π/2,0)
+ # clref = cluster_single(20,20,40,0,π/2,0)
 
 ref = spectrum_oa(clref, mat, "gl", 300)
 
