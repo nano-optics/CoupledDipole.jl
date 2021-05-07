@@ -1,5 +1,5 @@
 # include("../src/CoupledDipole.jl")
-push!(LOAD_PATH, "/Users/baptiste/Documents/nano-optics/CoupledDipole.jl/")
+push!(LOAD_PATH, "/Users/auguieba/Documents/nano-optics/CoupledDipole.jl/")
 using CoupledDipole
 
 using LinearAlgebra
@@ -8,6 +8,9 @@ using FastGaussQuadrature
 using DataFrames
 using VegaLite
 # using Gadfly
+
+
+# a =  cubature_sphere(12, "gl")
 
 
 N_dip = 5
@@ -72,7 +75,7 @@ medium = Dict([("Au", CoupledDipole.epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelength, medium)
 
 cl = cluster_dimer(100, 20, 20, 40, π/4)
-cl = cluster_single(20, 20, 40)
+# cl = cluster_single(20, 20, 40)
 #
 # Alpha = alpha_spheroids(500, -10+1im, 1.33^2, cl.sizes)
 #
@@ -90,7 +93,7 @@ typeof(mat)
 
 testdisp = spectrum_dispersion(cl, mat, Incidence)
 
-a = DataFrame(testdisp.extinction)
+a = DataFrame(testdisp.extinction, :auto)
 a[!,:wavelength] = mat.wavelength
 d = stack(a, Not(:wavelength))
 d |> @vlplot(
@@ -113,10 +116,11 @@ weights = SVector([a*b for a in alpha.weights, b in beta.weights]...)
 
 quad_inc = cubature_sphere(3, "gl")
 
+cl = cluster_dimer(80, 20, 20, 40, 0)
 testoa = spectrum_oa(cl, mat, "gl", 300)
 
 clref = cluster_single(20,20,40,0,0,0)
- # clref = cluster_single(20,20,40,0,π/2,0)
+# clref = cluster_single(20,20,40,0,π/2,0)
 
 ref = spectrum_oa(clref, mat, "gl", 300)
 
@@ -131,6 +135,7 @@ d = stack(a, Not(:wavelength))
 d |> @vlplot(
     mark = :line,
     encoding = {x = "wavelength:q", y = "value", color = "variable:n"},
+           tooltip={field="value", typ="quantitative"},
   width= 400,
   height =  300,
 )

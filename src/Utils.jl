@@ -127,10 +127,10 @@ function cubature_sphere(N, method = "gl")
     beta = quadrature_lgwt(rndN, 0, 1)
 
     nodes = [
-        SVector{3}(a, acos(2b - 1), 0.0) for b in beta.nodes,
-        a in alpha.nodes
+        SVector{3}(a, acos(2b - 1), 0.0) for
+        b in beta.nodes, a in alpha.nodes
     ]
-    weights = hcat([a * b for a in alpha.weights, b in beta.weights]...)
+    weights = hcat([a * b for b in beta.weights, a in alpha.weights]...)
 
-    (nodes = nodes, weights = 1 / (2π) * weights)
+    (nodes = nodes[:], weights = 1 / (2π) * weights[:])
 end
