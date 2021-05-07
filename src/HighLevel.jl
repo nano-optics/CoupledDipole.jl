@@ -17,7 +17,7 @@ function spectrum_dispersion(
     cl::Cluster,
     mat::Material,
     Incidence,
-    N_sca::Int = 36,
+    N_sca::Int = 36
 )
 
     # what is the type of arrays to initialise?
@@ -31,7 +31,7 @@ function spectrum_dispersion(
     N_inc = length(Incidence)
 
     # scattering angles for Csca
-    quad_sca = cubature_sphere(N_sca, cubature)
+    quad_sca = cubature_sphere(N_sca, "gl")
 
     # initialise
     # https://discourse.julialang.org/t/initialise-array-without-specific-types/60204/3

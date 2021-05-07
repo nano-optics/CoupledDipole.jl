@@ -98,7 +98,7 @@ $$
    quadrature_lgwt(6,0,3)
 """
 function quadrature_lgwt(N, a, b)
-    n, w = FastGaussQuadrature.gausslegendre(N)
+    n, w = gausslegendre(N)
     (nodes = (b - a) / 2 * n .+ (a + b) / 2,
      weights = (b - a) / 2 * w)
 end

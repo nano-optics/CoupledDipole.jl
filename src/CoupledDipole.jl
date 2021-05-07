@@ -1,4 +1,4 @@
-__precompile__()
+# __precompile__()
 
 module CoupledDipole
 
@@ -185,7 +185,7 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
     Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
     Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
 
-    for jj in eachindex(Incidence)
+    for jj in eachindex(IncidenceRotations)
         Rm = IncidenceRotations[jj]
         # Rot * [0;0;1] == 3rd column
         k_hat = kn * Rm[:, 3]
