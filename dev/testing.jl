@@ -1,5 +1,6 @@
 # include("../src/CoupledDipole.jl")
 push!(LOAD_PATH, expanduser( "~/Documents/nano-optics/CoupledDipole.jl/"))
+using Revise 
 using CoupledDipole
 
 using LinearAlgebra
