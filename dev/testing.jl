@@ -1,5 +1,5 @@
 # include("../src/CoupledDipole.jl")
-push!(LOAD_PATH, "/Users/auguieba/Documents/nano-optics/CoupledDipole.jl/")
+push!(LOAD_PATH, expanduser( "~/Documents/nano-optics/CoupledDipole.jl/"))
 using CoupledDipole
 
 using LinearAlgebra
@@ -116,8 +116,8 @@ weights = SVector([a*b for a in alpha.weights, b in beta.weights]...)
 
 quad_inc = cubature_sphere(3, "gl")
 
-cl = cluster_dimer(80, 20, 20, 40, 0)
-testoa = spectrum_oa(cl, mat, "gl", 300)
+cl = cluster_dimer(80, 20, 20, 40, pi/4)
+testoa = spectrum_oa(cl, mat, "gl", 100)
 
 clref = cluster_single(20,20,40,0,0,0)
 # clref = cluster_single(20,20,40,0,π/2,0)
@@ -137,5 +137,6 @@ d |> @vlplot(
     encoding = {x = "wavelength:q", y = "value", color = "variable:n"},
            tooltip={field="value", typ="quantitative"},
   width= 400,
-  height =  300,
+  height = 300,
+  autosize = "fit",
 )
