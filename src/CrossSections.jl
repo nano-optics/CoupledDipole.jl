@@ -95,9 +95,6 @@ function scattering!(Csca, positions, angles, weights, kn, P)
             nrj = dot(n,rj)
             indjj = (jj-1)*3+1:jj*3 # find current dipole
             phase = exp(-1im*kn*nrj)
-            # println(size(phase * G))   # 3x3
-            # println(size(P[indjj, :])) # 3x72
-            # println(size(Esca))        # 3x1
 
             Esca = Esca +  phase * G * P[indjj, :]
 
@@ -111,6 +108,6 @@ function scattering!(Csca, positions, angles, weights, kn, P)
     # need to integrate Isca over all scattering angles
     # (for each incident angle)
 
-    Csca = 4π * kn^4 * transpose(weights) * Isca
+    Csca[:] = 4π * kn^4 * transpose(weights) * Isca
     return Csca
 end

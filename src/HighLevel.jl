@@ -17,7 +17,7 @@ function spectrum_dispersion(
     cl::Cluster,
     mat::Material,
     Incidence,
-    N_sca::Int = 36
+    N_sca::Int = 300
 )
 
     # what is the type of arrays to initialise?
@@ -138,7 +138,7 @@ function spectrum_oa(
     mat::Material,
     cubature = "gl",
     N_inc = 300,
-    N_sca = 36,
+    N_sca = 300,
 )
 
     quad_inc = cubature_sphere(N_inc, cubature)
