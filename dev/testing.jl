@@ -98,20 +98,33 @@ Incidence = [SVector(0,0,0),SVector(0,π/2,0)]
 typeof(cl)
 typeof(mat)
 #
-Juno.@enter spectrum_dispersion(cl, mat, Incidence)
+# Juno.@enter spectrum_dispersion(cl, mat, Incidence)
 
 
 testdisp = spectrum_dispersion(cl, mat, Incidence)
 
 a = DataFrame(testdisp.scattering, :auto)
-b = DataFrame(testdisp.absorption, :auto)
-c = DataFrame(testdisp.extinction, :auto)
+b = DataFrame(testdisp.extinction - testdisp.absorption, :auto)
+# c = DataFrame(testdisp.extinction, :auto)
 a[!,:wavelength] = mat.wavelength
 b[!,:wavelength] = mat.wavelength
-c[!,:wavelength] = mat.wavelength
+# c[!,:wavelength] = mat.wavelength
 da = stack(a, Not(:wavelength))
 db = stack(b, Not(:wavelength))
-dc = stack(c, Not(:wavelength))
+# dc = stack(c, Not(:wavelength))
+
+@vlplot(
+width= 400,
+height =  300) +
+@vlplot(data=da, #csca
+    mark = {:line, strokeDash=(5,5)},
+    encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
+) +
+@vlplot(data=db, #cext - cabs
+    mark = :line,
+    encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
+)
+
 
 @vlplot(
 width= 400,
