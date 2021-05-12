@@ -85,6 +85,7 @@ function alpha_blocks!(AlphaBlocks, Alpha, Angles)
     for ii = 1:N_dip
         Rm = euler_passive(Angles[ii]...)
         AlphaBlocks[ii] = Rm' * diagm(Alpha[ii]) * Rm
+        # transpose(Rot) * diag(Alpha(ind)) * Rot;
     end
 
     return AlphaBlocks

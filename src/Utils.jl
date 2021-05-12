@@ -23,15 +23,16 @@ function euler_active(φ, θ, ψ = 0)
     sinψ = sin(ψ)
     sinθ = sin(θ)
 
+    # filled by columns
     R = SMatrix{3,3}(
         cosφ * cosθ * cosψ - sinφ * sinψ,
-        -cosφ * cosθ * sinψ - sinφ * cosψ,
-        cosφ * sinθ,
         sinφ * cosθ * cosψ + cosφ * sinψ,
-        -sinφ * cosθ * sinψ + cosφ * cosψ,
-        sinφ * sinθ,
         -sinθ * cosψ,
+        -cosφ * cosθ * sinψ - sinφ * cosψ,
+        -sinφ * cosθ * sinψ + cosφ * cosψ,
         sinθ * sinψ,
+        cosφ * sinθ,
+        sinφ * sinθ,
         cosθ,
     )
 
@@ -63,15 +64,16 @@ function euler_passive(φ, θ, ψ = 0)
     sinψ = sin(ψ)
     sinθ = sin(θ)
 
+    # filled by columns
     R = SMatrix{3,3}(
         cosφ * cosθ * cosψ - sinφ * sinψ,
-        sinφ * cosθ * cosψ + cosφ * sinψ,
-        -sinθ * cosψ,
         -cosφ * cosθ * sinψ - sinφ * cosψ,
-        -sinφ * cosθ * sinψ + cosφ * cosψ,
-        sinθ * sinψ,
         cosφ * sinθ,
+        sinφ * cosθ * cosψ + cosφ * sinψ,
+        -sinφ * cosθ * sinψ + cosφ * cosψ,
         sinφ * sinθ,
+        -sinθ * cosψ,
+        sinθ * sinψ,
         cosθ,
     )
 
