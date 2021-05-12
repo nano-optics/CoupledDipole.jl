@@ -58,8 +58,10 @@ function spectrum_dispersion(
     # this is to be compatible with autodiff when optimising cluster geometry
     cext = Array{T}(undef, (N_lam, 2 * N_inc))
     cabs = similar(cext)
+    csca = similar(cext)
     tmpcext = Vector{T}(undef, 2N_inc)
     tmpcabs = similar(tmpcext)
+    tmpcsca = similar(tmpcext)
 
     for ii = 1:N_lam
         λ = mat.wavelength[ii]
@@ -105,11 +107,15 @@ function spectrum_dispersion(
         # cross-sections for multiple angles
         extinction!(tmpcext, kn, P, Ein)
         absorption!(tmpcabs, kn, P, E)
+        scattering!(tmpcsca, cl.positions, quad_sca.nodes, quad_sca.weights, kn, P)
+
         cext[ii, :] = tmpcext
         cabs[ii, :] = tmpcabs
+        csca[ii, :] = tmpcsca
     end
 
-    CrossSections(1 / N_dip * cext, 1 / N_dip * cabs, 1 / N_dip * (cext - cabs))
+    # CrossSections(1 / N_dip * cext, 1 / N_dip * cabs, 1 / N_dip * (cext - cabs))
+    CrossSections(1 / N_dip * cext, 1 / N_dip * cabs, 1 / N_dip * csca)
 
 end
 
@@ -178,13 +184,14 @@ function spectrum_oa(
     # this is to be compatible with autodiff when optimising cluster geometry
     cext = Vector{T}(undef, N_lam)
     cabs = similar(cext)
-    csca2 = similar(cext)
+    csca = similar(cext)
     dext = similar(cext)
     dabs = similar(cext)
-    dsca2 = similar(cext)
+    dsca = similar(cext)
 
     tmpcext = Vector{T}(undef, 2N_inc)
     tmpcabs = similar(tmpcext)
+    tmpcsca = similar(tmpcext)
 
     for ii = 1:N_lam
         λ = mat.wavelength[ii]
@@ -223,29 +230,31 @@ function spectrum_oa(
         # cross-sections for cubature angles
         extinction!(tmpcext, kn, P, Ein)
         absorption!(tmpcext, kn, P, E)
+        scattering!(tmpcsca, cl.positions, quad_sca.nodes, quad_sca.weights, kn, P)
+
 
         #  perform cubature for angular averaging
         cext[ii] = dot(tmpcext, weights1)
         cabs[ii] = dot(tmpcabs, weights1)
-        # csca2[ii] = dot(tmpsca2, weights1)
+        csca[ii] = dot(tmpcsca, weights1)
         dext[ii] = dot(tmpcext, weights2)
         dabs[ii] = dot(tmpcabs, weights2)
-        # dsca2[ii] = dot(tmpsca2, weights2)
+        dsca[ii] = dot(tmpcsca, weights2)
     end
 
-    csca = cext - cabs
-    dsca = dext - dabs
+    # csca = cext - cabs
+    # dsca = dext - dabs
 
     (
         average = CrossSections(
             1 / N_dip * cext,
             1 / N_dip * cabs,
-            1 / N_dip * (cext - cabs),
+            1 / N_dip * csca,
         ),
         dichroism = CrossSections(
             1 / N_dip * dext,
             1 / N_dip * dabs,
-            1 / N_dip * (dext - dabs),
+            1 / N_dip * dsca,
         ),
     )
 

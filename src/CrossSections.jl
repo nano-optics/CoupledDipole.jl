@@ -53,7 +53,16 @@ end
 
 
 # note: need also Csca as numerical cubature, for consistency check with Ext-Abs
+"""
+    scattering(kn::Real, P::Array{Complex}, E::Array{Complex})
 
+Scattering cross-section for each incident angle, obtained by numerical cubature
+over the full solid angle of scattering directions
+
+- kn: wavenumber in incident medium
+- P: 3N_dip x N_inc matrix, polarisations for all incidences
+
+"""
 function scattering!(Csca, positions, angles, weights, kn, P)
 
     N_dip = length(positions)
@@ -62,13 +71,15 @@ function scattering!(Csca, positions, angles, weights, kn, P)
     # G = zeros(3, 3)
     # I3 = I
     #
-    T = typeof(Csca)
-    Isca = zeros(N_sca, N_inc); # temp. storage of FF intensities for all scattering directions
+    # T = typeof(Csca[1])
+    # note: https://stackoverflow.com/questions/41843949/julia-lang-check-element-type-of-arbitrarily-nested-array
+    T = eltype(Csca)
+    Isca = zeros(T, N_sca, N_inc); # temp. storage of FF intensities for all scattering directions
 
     for ii = 1:N_sca # loop over scattering angles
 
         # # unit vector in the scattering direction
-        Rm = rotation_euler_active(angles[ii]...)
+        Rm = euler_active(angles[ii]...)
         n = Rm[:,3] # rotation of Oz is the third column of Rm
 
         # # FF propagator [akin to]
@@ -77,19 +88,23 @@ function scattering!(Csca, positions, angles, weights, kn, P)
 
         # temporary storage of net far-field [sum_j Esca[dipole j]]
         # for a given scattering direction
-        # Esca = zeros(3, N_inc);
+        Esca = zeros(Complex{T},3,N_inc)
         for jj = 1:N_dip
 
-            rj = positions[:,jj]
+            rj = positions[jj]
             nrj = dot(n,rj)
             indjj = (jj-1)*3+1:jj*3 # find current dipole
-            phase = exp(-1i*kn*nrj)
+            phase = exp(-1im*kn*nrj)
+            # println(size(phase * G))   # 3x3
+            # println(size(P[indjj, :])) # 3x72
+            # println(size(Esca))        # 3x1
+
             Esca = Esca +  phase * G * P[indjj, :]
 
         end
 
         # Esca is now the net FF in direction ii
-        Isca[ii,:] = real(sum(Esca.*conj(Esca))) # |Esca|^2
+        Isca[ii,:] = real(sum(Esca.*conj(Esca),dims=1)) # |Esca|^2
 
     end
 

@@ -29,6 +29,7 @@ export cluster_single
 export cluster_dimer
 export extinction!
 export absorption!
+export scattering!
 export Material
 export epsilon_Ag
 export epsilon_Au

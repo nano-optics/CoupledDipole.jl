@@ -1,6 +1,6 @@
 # include("../src/CoupledDipole.jl")
 push!(LOAD_PATH, expanduser( "~/Documents/nano-optics/CoupledDipole.jl/"))
-using Revise 
+using Revise
 using CoupledDipole
 
 using LinearAlgebra
@@ -55,6 +55,16 @@ E = similar(Ein)
 P = similar(Ein)
 polarisation!(P, E, AlphaBlocks)
 
+Cabs = Array{Float64}(undef, (2Ni))
+
+absorption!(Cabs, kn, P, E)
+extinction!(Cabs, kn, P, Ein)
+
+cl = cluster_dimer(0.5, 1.0, 1.0, 1.0)
+
+q = cubature_sphere(20)
+scattering!(Cabs, cl.positions, q.nodes, q.weights, kn, P)
+
 
 wavelength = collect(450:2:850.0)
 epsilon = epsilon_Ag.(wavelength)
@@ -67,7 +77,6 @@ medium = Dict([("alpha", alpha_bare), ("medium", x -> 1.33)])
 
 mat = Material(wavelength, medium)
 cl = cluster_dimer(0.5, 1.0, 1.0, 1.0)
-
 
 # particle
 wavelength = collect(450:2:850.0)
