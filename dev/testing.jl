@@ -115,7 +115,8 @@ db = stack(b, Not(:wavelength))
 
 @vlplot(
 width= 400,
-height =  300) +
+height =  300,
+ tooltip={field="value", type="quantitative"}) +
 @vlplot(data=da, #csca
     mark = {:line, strokeDash=(5,5)},
     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}

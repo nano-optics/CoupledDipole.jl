@@ -229,7 +229,7 @@ function spectrum_oa(
 
         # cross-sections for cubature angles
         extinction!(tmpcext, kn, P, Ein)
-        absorption!(tmpcext, kn, P, E)
+        absorption!(tmpcabs, kn, P, E)
         scattering!(tmpcsca, cl.positions, quad_sca.nodes, quad_sca.weights, kn, P)
 
 
