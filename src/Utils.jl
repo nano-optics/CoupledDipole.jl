@@ -40,7 +40,7 @@ function euler_active(φ, θ, ψ = 0)
 
 end
 
-euler_active(v::SVector) = euler_passive(v...)
+euler_active(v::SVector) = euler_active(v...)
 
 """
     euler_passive(φ::Real, θ::Real, ψ::Real)

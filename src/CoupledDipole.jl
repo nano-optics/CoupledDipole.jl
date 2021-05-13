@@ -191,10 +191,12 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
         Rm = IncidenceRotations[jj]
         # Rot * [0;0;1] == 3rd column
         k_hat = kn * Rm[:, 3]
+        E1_r = Rm * Evec1
+        E2_r = Rm * Evec2
         for kk = 1:N_dip
-            kR = dot(k_hat, R[kk])
-            Ein[kk*3-2:kk*3, jj] = (Rm * (Evec1 * exp(im * kR)))
-            Ein[kk*3-2:kk*3, jj+N_inc] = (Rm * (Evec2 * exp(im * kR)))
+            kR = dot(k_hat, R[kk]) # everything real
+            Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
+            Ein[kk*3-2:kk*3, jj+N_inc] =  E2_r * exp(im * kR)
         end
     end
     return Ein

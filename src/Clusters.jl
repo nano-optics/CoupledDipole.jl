@@ -45,7 +45,7 @@ Particle cluster consisting of 2 identical particles separated along y
 """
 function cluster_dimer(d, a, b, c, dihedral = 0.0, material = "Au", type="particle")
     sizes = [SVector{3}(a, b, c) for ii in 1:2] # identical particles
-    positions = [SVector{3}(0.0, y, 0.0) for y in (d/2, -d/2)]
+    positions = [SVector{3}(0.0, y, 0.0) for y in (-d/2, d/2)]
     angles = [SVector{3}(0.0, dihedral, 0.0),
               SVector{3}(0.0, 0.0, 0.0)]
     Cluster(positions, angles, sizes, material, type)

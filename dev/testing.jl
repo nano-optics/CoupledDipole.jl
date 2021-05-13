@@ -126,21 +126,21 @@ height =  300) +
 )
 
 
-@vlplot(
-width= 400,
-height =  300) +
-@vlplot(data=da, #sca
-    mark = {:line, strokeDash=(1,5)},
-    encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
-) +
-@vlplot(data=db, # abs
-    mark = :line,
-    encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
-) +
-@vlplot(data=dc, # ext
-    mark = {:line, strokeDash=(5,1)},
-    encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
-)
+# @vlplot(
+# width= 400,
+# height =  300) +
+# @vlplot(data=da, #sca
+#     mark = {:line, strokeDash=(1,5)},
+#     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
+# ) +
+# @vlplot(data=db, # abs
+#     mark = :line,
+#     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
+# ) +
+# @vlplot(data=dc, # ext
+#     mark = {:line, strokeDash=(5,1)},
+#     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
+# )
 
 
 
