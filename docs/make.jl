@@ -19,5 +19,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/baptiste/CoupledDipole.jl",
+    repo="github.com/baptiste/CoupledDipole.jl.git",
 )
