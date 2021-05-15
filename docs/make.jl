@@ -6,11 +6,11 @@ DocMeta.setdocmeta!(CoupledDipole, :DocTestSetup, :(using CoupledDipole); recurs
 makedocs(;
     modules=[CoupledDipole],
     authors="baptiste",
-    repo="https://github.com/baptiste/CoupledDipole.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/nano-optics/CoupledDipole.jl/blob/{commit}{path}#{line}",
     sitename="CoupledDipole.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://baptiste.github.io/CoupledDipole.jl",
+        canonical="https://nano-optics.github.io/CoupledDipole.jl",
         assets=String[],
     ),
     pages=[
@@ -19,6 +19,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/baptiste/CoupledDipole.jl.git",
-     target = "build",
+    repo="github.com/nano-optics/CoupledDipole.jl.git",
 )
