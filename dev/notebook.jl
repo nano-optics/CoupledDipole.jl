@@ -46,7 +46,7 @@ We consider 2 spheroids separated by a distance d, and oriented with a dihedral 
 
 # ╔═╡ 780b6df4-541d-4add-8ff9-5b27ee705251
 begin
-	wavelength = collect(450:5:850)
+	wavelength = collect(450:2:850)
     medium = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
     mat = Material(wavelength, medium)
 end

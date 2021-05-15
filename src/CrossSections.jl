@@ -12,9 +12,9 @@ end
 
 Extinction cross-section for each incident angle
 
-- kn: wavenumber in incident medium
-- P:   3N_dip x N_inc matrix, polarisations for all incidences
-- Ein: 3N_dip x N_inc matrix, incident field for all incidences
+- `kn`: wavenumber in incident medium
+- `P`:   3N_dip x N_inc matrix, polarisations for all incidences
+- `Ein`: 3N_dip x N_inc matrix, incident field for all incidences
 
 """
 function extinction!(Cext, kn, P, Ein)
@@ -34,9 +34,9 @@ end
 
 Absorption cross-section for each incident angle
 
-- kn: wavenumber in incident medium
-- P: 3N_dip x N_inc matrix, polarisations for all incidences
-- E: 3N_dip x N_inc matrix, total field for all incidences
+- `kn`: wavenumber in incident medium
+- `P`: 3N_dip x N_inc matrix, polarisations for all incidences
+- `E`: 3N_dip x N_inc matrix, total field for all incidences
 
 """
 function absorption!(Cabs, kn, P, E)
@@ -58,14 +58,14 @@ end
 Scattering cross-section for each incident angle, obtained by numerical cubature
 over the full solid angle of scattering directions
 
-- positions: vector of cluster particle positions
-- angles: N_inc-vector of cubature Euler angles
-- weights: N_inc-vector of cubature weights
-- kn: wavenumber in incident medium
-- P: 3N_dip x N_inc matrix, polarisations for all incidences
+- `positions`: vector of cluster particle positions
+- `ScatteringRotations`: `N_inc`-vector of 3x3 rotation Smatrices
+- `weights`: N_inc-vector of cubature weights
+- `kn`: wavenumber in incident medium
+- `P`: 3N_dip x N_inc matrix, polarisations for all incidences
 
 """
-function scattering!(Csca, positions, angles, weights, kn, P)
+function scattering!(Csca, positions, ScatteringRotations, weights, kn, P)
 
     N_dip = length(positions)
     N_inc = size(P, 2)
@@ -79,7 +79,7 @@ function scattering!(Csca, positions, angles, weights, kn, P)
     for ii = 1:N_sca # loop over scattering angles
 
         # # unit vector in the scattering direction
-        Rm = euler_active(angles[ii]...)
+        Rm = ScatteringRotations[ii]
         n = Rm[:,3] # rotation of Oz is the third column of Rm
 
         # far-field "propagator" [kind of]

@@ -2,15 +2,15 @@
 ## high-level wrappers
 
 """
-     spectrum_dispersion(cl::Cluster, material::Material,
+     spectrum_dispersion(cl::Cluster, mat::Material,
                          Incidence, N_sca::Int=36)
 
 Simulating far-field cross-sections for multiple wavelengths and directions of incidence
 
-- cl: cluster of particles
-- material: dielectric functions
-- Incidence: N_inc vector of 3-Svectors of incidence Euler angles
-- N_sca: number of scattering angles for spherical cubature estimate of σ_sca
+- `cl`: cluster of particles
+- `mat`: dielectric functions
+- `Incidence`: N_inc vector of 3-Svectors of incidence Euler angles
+- `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
 
 """
 function spectrum_dispersion(
@@ -51,6 +51,8 @@ function spectrum_dispersion(
     # store all rotation matrices
     ParticleRotations = map(euler_passive, cl.angles)
     IncidenceRotations = map(euler_active, Incidence)
+    ScatteringRotations = map(euler_active, quad_sca.nodes)
+    # NOTE: we only need the third column to rotate kz, should specialise
 
     ## loop over wavelengths
 
@@ -107,7 +109,7 @@ function spectrum_dispersion(
         # cross-sections for multiple angles
         extinction!(tmpcext, kn, P, Ein)
         absorption!(tmpcabs, kn, P, E)
-        scattering!(tmpcsca, cl.positions, quad_sca.nodes, quad_sca.weights, kn, P)
+        scattering!(tmpcsca, cl.positions, ScatteringRotations, quad_sca.weights, kn, P)
 
         cext[ii, :] = tmpcext
         cabs[ii, :] = tmpcabs
@@ -125,11 +127,11 @@ end
 
 Orientation-averaged far-field cross-sections for multiple wavelengths
 
-- cl: cluster of particles
-- mat: dielectric functions
-- Cubature: spherical cubature method
-- N_inc: number of incident angles for spherical cubature
-- N_sca: number of scattering angles for spherical cubature estimate of σ_sca
+- `cl`: cluster of particles
+- `mat`: dielectric functions
+- `Cubature`: spherical cubature method
+- `N_inc`: number of incident angles for spherical cubature
+- `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
 
 """
 function spectrum_oa(
@@ -174,6 +176,7 @@ function spectrum_oa(
     # store all rotation matrices
     ParticleRotations = map(euler_passive, cl.angles)
     IncidenceRotations = map(euler_active, quad_inc.nodes)
+    ScatteringRotations = map(euler_active, quad_sca.nodes)
 
     # average both polarisations, so divide by two
     weights1 = 0.5 * vcat(quad_inc.weights, quad_inc.weights) #  standard cross sections
@@ -229,7 +232,7 @@ function spectrum_oa(
         # cross-sections for cubature angles
         extinction!(tmpcext, kn, P, Ein)
         absorption!(tmpcabs, kn, P, E)
-        scattering!(tmpcsca, cl.positions, quad_sca.nodes, quad_sca.weights, kn, P)
+        scattering!(tmpcsca, cl.positions, ScatteringRotations, quad_sca.weights, kn, P)
 
 
         #  perform cubature for angular averaging

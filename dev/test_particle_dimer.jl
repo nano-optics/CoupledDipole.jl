@@ -21,6 +21,13 @@ cl2 = cluster_single(20, 20, 40)
 ## incidence: along z, along x, along y
 Incidence = [SVector(0,0,0),SVector(0,π/2,0),SVector(π/2,π/2,0)]
 
+@time spectrum_dispersion(cl1, mat, Incidence)
+@time spectrum_oa(cl1, mat, "gl", 3)
+
+using Profile
+@profile spectrum_dispersion(cl1, mat, Incidence)
+# Juno.@profiler spectrum_dispersion(cl1, mat, Incidence)
+
 disp1 = spectrum_dispersion(cl1, mat, Incidence)
 disp2 = spectrum_dispersion(cl2, mat, Incidence)
 

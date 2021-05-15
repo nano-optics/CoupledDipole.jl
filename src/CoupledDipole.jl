@@ -58,19 +58,19 @@ export spectrum_oa
 
 Interaction matrix
 
-- A: 3N_dip x 3N_dip interaction matrix
-- kn: wavenumber in incident medium
-- R: N_dip-vector of 3-Svectors of particle positions
-- AlphaBlocks: N_dip-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
-
-# Note: might want/need to try BlockArray.jl
-# Construct a BlockArray from blocks
-# mortar((A,B),(C,D))
+- `A`: `3N_dip x 3N_dip` interaction matrix
+- `kn`: wavenumber in incident medium
+- `R`: `N_dip`-vector of 3-Svectors of particle positions
+- `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
 
 """
 function propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
 
     N_dip = length(R)
+
+    # Note: might want/need to try BlockArray.jl
+    # Construct a BlockArray from blocks
+    # mortar((A,B),(C,D))
 
     # nested for loop over N_dip dipoles
     for jj = 1:N_dip
@@ -110,11 +110,11 @@ end
 
 Incident field at particle positions
 
-- Ein: 3N_dip x N_inc matrix, right-hand side of coupled-dipole system
-- Ejones: tuple of 2 2-Svectors defining 2 orthogonal Jones polarisations
-- kn: wavenumber in incident medium
-- R: N_dip-vector of 3-Svectors of particle positions
-- IncidenceRotations: N_inc-vector of rotation 3-Smatrices
+- `Ein`: `3N_dip x N_inc` matrix, right-hand side of coupled-dipole system
+- `Ejones`: tuple of 2 2-Svectors defining 2 orthogonal Jones polarisations
+- `kn`: wavenumber in incident medium
+- `R`: `N_dip`-vector of 3-Svectors of particle positions
+- `IncidenceRotations`: `N_inc`-vector of rotation 3-Smatrices
 
 """
 function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
@@ -147,9 +147,9 @@ end
 
 Self-consistent dipole moments from the electric field, P = αE
 
-- P: 3N_dip x N_inc matrix, polarisations for all incidences
-- E: 3N_dip x N_inc matrix, total field for all incidences
-- AlphaBlocks: N_dip-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
+- `P`: `3N_dip x N_inc` matrix, polarisations for all incidences
+- `E`: `3N_dip x N_inc` matrix, total field for all incidences
+- `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
 
 """
 function polarisation!(P, E, AlphaBlocks)

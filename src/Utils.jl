@@ -6,9 +6,9 @@
 
 3D rotation matrix
 
-- φ: Euler angle (longitude, in [0,2π])
-- θ: Euler angle (colatitude, in [0,2π])
-- ψ: Euler angle (rotation around z", in [0,2π])
+- `φ`: Euler angle (longitude, in [0,2π])
+- `θ`: Euler angle (colatitude, in [0,2π])
+- `ψ`: Euler angle (rotation around z", in [0,2π])
 
 
 @example
@@ -48,9 +48,9 @@ euler_active(v::SVector) = euler_active(v...)
 
 3D rotation matrix
 
-- φ: Euler angle (longitude, in [0,2π])
-- θ: Euler angle (colatitude, in [0,2π])
-- ψ: Euler angle (rotation around z", in [0,2π])
+- `φ`: Euler angle (longitude, in [0,2π])
+- `θ`: Euler angle (colatitude, in [0,2π])
+- `ψ`: Euler angle (rotation around z", in [0,2π])
 
 
 @example
@@ -91,12 +91,12 @@ euler_passive(v::SVector) = euler_passive(v...)
     quadrature_lgwt(N::Int, a::Real, b::Real)
 
 N-point Gauss-Legendre quadrature over [a,b] interval
-- N: number of nodes
-- a,b: bounds
+- `N`: number of nodes
+- `a,b`: bounds
 
-$$
+```math
 \int_a^b f(x)\,dx=\frac{b-a}{2}\int_{-1}^{1}f\left(\frac{b-a}{2} x + \frac{a+b}{2}\right)\,dx.
-$$
+```
 
 @example
    quadrature_lgwt(6,0,3)
@@ -111,8 +111,8 @@ end
     cubature_sphere(N::Int, method::String)
 
 N-point cubature on the sphere
-- N: number of nodes
-- method: cubature method (only 'gl' currently implemented)
+- `N`: number of nodes
+- `method`: cubature method (only 'gl' currently implemented)
 
 Returns a Cubature object containing 2 arrays (N'x3 nodes and N'x1 weights), N'≈N
 Note: using array instead of tuple for weights because

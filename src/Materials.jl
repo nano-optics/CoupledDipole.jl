@@ -11,7 +11,7 @@ end
     epsilon_Ag(λ::Real)
 
 Drude model for the dielectric function of silver in the visible region
-- λ: wavelength in nm
+- `λ`: wavelength in nm
 
 @example
    epsilon_Ag(632.8)
@@ -24,7 +24,7 @@ end
     epsilon_Au(λ::Real)
 
 Extended Drude model for the dielectric function of gold in the visible region
-- λ: wavelength in nm
+- `λ`: wavelength in nm
 
 @example
    epsilon_Au(632.8)
@@ -58,10 +58,10 @@ end
     lorentzian(λ::T, α_k::T, λ_k::T, µ_k::T) where T <: Real
 
 Complex Lorentz function, to describe polarisabilities
-- λ: wavelength in nm
-- α_k: oscillator strength in S.I. units
-- λ_k: oscillator wavelength in nm
-- µ_k: damping in S.I. units
+- `λ`: wavelength in nm
+- `α_k`: oscillator strength in S.I. units
+- `λ_k`: oscillator wavelength in nm
+- `µ_k`: damping in S.I. units
 
 @example
    lorentzian(632.8)
@@ -75,10 +75,10 @@ end
     alpha_bare(λ::T, α_∞::T, α_k::Array{T}, λ_k::Array{T}, µ_k::Array{T}) where T <: Real
 
 Complex scalar polarisability, as sum of lorentz oscillators
-- λ: wavelength in nm
-- α_k: oscillator strength(s) in S.I. units
-- λ_k: oscillator wavelength(s) in nm
-- µ_k: damping(s) in S.I. units
+- `λ`: wavelength in nm
+- `α_k`: oscillator strength(s) in S.I. units
+- `λ_k`: oscillator wavelength(s) in nm
+- `µ_k`: damping(s) in S.I. units
 
 Default values mimic the main resonance of Rhodamine 700
 
@@ -103,8 +103,8 @@ end
     alpha_embedded(α::Complex{T}, medium::T) where T <: Real
 
 Effective point polarisability in medium, rescaled by local field correction
-- α: bare polarisabilty
-- medium: refractive index of embedding medium
+- `α`: bare polarisabilty
+- `medium`: refractive index of embedding medium
 
 Default values mimic the main resonance of Rhodamine 700
 
@@ -122,8 +122,8 @@ end
     alpha_rescale_molecule(alpha, sizes::Vector{SVector{3}})
 
 Principal polarisability components of a particle, rescaled along each principal axis
-- α: scalar polarisabilty
-- sizes: array of 3-vectors to scale along each principal axis
+- `α`: scalar polarisabilty
+- `sizes`: array of 3-vectors to scale along each principal axis
 
 @example
    sizes = [SVector{3}(1.0, 2.0, 3.0) for i in 1:4]
@@ -138,9 +138,9 @@ end
     depolarisation_spheroid(a, b, c)
 
 Depolarisation factor of a spheroid
-- a: semi-axis along x and y
-- b: semi-axis along x and y (unused)
-- c: semi-axis along z
+- `a`: semi-axis along x and y
+- `b`: semi-axis along x and y (unused)
+- `c`: semi-axis along z
 
 @example
    depolarisation_spheroid(1, 1, 1.5)
@@ -170,10 +170,10 @@ end
     alpha_kuwata(λ, ε, ε_m, Size)
 
 Principal polarisability components of a spheroidal particle
-- λ: wavelength
-- ε: complex dielectric function
-- ε_m: dielectric function of surrounding medium
-- Size: SVector with 3 semi-axes of the spheroid
+- `λ`: wavelength
+- `ε`: complex dielectric function
+- `ε_m`: dielectric function of surrounding medium
+- `Size`: SVector with 3 semi-axes of the spheroid
 
 @example
    alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
@@ -199,10 +199,10 @@ end
     alpha_spheroids(λ, ε, ε_m, Sizes)
 
 Principal polarisability components of N spheroidal particles
-- λ: wavelength
-- ε: complex dielectric function
-- ε_m: dielectric function of surrounding medium
-- Sizes: Vector of 3-SVectors of particle sizes
+- `λ`: wavelength
+- `ε`: complex dielectric function
+- `ε_m`: dielectric function of surrounding medium
+- `Sizes`: Vector of 3-SVectors of particle sizes
 
 @example
    alpha_spheroids(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])

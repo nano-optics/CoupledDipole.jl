@@ -1,7 +1,7 @@
 
 ## cluster definitions
 
-# note: for now all particles have the same material
+# NOTE: for now all particles have the same material
 # easy to extend if needed, by making it a vector
 # and matching a dictionary in HighLevel functions
 struct Cluster{T1,T2,T3}
@@ -18,10 +18,10 @@ end
     cluster_single(a::T, b::T, c::T, α::T = 0.0, β::T = 0.0, γ::T = 0.0) where T <: Real
 
 Particle cluster consisting of a single particle at the origin
-- a,b,c: semi-axis along x,y,z
-- α,β,γ: Euler angles
-- material: String referencing the material of the particle
-- type: String, "point" dipole or "particle"
+- `a,b,c`: semi-axis along x,y,z
+- `α,β,γ`: Euler angles
+- `material`: String referencing the material of the particle
+- `type`: String, "point" dipole or "particle"
 
 @example
    cluster_single(1.0,2.0,3.0)
@@ -38,10 +38,10 @@ end
     cluster_dimer(d::T, a::T, b::T, c::T, dihedral::T = 0.0, α_1::T = 0.0, α_2::T = 0.0) where T <: Real
 
 Particle cluster consisting of 2 identical particles separated along y
-- a,b,c: semi-axes along x,y,z
-- dihedral: angle between both particles seen along the y-axis
-- material: String referencing the material
-- type: String, "point" dipole or "particle"
+- `a,b,c`: semi-axes along x,y,z
+- `dihedral`: angle between both particles seen along the y-axis
+- `material`: String referencing the material
+- `type`: String, "point" dipole or "particle"
 
 @example
    cluster_dimer(10,1,2,3)
