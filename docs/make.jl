@@ -20,4 +20,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/nano-optics/CoupledDipole.jl.git",
+    devbranch = "main"
 )
