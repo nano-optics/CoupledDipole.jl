@@ -11,8 +11,7 @@ using VegaLite
 
 ## materials
 wavelength = collect(450:2:850.0)
-medium = Dict([("Au", CoupledDipole.epsilon_Au), ("medium", x -> 1.33)])
-
+medium = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelength, medium)
 
 ## dimer geometry

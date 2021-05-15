@@ -3,12 +3,12 @@
 
 struct Material{T}
     wavelength::Vector{T}
-    medium::Dict{String,Function}
+    medium::Dict{String, Function}
 end
 
 
 """
-    epsilon_Ag(λ::T) where T <: Real
+    epsilon_Ag(λ::Real)
 
 Drude model for the dielectric function of silver in the visible region
 - λ: wavelength in nm
@@ -21,9 +21,9 @@ function epsilon_Ag(λ)
 end
 
 """
-    epsilon_Au(λ::T) where T <: Real
+    epsilon_Au(λ::Real)
 
-Drude model for the dielectric function of gold in the visible region
+Extended Drude model for the dielectric function of gold in the visible region
 - λ: wavelength in nm
 
 @example
@@ -57,7 +57,7 @@ end
 """
     lorentzian(λ::T, α_k::T, λ_k::T, µ_k::T) where T <: Real
 
-Complex Lorentz function, to describe complex polarisabilities
+Complex Lorentz function, to describe polarisabilities
 - λ: wavelength in nm
 - α_k: oscillator strength in S.I. units
 - λ_k: oscillator wavelength in nm
@@ -102,7 +102,7 @@ end
 """
     alpha_embedded(α::Complex{T}, medium::T) where T <: Real
 
-Complex scalar polarisability, as sum of lorentz oscillators
+Effective point polarisability in medium, rescaled by local field correction
 - α: bare polarisabilty
 - medium: refractive index of embedding medium
 
@@ -130,7 +130,7 @@ Principal polarisability components of a particle, rescaled along each principal
    alpha_rescale_molecule(alpha_bare(632.8), sizes)
 """
 function alpha_rescale_molecule(alpha, sizes)
-    alpha .* (sizes ./ sum.(sizes))
+    @. alpha * (sizes / sum(sizes))
 end
 
 
@@ -138,9 +138,9 @@ end
     depolarisation_spheroid(a, b, c)
 
 Depolarisation factor of a spheroid
-- a semi-axis along x and y
-- b semi-axis along x and y (unused)
-- c semi-axis along z
+- a: semi-axis along x and y
+- b: semi-axis along x and y (unused)
+- c: semi-axis along z
 
 @example
    depolarisation_spheroid(1, 1, 1.5)
@@ -167,28 +167,27 @@ end
 
 
 """
-    alpha_kuwata(wavelength, epsilon, V, axis, L, medium)
+    alpha_kuwata(λ, ε, ε_m, Size)
 
 Principal polarisability components of a spheroidal particle
-- λ wavelength
-- ε complex dielectric function
-- Size SVector with 3 semi-axes of the spheroid
-- χ depolarisation factor
-- ε_m dielectric function of surrounding medium
+- λ: wavelength
+- ε: complex dielectric function
+- ε_m: dielectric function of surrounding medium
+- Size: SVector with 3 semi-axes of the spheroid
 
 @example
    alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
 """
-function alpha_kuwata(λ, ε, Size, ε_m)
+function alpha_kuwata(λ, ε, ε_m, Size)
 
     V = 4π / 3  * prod(Size)
-    x_0 = @. 2π * Size / λ
+    x = @. 2π/λ * Size
     χ = depolarisation_spheroid(Size...)
 
     A = @. -0.4865 * χ - 1.046 * χ^2 + 0.8481 * χ^3
     B = @. 0.01909 * χ + 0.19999 * χ^2 + 0.6077 * χ^3
 
-    denom = @. (χ + ε_m / (ε - ε_m)) + A * ε_m * x_0^2 + B * ε_m^2 * x_0^4 -
+    denom = @. (χ + ε_m / (ε - ε_m)) + A * ε_m * x^2 + B * ε_m^2 * x^4 -
        1im / 3 * 4 * π^2 * ε_m^(3 / 2) * V / λ^3
 
     return ((V / (4π)) ./ denom)
@@ -200,14 +199,14 @@ end
     alpha_spheroids(λ, ε, ε_m, Sizes)
 
 Principal polarisability components of N spheroidal particles
-- λ wavelength
-- ε complex dielectric function
-- ε_m dielectric function of surrounding medium
-- Sizes: Vector of SVectors of particle sizes
+- λ: wavelength
+- ε: complex dielectric function
+- ε_m: dielectric function of surrounding medium
+- Sizes: Vector of 3-SVectors of particle sizes
 
 @example
    alpha_spheroids(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])
 """
 function alpha_spheroids(λ, ε, ε_m, Sizes)
-    return (map(s -> alpha_kuwata(λ, ε, s, ε_m), Sizes))
+    return (map(s -> alpha_kuwata(λ, ε, ε_m, s), Sizes))
 end

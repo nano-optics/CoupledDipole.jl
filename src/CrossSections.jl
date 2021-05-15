@@ -45,20 +45,22 @@ function absorption!(Cabs, kn, P, E)
 
     for jj in 1:N_inc
         Cabs[jj] = 4π*kn*(imag(dot(E[:,jj], P[:,jj])) -
-                         kn^3 * 2/3 * real(dot(P[:,jj],P[:,jj])))
+                         kn^3 * 2/3 * real(dot(P[:,jj], P[:,jj])))
     end
 
     return  Cabs
 end
 
 
-# note: need also Csca as numerical cubature, for consistency check with Ext-Abs
 """
-    scattering(kn::Real, P::Array{Complex}, E::Array{Complex})
+    scattering(positions, angles, weights, kn::Real, P::Array{Complex})
 
 Scattering cross-section for each incident angle, obtained by numerical cubature
 over the full solid angle of scattering directions
 
+- positions: vector of cluster particle positions
+- angles: N_inc-vector of cubature Euler angles
+- weights: N_inc-vector of cubature weights
 - kn: wavenumber in incident medium
 - P: 3N_dip x N_inc matrix, polarisations for all incidences
 
@@ -68,11 +70,9 @@ function scattering!(Csca, positions, angles, weights, kn, P)
     N_dip = length(positions)
     N_inc = size(P, 2)
     N_sca = length(angles)
-    # G = zeros(3, 3)
-    # I3 = I
-    #
-    # T = typeof(Csca[1])
-    # note: https://stackoverflow.com/questions/41843949/julia-lang-check-element-type-of-arbitrarily-nested-array
+
+    # note: maybe this will be needed, though eltype seems to do the trick
+    # https://stackoverflow.com/questions/41843949/julia-lang-check-element-type-of-arbitrarily-nested-array
     T = eltype(Csca)
     Isca = zeros(T, N_sca, N_inc); # temp. storage of FF intensities for all scattering directions
 
@@ -82,7 +82,7 @@ function scattering!(Csca, positions, angles, weights, kn, P)
         Rm = euler_active(angles[ii]...)
         n = Rm[:,3] # rotation of Oz is the third column of Rm
 
-        # # FF propagator [akin to]
+        # far-field "propagator" [kind of]
         nn = n*transpose(n)
         G = (I - nn)
 
@@ -105,7 +105,7 @@ function scattering!(Csca, positions, angles, weights, kn, P)
 
     end
 
-    # need to integrate Isca over all scattering angles
+    # now integrate Isca over all scattering angles
     # (for each incident angle)
 
     Csca[:] = 4π * kn^4 * transpose(weights) * Isca

@@ -1,6 +1,9 @@
 
 ## cluster definitions
 
+# note: for now all particles have the same material
+# easy to extend if needed, by making it a vector
+# and matching a dictionary in HighLevel functions
 struct Cluster{T1,T2,T3}
     positions::Vector{SVector{3,T1}}
     angles::Vector{SVector{3,T2}}

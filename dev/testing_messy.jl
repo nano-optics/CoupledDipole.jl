@@ -14,6 +14,8 @@ using VegaLite
 # a =  cubature_sphere(12, "gl")
 
 
+using Profile
+
 N_dip = 5
 N_inc = 36
 F = Matrix{Complex{Float64}}(I, 3N_dip, 3N_dip)
@@ -103,6 +105,8 @@ typeof(mat)
 
 testdisp = spectrum_dispersion(cl, mat, Incidence)
 
+
+
 a = DataFrame(testdisp.scattering, :auto)
 b = DataFrame(testdisp.extinction - testdisp.absorption, :auto)
 # c = DataFrame(testdisp.extinction, :auto)
@@ -166,6 +170,9 @@ quad_inc = cubature_sphere(3, "gl")
 
 cl = cluster_dimer(80, 20, 20, 40, pi/4)
 testoa = spectrum_oa(cl, mat, "gl", 100)
+
+@profile spectrum_oa(cl, mat, "gl", 100)
+
 
 clref = cluster_single(20,20,40,0,0,0)
 # clref = cluster_single(20,20,40,0,π/2,0)

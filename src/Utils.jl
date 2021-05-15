@@ -40,6 +40,7 @@ function euler_active(φ, θ, ψ = 0)
 
 end
 
+# splatted version
 euler_active(v::SVector) = euler_active(v...)
 
 """
@@ -81,6 +82,7 @@ function euler_passive(φ, θ, ψ = 0)
 
 end
 
+# splatted version
 euler_passive(v::SVector) = euler_passive(v...)
 
 ## orientation-averaging
@@ -108,12 +110,13 @@ end
 """
     cubature_sphere(N::Int, method::String)
 
-N-point Gauss-Legendre quadrature over [a,b] interval
+N-point cubature on the sphere
 - N: number of nodes
 - method: cubature method (only 'gl' currently implemented)
 
-Returns a Cubature object containing 2 arrays (Nx3 nodes and Nx1 weights)
-Note: using array instead of tuple for weights because we'll probably use them in a scalar product in orientation-averaging
+Returns a Cubature object containing 2 arrays (N'x3 nodes and N'x1 weights), N'≈N
+Note: using array instead of tuple for weights because
+we'll use them in a scalar product in orientation-averaging
 For nodes there is less of a reason, but it can be convenient to visualise the nodes.
 
 The cubature is normalised by 4π such that a unit integrand approximates 1.
@@ -125,14 +128,14 @@ function cubature_sphere(N, method = "gl")
     #might have slightly more than N total points
     rndN = Integer(ceil(sqrt(N / 2.0)))
 
-    alpha = quadrature_lgwt(2 * rndN, 0, 2π)
-    beta = quadrature_lgwt(rndN, 0, 1)
+    φ = quadrature_lgwt(2rndN, 0, 2π) # longitude
+    cθ = quadrature_lgwt(rndN, 0, 1)   # cos(colatitude)
 
     nodes = [
         SVector{3}(a, acos(2b - 1), 0.0) for
-        b in beta.nodes, a in alpha.nodes
+        b in cθ.nodes, a in φ.nodes
     ]
-    weights = hcat([a * b for b in beta.weights, a in alpha.weights]...)
+    weights = hcat([a * b for b in cθ.weights, a in φ.weights]...)
 
     (nodes = nodes[:], weights = 1 / (2π) * weights[:])
 end

@@ -90,13 +90,13 @@ function spectrum_dispersion(
         # but instead we've prestored them, since wavelength-independent
         AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
-        # Interaction matrix (A = I - G0 alpha_eff)
+        # Interaction matrix (F = I - G0 alpha_eff)
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 
-                # update the incident field
-                # Remark: similarly, pre-computed rotations
-                # incident_field!(Ein, Ejones, kn, cl.positions, Incidence)
-                # but instead we've prestored them, since wavelength-independent
+        # update the incident field
+        # Remark: similarly, pre-computed rotations
+        # incident_field!(Ein, Ejones, kn, cl.positions, Incidence)
+        # but instead we've prestored them, since wavelength-independent
         incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
         # solve
@@ -114,7 +114,6 @@ function spectrum_dispersion(
         csca[ii, :] = tmpcsca
     end
 
-    # CrossSections(1 / N_dip * cext, 1 / N_dip * cabs, 1 / N_dip * (cext - cabs))
     CrossSections(1 / N_dip * cext, 1 / N_dip * cabs, 1 / N_dip * csca)
 
 end
@@ -137,7 +136,7 @@ function spectrum_oa(
     cl::Cluster,
     mat::Material,
     cubature = "gl",
-    N_inc = 300,
+    N_inc = 36,
     N_sca = 36,
 )
 
