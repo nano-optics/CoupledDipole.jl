@@ -85,6 +85,36 @@ end
 # splatted version
 euler_passive(v::SVector) = euler_passive(v...)
 
+
+
+
+"""
+    euler_unitvector(φ::Real, θ::Real)
+
+Unit vector along direction φ, θ
+
+- `φ`: Euler angle (longitude, in [0,2π])
+- `θ`: Euler angle (colatitude, in [0,2π])
+
+
+@example
+   euler_unitvector(π/2, 0)
+"""
+function euler_unitvector(φ, θ)
+
+    cosφ = cos(φ)
+    cosθ = cos(θ)
+    sinφ = sin(φ)
+    sinθ = sin(θ)
+    n = SVector(cosφ * sinθ, sinφ * sinθ, cosθ)
+
+    return n
+
+end
+
+euler_unitvector(v::SVector) = euler_unitvector(v[1],v[2]) # ψ irrelevant here
+
+
 ## orientation-averaging
 
 @doc raw"""

@@ -59,17 +59,17 @@ Scattering cross-section for each incident angle, obtained by numerical cubature
 over the full solid angle of scattering directions
 
 - `positions`: vector of cluster particle positions
-- `ScatteringRotations`: `N_inc`-vector of 3x3 rotation Smatrices
+- `ScatteringProjectorz`: `N_inc`-vector of 3x3 projector Smatrices
 - `weights`: N_inc-vector of cubature weights
 - `kn`: wavenumber in incident medium
 - `P`: 3N_dip x N_inc matrix, polarisations for all incidences
 
 """
-function scattering!(Csca, positions, ScatteringRotations, weights, kn, P)
+function scattering!(Csca, positions, ScatteringVectors, weights, kn, P)
 
     N_dip = length(positions)
     N_inc = size(P, 2)
-    N_sca = length(angles)
+    N_sca = length(ScatteringVectors)
 
     # note: maybe this will be needed, though eltype seems to do the trick
     # https://stackoverflow.com/questions/41843949/julia-lang-check-element-type-of-arbitrarily-nested-array
@@ -79,8 +79,7 @@ function scattering!(Csca, positions, ScatteringRotations, weights, kn, P)
     for ii = 1:N_sca # loop over scattering angles
 
         # # unit vector in the scattering direction
-        Rm = ScatteringRotations[ii]
-        n = Rm[:,3] # rotation of Oz is the third column of Rm
+        n = ScatteringVectors[ii] # rotation of Oz is the third column of Rm
 
         # far-field "propagator" [kind of]
         nn = n*transpose(n)

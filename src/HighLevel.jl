@@ -51,7 +51,7 @@ function spectrum_dispersion(
     # store all rotation matrices
     ParticleRotations = map(euler_passive, cl.angles)
     IncidenceRotations = map(euler_active, Incidence)
-    ScatteringRotations = map(euler_active, quad_sca.nodes)
+    ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
     # NOTE: we only need the third column to rotate kz, should specialise
 
     ## loop over wavelengths
@@ -109,7 +109,7 @@ function spectrum_dispersion(
         # cross-sections for multiple angles
         extinction!(tmpcext, kn, P, Ein)
         absorption!(tmpcabs, kn, P, E)
-        scattering!(tmpcsca, cl.positions, ScatteringRotations, quad_sca.weights, kn, P)
+        scattering!(tmpcsca, cl.positions, ScatteringVectors, quad_sca.weights, kn, P)
 
         cext[ii, :] = tmpcext
         cabs[ii, :] = tmpcabs
@@ -176,7 +176,7 @@ function spectrum_oa(
     # store all rotation matrices
     ParticleRotations = map(euler_passive, cl.angles)
     IncidenceRotations = map(euler_active, quad_inc.nodes)
-    ScatteringRotations = map(euler_active, quad_sca.nodes)
+    ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
 
     # average both polarisations, so divide by two
     weights1 = 0.5 * vcat(quad_inc.weights, quad_inc.weights) #  standard cross sections
@@ -232,7 +232,7 @@ function spectrum_oa(
         # cross-sections for cubature angles
         extinction!(tmpcext, kn, P, Ein)
         absorption!(tmpcabs, kn, P, E)
-        scattering!(tmpcsca, cl.positions, ScatteringRotations, quad_sca.weights, kn, P)
+        scattering!(tmpcsca, cl.positions, ScatteringVectors, quad_sca.weights, kn, P)
 
 
         #  perform cubature for angular averaging
