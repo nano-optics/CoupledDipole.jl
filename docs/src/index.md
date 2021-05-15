@@ -4,7 +4,7 @@ CurrentModule = CoupledDipole
 
 # CoupledDipole
 
-Documentation for [CoupledDipole](https://github.com/baptiste/CoupledDipole.jl).
+Documentation for [CoupledDipole](https://github.com/nano-optics/CoupledDipole.jl).
 
 ```@index
 ```
