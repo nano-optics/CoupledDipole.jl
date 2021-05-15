@@ -20,4 +20,5 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/baptiste/CoupledDipole.jl.git",
+     target = "build",
 )
