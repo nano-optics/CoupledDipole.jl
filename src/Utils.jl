@@ -13,6 +13,7 @@
 # Examples
 
 ```jldoctest
+julia> using StaticArrays
 julia>  euler_active(π/2,0,0)
 3×3 SMatrix{3, 3, Float64, 9} with indices SOneTo(3)×SOneTo(3):
   6.12323e-17  -1.0          0.0
@@ -62,6 +63,7 @@ euler_active(v::SVector) = euler_active(v...)
 # Examples
 
 ```jldoctest
+julia> using StaticArrays
 julia> euler_passive(π/2,0,0)
 3×3 SMatrix{3, 3, Float64, 9} with indices SOneTo(3)×SOneTo(3):
   6.12323e-17  1.0          -0.0
@@ -113,6 +115,7 @@ Unit vector along direction φ, θ
 # Examples
 
 ```jldoctest
+julia> using StaticArrays
 julia> euler_unitvector(π/2, 0)
 3-element SVector{3, Float64} with indices SOneTo(3):
  0.0
@@ -152,6 +155,7 @@ N-point Gauss-Legendre quadrature over [a,b] interval
 # Examples
 
 ```jldoctest
+julia> using StaticArrays
 julia> quadrature_lgwt(6,0,3)
 (nodes = [0.10129572869527204, 0.5081859203006033, 1.1420712208752046, 1.8579287791247954, 2.4918140796993966, 2.898704271304728], weights = [0.25698673856875537, 0.5411423595722078, 0.7018709018590369, 0.7018709018590369, 0.5411423595722078, 0.25698673856875537])
 ```
@@ -180,6 +184,7 @@ The cubature is normalised by 4π such that a unit integrand approximates 1.
 # Examples
 
 ```jldoctest
+julia> using StaticArrays
 julia> cubature_sphere(6)
 (nodes = SVector{3, Float64}[[0.43625314334650644, 2.1862760354652844, 0.0], [0.43625314334650644, 0.9553166181245093, 0.0], [2.0735107047038173, 2.1862760354652844, 0.0], [2.0735107047038173, 0.9553166181245093, 0.0], [4.2096746024757685, 2.1862760354652844, 0.0], [4.2096746024757685, 0.9553166181245093, 0.0], [5.846932163833079, 2.1862760354652844, 0.0], [5.846932163833079, 0.9553166181245093, 0.0]], weights = [0.08696371128436346, 0.08696371128436346, 0.16303628871563655, 0.16303628871563655, 0.16303628871563655, 0.16303628871563655, 0.08696371128436346, 0.08696371128436346])
 ```
