@@ -14,9 +14,23 @@ makedocs(;
         assets=String[],
     ),
     pages=[
-        "Home" => "index.md",
+        "Home" => "index.md",        
+        "gettingstarted.md",
+        "Introduction" => [
+            "background.md",
+            "theory.md"
+        ],
+        "Implementation" => [
+            "conventions.md",
+            "clusters.md",
+            "materials.md",
+            "utils.md",
+            "high_level.md",
+            "cross_sections.md"
+        ],
     ],
 )
+
 
 deploydocs(;
     repo="github.com/nano-optics/CoupledDipole.jl.git",
