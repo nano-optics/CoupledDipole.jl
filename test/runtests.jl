@@ -1,5 +1,6 @@
 using CoupledDipole
 using Test
+using StaticArrays
 
 @testset "CoupledDipole" begin
     q = cubature_sphere(8, "gl")
