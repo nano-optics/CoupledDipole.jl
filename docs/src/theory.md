@@ -5,7 +5,7 @@
 
 From a microscopic viewpoint, as taken in the discrete dipole approximation, a collection of small inclusions such as molecules dispersed in a solvent may be described as a set of point dipoles in a vaccuum, whereby not only the molecules of interest but also those comprising the medium itself are described as discrete dipoles. This approach is numerically prohibitive, due to the large number of dipoles required to model the environment, which is in fact infinite in most situations of interest. 
 
-With a more pragmatic approach, we are led to consider the response of dipoles within the framework of the macroscopic Maxwell equations, where the optical response of the solvent is encompassed in its refractive index ``n=\sqrt{\varepsilon}``. Waves propagating in this medium have a phase velocity ``c/n``. Light scattering by a collection of particles (or molecules) will thus be described as the interaction between dipole moments induced by the incident light and in mutual interaction via their own scattered field in the surrounding homogeneous medium, as illustrated in Fig.~\ref{fig:00schematic}.
+With a more pragmatic approach, we are led to consider the response of dipoles within the framework of the macroscopic Maxwell equations, where the optical response of the solvent is encompassed in its refractive index ``n=\sqrt{\varepsilon}``. Waves propagating in this medium have a phase velocity ``c/n``. Light scattering by a collection of particles (or molecules) will thus be described as the interaction between dipole moments induced by the incident light and in mutual interaction via their own scattered field in the surrounding homogeneous medium, as illustrated in Fig..
 
 
 We define the dipole moments ``\mathbf{P}`` to be proportional to the local (macroscopic) electric field,
@@ -14,7 +14,7 @@ We define the dipole moments ``\mathbf{P}`` to be proportional to the local (mac
 \mathbf{P} = \mathbb{\alpha} \mathbf{E}
 ```
 
-where ``\mathbb{\alpha}`` is a ``3\times 3`` polarisability tensor, which will be discussed in section~\ref{sec:XXX}. The standard CD equations take the form,
+where ``\mathbb{\alpha}`` is a ``3\times 3`` polarisability tensor, which will be discussed in section. The standard CD equations take the form,
 
 ```math
 \mathbf{P}^{i}= \mathbb{\alpha}_i \left( \mathbf{E_\text{inc}} + \sum_{j\neq i} \mathbb{G}_{ij} \mathbf{P}^j\right),
@@ -42,7 +42,7 @@ with,
 \mathbb{G} = \kappa^{-1} \frac{\mathrm{exp}(ikr)}{r}\left\{k_1^2\left[\mathbb{I} - \mathbf{\hat r}\otimes\mathbf{\hat r} \right] - \left(\frac{1}{r^2} - \frac{ik_1}{r}\right) \left[\mathbb{I} - 3\mathbf{\hat r}\otimes\mathbf{\hat r}\right] \right\}.
 ```
 
-Note the constant prefactor ``\kappa`` which will also appear in the definition of the polarisability, allowing us to diregard it throughout the code implementation, as discussed in section~\ref{sec:equivalence}.
+Note the constant prefactor ``\kappa`` which will also appear in the definition of the polarisability, allowing us to diregard it throughout the code implementation, as discussed in section.
 
 ## Coupled dipole equations 
 
@@ -174,7 +174,7 @@ We also discuss the polarisability of dye molecules, and its link to a microscop
 
 ### Effective scaling prefactor
 
-The prefactor ``\kappa`` appears in several equations and simplifies in the final expression for the cross-sections. We can therefore simplify the formalism throughout by defining reduced variables ``\bar\alpha, \bar \mathbf{P}, \bar\mathbb{G}``. The correspondence is summarised in Table~\ref{tab:equivalence}. Only the scaled quantities are used in the code, but for simplicity we refer to them with conventional variable names.
+The prefactor ``\kappa`` appears in several equations and simplifies in the final expression for the cross-sections. We can therefore simplify the formalism throughout by defining reduced variables ``\bar\alpha, \bar \mathbf{P}, \bar\mathbb{G}``. The correspondence is summarised in Table. Only the scaled quantities are used in the code, but for simplicity we refer to them with conventional variable names.
 
 Equivalence between theory and rescaled equations used in the code. The prefactor ``\kappa=4\pi\varepsilon_0\varepsilon`` can be simplified throughout by defining a suitably scaled polarisability.
 
@@ -190,19 +190,17 @@ Equivalence between theory and rescaled equations used in the code. The prefacto
 | ``\sigma_\text{sca}``      | ``\kappa^{-2}k_1^4 \iint_\Omega \left\|\sum_i \left(\mathbb{I} - \mathbf{\hat n}\otimes\mathbf{\hat n}\right) \mathbf{P}_i e^{-ik_1 \mathbf{r}_i\cdot\mathbf{\hat n}}\right\|^2 \text{d}\Omega``         | ``k_1^4 \iint_\Omega \left\|\sum_i \left(\mathbb{I} - \mathbf{\hat n}\otimes\mathbf{\hat n}\right) \bar\mathbf{P}_i e^{-ik_1 \mathbf{r}_i\cdot\mathbf{\hat n}}\right\|^2 \text{d}\Omega``            |
 
 
-
-
 ### Particle polarisability
 
-The static polarisability of a sphere of radius ``a`` in a medium is given by (ref. Jackson, Griffith)\footnote{note that the dielectric constant ``\varepsilon`` is sometimes factored in the dipole moment instead.},
+The static polarisability of a sphere of radius ``a`` in a medium is given by (ref. Jackson, Griffith) (note that the dielectric constant ``\varepsilon`` is sometimes factored in the dipole moment instead),
 
 ```math
-\mathbb{\alpha} = \kappa a^3 \frac{\varepsilon - \varepsilon'_p}{\varepsilon +2 \varepsilon'_p}\mathbb{I}, \qquad \text{(with ``\mathbf{P}=\mathbb{\alpha}\mathbf{E}``)}.
+\mathbb{\alpha} = \kappa a^3 \frac{\varepsilon - \varepsilon_p}{\varepsilon + 2 \varepsilon_p}\mathbb{I}, \qquad \mathbf{P}=\mathbb{\alpha}\mathbf{E}.
 ```
 
-This equation describes the response of a spherical particle to a static electric field. In nano-optics, the nanoparticles may be much smaller than the wavelength (and therefore are excited by an essentially constant field at any given time), but the time-variation of the fields implies that the induced dipole *radiates*. This requires a correction to the polarisability to satisfy energy conservation, namely an imaginary component accounting for radiative reaction. This subject will be further discussed in section~\ref{sec:rr}. Meier and Wokaun proposed\cite{} that larger nanoparticles may also benefit from a dynamic-depolarisation correction, which takes into account the dephasing of the internal field across finite nanoparticles and provides a more accurate description of their optical response. 
+This equation describes the response of a spherical particle to a static electric field. In nano-optics, the nanoparticles may be much smaller than the wavelength (and therefore are excited by an essentially constant field at any given time), but the time-variation of the fields implies that the induced dipole *radiates*. This requires a correction to the polarisability to satisfy energy conservation, namely an imaginary component accounting for radiative reaction. This subject will be further discussed in section. Meier and Wokaun proposed\cite{} that larger nanoparticles may also benefit from a dynamic-depolarisation correction, which takes into account the dephasing of the internal field across finite nanoparticles and provides a more accurate description of their optical response. 
 
-For homogeneous nanospheres and spherical nanoshells, the Mie theory readily provides an exact polarisability, but in practice it is often sufficient to use an approximate (but closed-form) formula\cite{dmitri}. For other geometries, no analytical solution is known. The static polarisability of ellipsoids may be derived analytically, and long-wavelength corrections have been proposed following the strategy of Meier and Wokaun\ref{schatz}. The accuracy is however rather poor in practice\cite{moroz,luke}, and we use instead the semi-empirical formula proposed by Kuwata et al. based on fits of full-wave simulations\cite{kuwata}. 
+For homogeneous nanospheres and spherical nanoshells, the Mie theory readily provides an exact polarisability, but in practice it is often sufficient to use an approximate (but closed-form) formula. For other geometries, no analytical solution is known. The static polarisability of ellipsoids may be derived analytically, and long-wavelength corrections have been proposed following the strategy of Meier and Wokaun. The accuracy is however rather poor in practice\cite{moroz,luke}, and we use instead the semi-empirical formula proposed by Kuwata et al. based on fits of full-wave simulations\cite{kuwata}. 
 
 ```math
 \alpha_i =  \frac{V}{4\pi}\frac{1}{L_i + \frac{\varepsilon}{\varepsilon'_p-\varepsilon} + 
@@ -210,7 +208,7 @@ For homogeneous nanospheres and spherical nanoshells, the Mie theory readily pro
 ```
 with ``V`` the volume of the particle, and ``x = \frac{2\pi a_i}{\lambda}`` the size parameter along the semi-axis ``a_i`` (``a``, ``b``, or ``c`` in the case of spheroids).
 
-A numerical test of the validity of these polarisability prescriptions against exact results is presented in Appendix\ref{sec:kuwata}.
+A numerical test of the validity of these polarisability prescriptions against exact results is presented in Appendix.
 
 ### Dye polarisability
 
