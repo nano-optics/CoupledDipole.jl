@@ -22,11 +22,12 @@ makedocs(;
         ],
         "Implementation" => [
             "conventions.md",
+            "high_level.md",
             "clusters.md",
             "materials.md",
-            "utils.md",
-            "high_level.md",
-            "cross_sections.md"
+            "system.md",
+            "cross_sections.md",
+            "utils.md"
         ],
     ],
 )
