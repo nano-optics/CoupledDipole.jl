@@ -43,6 +43,7 @@ export depolarisation_spheroid
 export quadrature_lgwt
 export euler_active
 export euler_passive
+export euler_unitvector
 export cubature_sphere
 export spectrum_dispersion
 export spectrum_oa
