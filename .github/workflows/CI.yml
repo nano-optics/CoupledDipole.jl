@@ -56,8 +56,8 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using CoupledDipole
-            DocMeta.setdocmeta!(CoupledDipole, :DocTestSetup, :(using CoupledDipole); recursive=true)
+            using CoupledDipole, StaticArrays
+            DocMeta.setdocmeta!(CoupledDipole, :DocTestSetup, :(using CoupledDipole, StaticArrays); recursive=true)
             doctest(CoupledDipole)'
       - run: julia --project=docs docs/make.jl
         env:
