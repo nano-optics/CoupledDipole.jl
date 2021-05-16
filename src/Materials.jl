@@ -13,8 +13,12 @@ end
 Drude model for the dielectric function of silver in the visible region
 - `λ`: wavelength in nm
 
-@example
-   epsilon_Ag(632.8)
+# Examples
+
+```jldoctest
+julia> epsilon_Ag(632.8)
+```
+
 """
 function epsilon_Ag(λ)
     4 * (1.0 - 1.0 / (282.0^2 * (1 / λ^2 + 1im / (17000 * λ))))
@@ -26,8 +30,12 @@ end
 Extended Drude model for the dielectric function of gold in the visible region
 - `λ`: wavelength in nm
 
-@example
-   epsilon_Au(632.8)
+# Examples
+
+```jldoctest
+julia> epsilon_Au(632.8)
+```
+
 """
 function epsilon_Au(λ)
 
@@ -63,8 +71,12 @@ Complex Lorentz function, to describe polarisabilities
 - `λ_k`: oscillator wavelength in nm
 - `µ_k`: damping in S.I. units
 
-@example
-   lorentzian(632.8)
+# Examples
+
+```jldoctest
+julia> lorentzian(632.8)
+```
+
 """
 function lorentzian(λ, α_k = 5.76e-38, λ_k = 526.0, µ_k = 1.0e4)
     -α_k * λ_k / µ_k *
@@ -82,8 +94,12 @@ Complex scalar polarisability, as sum of lorentz oscillators
 
 Default values mimic the main resonance of Rhodamine 700
 
-@example
-   alpha_bare(632.8)
+# Examples
+
+```jldoctest
+julia> alpha_bare(632.8)
+```
+
 """
 function alpha_bare(λ, α_∞ = 9.6e-39, α_k = 5.76e-38, λ_k = 526.0, µ_k = 1.0e4)
 
@@ -108,8 +124,12 @@ Effective point polarisability in medium, rescaled by local field correction
 
 Default values mimic the main resonance of Rhodamine 700
 
-@example
-   alpha_embedded(alpha_bare(632.8))
+# Examples
+
+```jldoctest
+julia> alpha_embedded(alpha_bare(632.8))
+```
+
 """
 function alpha_embedded(α, medium = 1.33)
     ε_m = medium^2
@@ -125,9 +145,13 @@ Principal polarisability components of a particle, rescaled along each principal
 - `α`: scalar polarisabilty
 - `sizes`: array of 3-vectors to scale along each principal axis
 
-@example
-   sizes = [SVector{3}(1.0, 2.0, 3.0) for i in 1:4]
-   alpha_rescale_molecule(alpha_bare(632.8), sizes)
+# Examples
+
+```jldoctest
+julia> sizes = [SVector{3}(1.0, 2.0, 3.0) for i in 1:4]
+julia> alpha_rescale_molecule(alpha_bare(632.8), sizes)
+```
+
 """
 function alpha_rescale_molecule(alpha, sizes)
     @. alpha * (sizes / sum(sizes))
@@ -142,8 +166,13 @@ Depolarisation factor of a spheroid
 - `b`: semi-axis along x and y (unused)
 - `c`: semi-axis along z
 
-@example
-   depolarisation_spheroid(1, 1, 1.5)
+# Examples
+
+```jldoctest
+julia> depolarisation_spheroid(1, 1, 1.5)
+```
+
+
 """
 function depolarisation_spheroid(a, b, c)
     if (c == a)# sphere
@@ -175,8 +204,12 @@ Principal polarisability components of a spheroidal particle
 - `ε_m`: dielectric function of surrounding medium
 - `Size`: SVector with 3 semi-axes of the spheroid
 
-@example
-   alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
+# Examples
+
+```jldoctest
+julia> alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
+```
+
 """
 function alpha_kuwata(λ, ε, ε_m, Size)
 
@@ -204,8 +237,12 @@ Principal polarisability components of N spheroidal particles
 - `ε_m`: dielectric function of surrounding medium
 - `Sizes`: Vector of 3-SVectors of particle sizes
 
-@example
-   alpha_spheroids(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])
+# Examples
+
+```jldoctest
+julia> alpha_spheroids(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])
+```
+
 """
 function alpha_spheroids(λ, ε, ε_m, Sizes)
     return (map(s -> alpha_kuwata(λ, ε, ε_m, s), Sizes))

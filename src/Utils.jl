@@ -10,9 +10,12 @@
 - `θ`: Euler angle (colatitude, in [0,2π])
 - `ψ`: Euler angle (rotation around z", in [0,2π])
 
+# Examples
 
-@example
-   euler_active(π/2,0,0)
+```jldoctest
+julia> euler_active(π/2,0,0)
+```
+
 """
 function euler_active(φ, θ, ψ = 0)
 
@@ -52,9 +55,12 @@ euler_active(v::SVector) = euler_active(v...)
 - `θ`: Euler angle (colatitude, in [0,2π])
 - `ψ`: Euler angle (rotation around z", in [0,2π])
 
+# Examples
 
-@example
-   euler_passive(π/2,0,0)
+```jldoctest
+julia> euler_passive(π/2,0,0)
+```
+
 """
 function euler_passive(φ, θ, ψ = 0)
 
@@ -96,9 +102,12 @@ Unit vector along direction φ, θ
 - `φ`: Euler angle (longitude, in [0,2π])
 - `θ`: Euler angle (colatitude, in [0,2π])
 
+# Examples
 
-@example
-   euler_unitvector(π/2, 0)
+```jldoctest
+julia> euler_unitvector(π/2, 0)
+```
+
 """
 function euler_unitvector(φ, θ)
 
@@ -128,8 +137,12 @@ N-point Gauss-Legendre quadrature over [a,b] interval
 \int_a^b f(x)\,dx=\frac{b-a}{2}\int_{-1}^{1}f\left(\frac{b-a}{2} x + \frac{a+b}{2}\right)\,dx.
 ```
 
-@example
-   quadrature_lgwt(6,0,3)
+# Examples
+
+```jldoctest
+julia> quadrature_lgwt(6,0,3)
+```
+
 """
 function quadrature_lgwt(N, a, b)
     n, w = gausslegendre(N)
@@ -151,8 +164,12 @@ For nodes there is less of a reason, but it can be convenient to visualise the n
 
 The cubature is normalised by 4π such that a unit integrand approximates 1.
 
-@example
-   cubature_sphere(36*18)
+# Examples
+
+```jldoctest
+julia> cubature_sphere(36*18)
+```
+
 """
 function cubature_sphere(N, method = "gl")
     #might have slightly more than N total points

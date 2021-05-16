@@ -23,8 +23,12 @@ Particle cluster consisting of a single particle at the origin
 - `material`: String referencing the material of the particle
 - `type`: String, "point" dipole or "particle"
 
-@example
-   cluster_single(1.0,2.0,3.0)
+# Examples
+
+```jldoctest
+julia> cluster_single(1.0,2.0,3.0)
+```
+
 """
 function cluster_single(a, b, c, α = 0.0, β = 0.0, γ = 0.0, material = "Au", type="particle")
     sizes = [SVector{3}(a, b, c)]
@@ -43,8 +47,12 @@ Particle cluster consisting of 2 identical particles separated along y
 - `material`: String referencing the material
 - `type`: String, "point" dipole or "particle"
 
-@example
-   cluster_dimer(10,1,2,3)
+# Examples
+
+```jldoctest
+julia> cluster_dimer(10,1,2,3)
+```
+
 """
 function cluster_dimer(d, a, b, c, dihedral = 0.0, material = "Au", type="particle")
     sizes = [SVector{3}(a, b, c) for ii in 1:2] # identical particles
