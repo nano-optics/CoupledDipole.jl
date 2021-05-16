@@ -50,7 +50,7 @@ Particle cluster consisting of 2 identical particles separated along y
 # Examples
 
 ```jldoctest
-julia> cluster_dimer(10,1,2,3)
+julia> cluster_dimer(10, 1, 2, 3)
 ```
 
 """
