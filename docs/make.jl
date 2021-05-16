@@ -2,7 +2,7 @@ using CoupledDipole
 using Documenter
 using StaticArrays
 
-DocMeta.setdocmeta!(CoupledDipole, :DocTestSetup, :(using CoupledDipole, StaticArrays); recursive=true)
+DocMeta.setdocmeta!(CoupledDipole, :DocTestSetup, :(using CoupledDipole); recursive=true)
 
 makedocs(;
     modules=[CoupledDipole],
