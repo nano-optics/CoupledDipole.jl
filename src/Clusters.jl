@@ -26,7 +26,6 @@ Particle cluster consisting of a single particle at the origin
 # Examples
 
 ```jldoctest
-julia> using StaticArrays
 julia> cluster_single(1.0,2.0,3.0)
 Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector{3, Float64}[[1.0, 2.0, 3.0]], "Au", "particle")
 ```
@@ -52,7 +51,6 @@ Particle cluster consisting of 2 identical particles separated along y
 # Examples
 
 ```jldoctest
-julia> using StaticArrays
 julia> cluster_dimer(10, 1, 2, 3)
 Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -5.0, 0.0], [0.0, 5.0, 0.0]], SVector{3, Float64}[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], SVector{3, Int64}[[1, 2, 3], [1, 2, 3]], "Au", "particle")
 ```

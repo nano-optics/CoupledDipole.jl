@@ -153,7 +153,6 @@ Principal polarisability components of a particle, rescaled along each principal
 # Examples
 
 ```jldoctest
-julia> using StaticArrays
 julia> alpha_rescale_molecule(alpha_bare(632.8), [SVector{3}(1.0, 2.0, 3.0) for i in 1:4])
 
 4-element Vector{SVector{3, ComplexF64}}:
@@ -180,7 +179,6 @@ Depolarisation factor of a spheroid
 # Examples
 
 ```jldoctest
-julia> using StaticArrays
 julia> depolarisation_spheroid(1, 1, 1.5)
 3-element SVector{3, Float64} with indices SOneTo(3):
  0.38350927084319514
@@ -222,7 +220,6 @@ Principal polarisability components of a spheroidal particle
 # Examples
 
 ```jldoctest
-julia> using StaticArrays
 julia> alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
 3-element SVector{3, ComplexF64} with indices SOneTo(3):
   77076.04648078184 + 26235.664281642235im
@@ -260,7 +257,6 @@ Principal polarisability components of N spheroidal particles
 # Examples
 
 ```jldoctest
-julia> using StaticArrays
 julia> alpha_spheroids(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])
 4-element Vector{SVector{3, ComplexF64}}:
  [83399.81975161123 + 64172.28157743772im, 83399.81975161123 + 64172.28157743772im, -86034.64340475321 + 79773.72029581512im]
