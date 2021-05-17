@@ -15,7 +15,7 @@ Drude model for the dielectric function of silver in the visible region
 
 # Examples
 
-```jldoctest
+```
 julia> epsilon_Ag(632.8)
 -16.113765271633408 + 0.7487053331699776im
 ```
@@ -33,7 +33,7 @@ Extended Drude model for the dielectric function of gold in the visible region
 
 # Examples
 
-```jldoctest
+```
 julia> epsilon_Au(632.8)
 -11.401847653916297 + 1.1867915550941681im
 ```
@@ -75,7 +75,7 @@ Complex Lorentz function, to describe polarisabilities
 
 # Examples
 
-```jldoctest
+```
 julia> lorentzian(632.8)
 6.580953683644669e-39 + 1.359608461637723e-39im
 ```
@@ -99,7 +99,7 @@ Default values mimic the main resonance of Rhodamine 700
 
 # Examples
 
-```jldoctest
+```
 julia> alpha_bare(632.8)
 0.14542715927993569 + 0.012219551466165574im
 ```
@@ -130,7 +130,7 @@ Default values mimic the main resonance of Rhodamine 700
 
 # Examples
 
-```jldoctest
+```
 julia> alpha_embedded(alpha_bare(632.8))
 0.1297564509794281 + 0.010902816493568609im
 ```
@@ -152,7 +152,7 @@ Principal polarisability components of a particle, rescaled along each principal
 
 # Examples
 
-```jldoctest
+```
 julia> alpha_rescale_molecule(alpha_bare(632.8), [SVector{3}(1.0, 2.0, 3.0) for i in 1:4])
 
 4-element Vector{SVector{3, ComplexF64}}:
@@ -178,7 +178,7 @@ Depolarisation factor of a spheroid
 
 # Examples
 
-```jldoctest
+```
 julia> depolarisation_spheroid(1, 1, 1.5)
 3-element SVector{3, Float64} with indices SOneTo(3):
  0.38350927084319514
@@ -219,7 +219,7 @@ Principal polarisability components of a spheroidal particle
 
 # Examples
 
-```jldoctest
+```
 julia> alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
 3-element SVector{3, ComplexF64} with indices SOneTo(3):
   77076.04648078184 + 26235.664281642235im
@@ -256,7 +256,7 @@ Principal polarisability components of N spheroidal particles
 
 # Examples
 
-```jldoctest
+```
 julia> alpha_spheroids(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])
 4-element Vector{SVector{3, ComplexF64}}:
  [83399.81975161123 + 64172.28157743772im, 83399.81975161123 + 64172.28157743772im, -86034.64340475321 + 79773.72029581512im]
