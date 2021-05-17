@@ -3,7 +3,7 @@
 ```@contents
 ```
 
-From a microscopic viewpoint, as taken in the discrete dipole approximation, a collection of small inclusions such as molecules dispersed in a solvent may be described as a set of point dipoles in a vaccuum, whereby not only the molecules of interest but also those comprising the medium itself are described as discrete dipoles. This approach is numerically prohibitive, due to the large number of dipoles required to model the environment, which is in fact infinite in most situations of interest. 
+From a microscopic viewpoint, as taken in the discrete dipole approximation, a collection of small inclusions such as molecules dispersed in a solvent may be described as a set of point dipoles in a vacuum, whereby not only the molecules of interest but also those comprising the medium itself are described as discrete dipoles. This approach is numerically prohibitive, due to the large number of dipoles required to model the environment, which is in fact infinite in most situations of interest. 
 
 With a more pragmatic approach, we are led to consider the response of dipoles within the framework of the macroscopic Maxwell equations, where the optical response of the solvent is encompassed in its refractive index ``n=\sqrt{\varepsilon}``. Waves propagating in this medium have a phase velocity ``c/n``. Light scattering by a collection of particles (or molecules) will thus be described as the interaction between dipole moments induced by the incident light and in mutual interaction via their own scattered field in the surrounding homogeneous medium, as illustrated in Fig..
 

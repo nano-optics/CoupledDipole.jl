@@ -10,3 +10,8 @@ euler_active
 euler_passive
 ```
 
+
+```@docs
+euler_unitvector
+```
+
