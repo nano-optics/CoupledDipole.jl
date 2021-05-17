@@ -13,11 +13,11 @@
      		return;
      	}
      
-     	var width  = window.innerWidth,
-     		height = window.innerHeight;
+     	var width  = 400,
+     		height = 400;
      
      	// sphere params
-     	var radius   = 0.2,
+     	var radius   = 1,
      		segments = 36,
      		rotation = 6;  
      
@@ -32,11 +32,11 @@
      
      	scene.add(new THREE.AmbientLight(0xffffff, 1));
      
-     	var xDistance = 0.5;
-         var yDistance = 0.5;
+     	var xDistance = 2;
+       var yDistance = 2;
          //initial offset so does not start in middle.
          var xOffset = 0;
-         var yOffset = 0.2;
+         var yOffset = 1;
          
         var i=0,j=0;
         var sphere1 = createSphere(radius, segments);
