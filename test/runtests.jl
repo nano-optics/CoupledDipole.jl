@@ -23,7 +23,7 @@ end
 end;
 
 
-@testset verbose = true "Foo Tests" begin
+@testset "Foo Tests" begin
     @testset "Animals" begin
         @test 9 == 9
         @test "dog" == "dog"
