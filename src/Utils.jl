@@ -112,7 +112,7 @@ Unit vector along direction φ, θ
 
 # Examples
 
-```
+```jldoctest
 julia> euler_unitvector(π/2, 0)
 3-element SVector{3, Float64} with indices SOneTo(3):
  0.0
