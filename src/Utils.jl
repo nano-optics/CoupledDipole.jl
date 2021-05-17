@@ -12,12 +12,12 @@
 
 # Examples
 
-```
-julia>  euler_active(π/2,0,0)
+```jldoctest
+julia> round.(euler_active(π/2,0,0), digits=5)
 3×3 SMatrix{3, 3, Float64, 9} with indices SOneTo(3)×SOneTo(3):
-  6.12323e-17  -1.0          0.0
-  1.0           6.12323e-17  0.0
- -0.0           0.0          1.0
+  0.0  -1.0  0.0
+  1.0   0.0  0.0
+ -0.0   0.0  1.0
 ```
 
 """
@@ -61,12 +61,12 @@ euler_active(v::SVector) = euler_active(v...)
 
 # Examples
 
-```
-julia> euler_passive(π/2,0,0)
+```jldoctest
+julia> round.(euler_passive(π/2,0,0), digits=5)
 3×3 SMatrix{3, 3, Float64, 9} with indices SOneTo(3)×SOneTo(3):
-  6.12323e-17  1.0          -0.0
- -1.0          6.12323e-17   0.0
-  0.0          0.0           1.0
+  0.0  1.0  -0.0
+ -1.0  0.0   0.0
+  0.0  0.0   1.0
 ```
 
 """

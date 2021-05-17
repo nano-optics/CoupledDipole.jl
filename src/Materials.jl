@@ -15,9 +15,9 @@ Drude model for the dielectric function of silver in the visible region
 
 # Examples
 
-```
-julia> epsilon_Ag(632.8)
--16.113765271633408 + 0.7487053331699776im
+```jldoctest
+julia> round(epsilon_Ag(632.8), digits=5)
+-16.11377 + 0.74871im
 ```
 
 """
@@ -33,9 +33,9 @@ Extended Drude model for the dielectric function of gold in the visible region
 
 # Examples
 
-```
-julia> epsilon_Au(632.8)
--11.401847653916297 + 1.1867915550941681im
+```jldoctest
+julia>  round(epsilon_Au(632.8), digits=5)
+-11.40185 + 1.18679im
 ```
 
 """
@@ -75,9 +75,9 @@ Complex Lorentz function, to describe polarisabilities
 
 # Examples
 
-```
-julia> lorentzian(632.8)
-6.580953683644669e-39 + 1.359608461637723e-39im
+```jldoctest
+julia> round(lorentzian(632.8)*1e39, digits=5)
+6.58095 + 1.35961im
 ```
 
 """
@@ -99,9 +99,10 @@ Default values mimic the main resonance of Rhodamine 700
 
 # Examples
 
-```
-julia> alpha_bare(632.8)
-0.14542715927993569 + 0.012219551466165574im
+
+```jldoctest
+julia> round(alpha_bare(632.8), digits=5)
+0.14543 + 0.01222im
 ```
 
 """
@@ -130,9 +131,9 @@ Default values mimic the main resonance of Rhodamine 700
 
 # Examples
 
-```
-julia> alpha_embedded(alpha_bare(632.8))
-0.1297564509794281 + 0.010902816493568609im
+```jldoctest
+julia> round(alpha_embedded(alpha_bare(632.8)), digits=5)
+0.12976 + 0.0109im
 ```
 
 """
@@ -150,18 +151,6 @@ Principal polarisability components of a particle, rescaled along each principal
 - `α`: scalar polarisabilty
 - `sizes`: array of 3-vectors to scale along each principal axis
 
-# Examples
-
-```
-julia> alpha_rescale_molecule(alpha_bare(632.8), [SVector{3}(1.0, 2.0, 3.0) for i in 1:4])
-
-4-element Vector{SVector{3, ComplexF64}}:
- [0.02423785987998928 + 0.0020365919110275953im, 0.04847571975997856 + 0.004073183822055191im, 0.07271357963996784 + 0.006109775733082787im]
- [0.02423785987998928 + 0.0020365919110275953im, 0.04847571975997856 + 0.004073183822055191im, 0.07271357963996784 + 0.006109775733082787im]
- [0.02423785987998928 + 0.0020365919110275953im, 0.04847571975997856 + 0.004073183822055191im, 0.07271357963996784 + 0.006109775733082787im]
- [0.02423785987998928 + 0.0020365919110275953im, 0.04847571975997856 + 0.004073183822055191im, 0.07271357963996784 + 0.006109775733082787im]
- ```
-
 """
 function alpha_rescale_molecule(alpha, sizes)
     @. alpha * (sizes / sum(sizes))
@@ -178,12 +167,12 @@ Depolarisation factor of a spheroid
 
 # Examples
 
-```
-julia> depolarisation_spheroid(1, 1, 1.5)
+```jldoctest
+julia> round.(depolarisation_spheroid(1, 1, 1.5), digits=5)
 3-element SVector{3, Float64} with indices SOneTo(3):
- 0.38350927084319514
- 0.38350927084319514
- 0.2329814583136097
+ 0.38351
+ 0.38351
+ 0.23298
 ```
 
 """
