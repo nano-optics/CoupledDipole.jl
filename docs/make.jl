@@ -12,7 +12,7 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://nano-optics.github.io/CoupledDipole.jl",
-        assets=[asset("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", class=:js, islocal=false),
+        assets=[asset("assets/three.min.js", class=:js, islocal=true),
         asset("assets/Detector.js", class=:js, islocal=true),
         asset("assets/TrackballControls.js", class=:js, islocal=true)],
     ),
