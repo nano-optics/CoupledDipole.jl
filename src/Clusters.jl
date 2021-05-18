@@ -32,9 +32,9 @@ Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector
 
 """
 function cluster_single(a, b, c, α = 0.0, β = 0.0, γ = 0.0, material = "Au", type="particle")
-    sizes = [SVector{3}(a, b, c)]
-    positions = [SVector{3}(0.0, 0.0, 0.0)]
-    angles = [SVector{3}(α, β, γ)]
+    sizes = [SVector(a, b, c)]
+    positions = [SVector(0.0, 0.0, 0.0)]
+    angles = [SVector(α, β, γ)]
     Cluster(positions, angles, sizes, material, type)
 end
 
@@ -57,10 +57,10 @@ Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -5.0, 0.0], [0.0, 5.0
 
 """
 function cluster_dimer(d, a, b, c, dihedral = 0.0, material = "Au", type="particle")
-    sizes = [SVector{3}(a, b, c) for ii in 1:2] # identical particles
-    positions = [SVector{3}(0.0, y, 0.0) for y in (-d/2, d/2)]
-    angles = [SVector{3}(0.0, dihedral, 0.0),
-              SVector{3}(0.0, 0.0, 0.0)]
+    sizes = [SVector(a, b, c) for ii in 1:2] # identical particles
+    positions = [SVector(0.0, y, 0.0) for y in (-d/2, d/2)]
+    angles = [SVector(0.0, dihedral, 0.0),
+              SVector(0.0, 0.0, 0.0)]
     Cluster(positions, angles, sizes, material, type)
 end
 
@@ -91,14 +91,13 @@ cluster_helix(5, 20, 20, 30, 50, 300)
 function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left",
     material = "Au", type="particle")
 
-    sizes = [SVector{3}(a, b, c) for ii in 1:N] # identical particles
+    sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
 
     s = handedness == "left" ? -1 : +1
     ϕ = collect(1:N) * δ .+ δ_0
     x = R * cos.(ϕ)
     y = R * sin.(ϕ)
     z = s * ϕ * Λ/(2π)
-
 
     # angles calculation
     x′ =  - y
@@ -108,10 +107,10 @@ function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left"
 
     φ =  atan.(y′, x′)
     θ =  acos.(z′ ./ n)
-    ψ = 0 # don't care for axisymmetric particles
+    ψ = 0.0 # don't care for axisymmetric particles
 
-    positions = map((x,y,z) -> SVector(x,y,z), x, y, z) # better way?
-    angles = map((φ,θ,ψ) -> SVector(φ,θ,ψ), φ, θ, ψ) # better way?
+    positions = SVector.(x,y,z)
+    angles = SVector.(φ,θ,ψ)
 
     Cluster(positions, angles, sizes, material, type)
 end
@@ -141,7 +140,7 @@ function  cluster_line(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="partic
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
     angles = [SVector(φ, θ, ψ) for ii in 1:N] # identical particles
 
-    positions = map(x -> SVector(x,0,0), -(N-1)*Λ/2:Λ:(N-1)*Λ/2)
+    positions = SVector.(-(N-1)*Λ/2:Λ:(N-1)*Λ/2), 0.0, 0.0)
 
     Cluster(positions, angles, sizes, material, type)
 end
@@ -174,7 +173,7 @@ function  cluster_array(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="parti
     angles = [SVector(φ, θ, ψ) for ii in 1:N′^2] # identical particles
 
     x =  -(N′-1)*Λ/2:Λ:(N′-1)*Λ/2
-    positions = map(x -> SVector(x), Iterators.product(x, x, 0))[:]
+    positions = map(x -> SVector(x), Iterators.product(x, x, 0.0))[:]
 
     Cluster(positions, angles, sizes, material, type)
 end
