@@ -140,7 +140,7 @@ function  cluster_line(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="partic
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
     angles = [SVector(φ, θ, ψ) for ii in 1:N] # identical particles
 
-    positions = SVector.(-(N-1)*Λ/2:Λ:(N-1)*Λ/2), 0.0, 0.0)
+    positions = SVector.(-(N-1)*Λ/2:Λ:(N-1)*Λ/2, 0.0, 0.0)
 
     Cluster(positions, angles, sizes, material, type)
 end
@@ -173,7 +173,7 @@ function  cluster_array(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="parti
     angles = [SVector(φ, θ, ψ) for ii in 1:N′^2] # identical particles
 
     x =  -(N′-1)*Λ/2:Λ:(N′-1)*Λ/2
-    positions = map(x -> SVector(x), Iterators.product(x, x, 0.0))[:]
+    positions = SVector.(Iterators.product(x, x, 0.0))[:]
 
     Cluster(positions, angles, sizes, material, type)
 end
