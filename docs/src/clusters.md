@@ -1,5 +1,8 @@
 # Cluster geometries
 
+```@docs
+Cluster
+```
 
 ```@docs
 cluster_single

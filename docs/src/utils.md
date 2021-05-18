@@ -1,6 +1,8 @@
 # Utility functions
 
 
+## Euler rotations
+
 ```@docs
 euler_active
 ```
@@ -15,3 +17,13 @@ euler_passive
 euler_unitvector
 ```
 
+## Spherical cubature
+
+```@docs
+quadrature_lgwt
+```
+
+
+```@docs
+cubature_sphere
+```

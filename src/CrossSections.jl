@@ -13,8 +13,8 @@ end
 Extinction cross-section for each incident angle
 
 - `kn`: wavenumber in incident medium
-- `P`:   3N_dip x N_inc matrix, polarisations for all incidences
-- `Ein`: 3N_dip x N_inc matrix, incident field for all incidences
+- `P`:   `3N_dip x N_inc` matrix, polarisations for all incidences
+- `Ein`: `3N_dip x N_inc` matrix, incident field for all incidences
 
 """
 function extinction!(Cext, kn, P, Ein)
@@ -35,8 +35,8 @@ end
 Absorption cross-section for each incident angle
 
 - `kn`: wavenumber in incident medium
-- `P`: 3N_dip x N_inc matrix, polarisations for all incidences
-- `E`: 3N_dip x N_inc matrix, total field for all incidences
+- `P`: `3N_dip x N_inc` matrix, polarisations for all incidences
+- `E`: `3N_dip x N_inc` matrix, total field for all incidences
 
 """
 function absorption!(Cabs, kn, P, E)
@@ -53,16 +53,16 @@ end
 
 
 """
-    scattering(positions, angles, weights, kn::Real, P::Array{Complex})
+    scattering(positions::Vector{SVector{3}}, ScatteringVectors::Vector{SVector{3}}, weights::Vector{Real}, kn::Real, P::Array{Complex})
 
 Scattering cross-section for each incident angle, obtained by numerical cubature
 over the full solid angle of scattering directions
 
 - `positions`: vector of cluster particle positions
-- `ScatteringProjectorz`: `N_inc`-vector of 3x3 projector Smatrices
-- `weights`: N_inc-vector of cubature weights
+- `ScatteringProjectorz`: `N_inc`-vector of far-field directions
+- `weights`: `N_inc`-vector of cubature weights
 - `kn`: wavenumber in incident medium
-- `P`: 3N_dip x N_inc matrix, polarisations for all incidences
+- `P`: `3N_dip x N_inc` matrix, polarisations for all incidences
 
 """
 function scattering!(Csca, positions, ScatteringVectors, weights, kn, P)
