@@ -8,7 +8,10 @@ Cluster
 cluster_single
 ```
 
-
 ```@docs
 cluster_dimer
+```
+
+```@docs
+cluster_helix
 ```

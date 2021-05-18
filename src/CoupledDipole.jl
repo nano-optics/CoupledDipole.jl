@@ -25,6 +25,7 @@ export incident_field!
 export polarisation!
 export Cluster
 export cluster_single
+export cluster_helix
 export cluster_dimer
 export extinction!
 export absorption!
