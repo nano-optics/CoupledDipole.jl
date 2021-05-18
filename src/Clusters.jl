@@ -88,7 +88,7 @@ cluster_helix(5, 20, 20, 30, 50, 300)
 ```
 
 """
-function cluster_helix(N, a, b, c, R, λ, δ = π/4, δ_0 = 0, handedness="left",
+function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left",
     material = "Au", type="particle")
 
     sizes = [SVector{3}(a, b, c) for ii in 1:N] # identical particles
@@ -97,13 +97,13 @@ function cluster_helix(N, a, b, c, R, λ, δ = π/4, δ_0 = 0, handedness="left"
     ϕ = collect(1:N) * δ .+ δ_0
     x = R * cos.(ϕ)
     y = R * sin.(ϕ)
-    z = s * ϕ * λ/(2π)
+    z = s * ϕ * Λ/(2π)
 
 
     # angles calculation
     x′ =  - y
     y′ =   x
-    z′ =  s * λ / (2π)
+    z′ =  s * Λ / (2π)
     n = @. sqrt(x′^2 + y′^2 + z′^2)
 
     φ =  atan.(y′, x′)
@@ -112,6 +112,69 @@ function cluster_helix(N, a, b, c, R, λ, δ = π/4, δ_0 = 0, handedness="left"
 
     positions = map((x,y,z) -> SVector(x,y,z), x, y, z) # better way?
     angles = map((φ,θ,ψ) -> SVector(φ,θ,ψ), φ, θ, ψ) # better way?
+
+    Cluster(positions, angles, sizes, material, type)
+end
+
+
+
+"""
+    cluster_line(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
+
+Line of N identical particles in the x direction
+- `N`: number of particles (approximate if not exact square)
+- `a,b,c`: semi-axes along x,y,z
+- `Λ`: array pitch
+- `φ, θ, ψ`: particle Euler angles
+- `material`: String referencing the material
+- `type`: String, "point" dipole or "particle"
+
+# Examples
+
+```
+cluster_line(10, 500, 20, 20, 30, 0, 0, 0)
+```
+
+"""
+function  cluster_line(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
+
+    sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
+    angles = [SVector(φ, θ, ψ) for ii in 1:N] # identical particles
+
+    positions = map(x -> SVector(x,0,0), -(N-1)*Λ/2:Λ:(N-1)*Λ/2)
+
+    Cluster(positions, angles, sizes, material, type)
+end
+
+
+
+"""
+    cluster_array(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
+
+Square array of N identical particles in the xy plane
+- `N`: number of particles (approximate if not exact square)
+- `a,b,c`: semi-axes along x,y,z
+- `Λ`: array pitch
+- `φ, θ, ψ`: particle Euler angles
+- `material`: String referencing the material
+- `type`: String, "point" dipole or "particle"
+
+# Examples
+
+```
+cluster_array(10, 500, 20, 20, 30, 0, 0, 0)
+```
+
+"""
+function  cluster_array(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
+
+    N′ = floor(sqrt(N)) # may have fewer than N particles
+
+    sizes = [SVector(a, b, c) for ii in 1:N′^2] # identical particles
+    angles = [SVector(φ, θ, ψ) for ii in 1:N′^2] # identical particles
+
+    x =  -(N′-1)*Λ/2:Λ:(N′-1)*Λ/2
+    positions = map(x -> SVector(x), Iterators.product(x, x, 0))[:]
 
     Cluster(positions, angles, sizes, material, type)
 end

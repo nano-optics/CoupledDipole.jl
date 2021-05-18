@@ -26,6 +26,8 @@ export polarisation!
 export Cluster
 export cluster_single
 export cluster_helix
+export cluster_line
+export cluster_array
 export cluster_dimer
 export extinction!
 export absorption!
