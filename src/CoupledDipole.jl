@@ -5,6 +5,7 @@ module CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature: gausslegendre
+using DataFrames
 
 #using BlockArrays
 #using Base.Threads
@@ -18,6 +19,7 @@ include("Materials.jl")
 include("Utils.jl")
 include("CrossSections.jl")
 include("HighLevel.jl")
+include("PostProcessing.jl")
 
 
 export propagator_freespace_labframe!
@@ -50,6 +52,8 @@ export euler_unitvector
 export cubature_sphere
 export spectrum_dispersion
 export spectrum_oa
+export dispersion_df
+export oa_df
 
 ## core functions
 

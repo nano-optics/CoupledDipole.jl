@@ -90,23 +90,6 @@ oa2 = spectrum_oa(cl2, mat)
 
 
 
-function oa_df(x, wavelength)
-
-    a = DataFrame(:extinction => x.average.extinction,
-            :absorption => x.average.absorption,
-            :scattering => x.average.scattering,
-            :wavelength => wavelength,
-            :type => "average")
-
-        d = DataFrame(:extinction => x.dichroism.extinction,
-                :absorption => x.dichroism.absorption,
-                :scattering => x.dichroism.scattering,
-                :wavelength => wavelength,
-                :type => "dichroism")
-
-    stack([a;d], Not([:wavelength,:type]))
-
-end
 
 d3 = oa_df(oa1, mat.wavelength)
 d4 = oa_df(oa2, mat.wavelength)
