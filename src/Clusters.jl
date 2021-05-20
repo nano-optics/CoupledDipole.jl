@@ -1,14 +1,31 @@
 
 ## cluster definitions
 
-# NOTE: for now all particles have the same material
-# easy to extend if needed, by making it a vector
-# and matching a dictionary in HighLevel functions
+
+"""
+    Cluster(positions, angles, sizes, material)
+
+Particle cluster specification.
+
+NOTE: for now all particles have the same material;
+easy to extend if needed, by making it a vector
+and matching a dictionary in HighLevel functions
+"""
 struct Cluster{T1,T2,T3}
+
+    "positions::Vector{SVector{3,T1}}"
     positions::Vector{SVector{3,T1}}
+
+    "angles::Vector{SVector{3,T2}}"
     angles::Vector{SVector{3,T2}}
+
+    "sizes::Vector{SVector{3,T3}}"
     sizes::Vector{SVector{3,T3}}
+
+    "material::String"
     material::String
+
+    "type::String"
     type::String
 end
 

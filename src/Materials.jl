@@ -1,9 +1,19 @@
 
 ## material functions
 
+
+"""
+    Material(wavelength, media)
+
+Particle cluster specification.
+
+NOTE: for now all particles have the same material;
+easy to extend if needed, by making it a vector
+and matching a dictionary in HighLevel functions
+"""
 struct Material{T}
-    wavelength::Vector{T}
-    medium::Dict{String, Function}
+    wavelengths::Vector{T}
+    media::Dict{String, Function}
 end
 
 

@@ -22,12 +22,12 @@ function spectrum_dispersion(
 
     # what is the type of arrays to initialise?
     proto_r = cl.positions[1][1]
-    proto_k = 2π / mat.wavelength[1]
+    proto_k = 2π / mat.wavelengths[1]
     T = typeof(proto_k * proto_r)
     # note: cross-sections are typeof(imag(P*E)), which boils down to T, hopefully
 
     N_dip = length(cl.positions)
-    N_lam = length(mat.wavelength)
+    N_lam = length(mat.wavelengths)
     N_inc = length(Incidence)
 
     # scattering angles for Csca
@@ -66,21 +66,21 @@ function spectrum_dispersion(
     tmpcsca = similar(tmpcext)
 
     for ii = 1:N_lam
-        λ = mat.wavelength[ii]
-        n_medium = mat.medium["medium"](λ)
+        λ = mat.wavelengths[ii]
+        n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
         if cl.type == "point"
 
             α_name = cl.material # e.g. "alpha" to refer to mat Dict
-            α_bare = mat.medium[α_name](λ)
+            α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
 
         elseif cl.type == "particle"
 
             ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
-            ε = mat.medium[ε_name](λ)
+            ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
         end
@@ -149,12 +149,12 @@ function spectrum_oa(
 
     # what is the type of arrays to initialise?
     proto_r = cl.positions[1][1]
-    proto_k = 2π / mat.wavelength[1]
+    proto_k = 2π / mat.wavelengths[1]
     T = typeof(proto_k * proto_r)
     # note: cross-sections are typeof(imag(P*E)), which boils down to T, hopefully
 
     N_dip = length(cl.positions)
-    N_lam = length(mat.wavelength)
+    N_lam = length(mat.wavelengths)
     N_inc = length(quad_inc.weights) # update with actual number of angles
 
     F = Matrix{Complex{T}}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
@@ -196,21 +196,21 @@ function spectrum_oa(
     tmpcsca = similar(tmpcext)
 
     for ii = 1:N_lam
-        λ = mat.wavelength[ii]
-        n_medium = mat.medium["medium"](λ)
+        λ = mat.wavelengths[ii]
+        n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
         if cl.type == "point"
 
             α_name = cl.material # e.g. "alpha" to refer to mat Dict
-            α_bare = mat.medium[α_name](λ)
+            α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
 
         elseif cl.type == "particle"
 
             ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
-            ε = mat.medium[ε_name](λ)
+            ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
         end

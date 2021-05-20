@@ -5,6 +5,7 @@ module CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature: gausslegendre
+using DataFrames
 
 #using BlockArrays
 #using Base.Threads
@@ -18,6 +19,7 @@ include("Materials.jl")
 include("Utils.jl")
 include("CrossSections.jl")
 include("HighLevel.jl")
+include("PostProcessing.jl")
 
 
 export propagator_freespace_labframe!
@@ -50,6 +52,8 @@ export euler_unitvector
 export cubature_sphere
 export spectrum_dispersion
 export spectrum_oa
+export dispersion_df
+export oa_df
 
 ## core functions
 
@@ -75,6 +79,7 @@ function propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
     # Note: might want/need to try BlockArray.jl
     # Construct a BlockArray from blocks
     # mortar((A,B),(C,D))
+    # would simply indexing at least..
 
     # nested for loop over N_dip dipoles
     for jj = 1:N_dip
@@ -95,8 +100,13 @@ function propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
                 )
 
             # assign blocks
-            A[ind_jj, ind_kk] = Ajk * AlphaBlocks[kk]
-            A[ind_kk, ind_jj] = transpose(Ajk) * AlphaBlocks[jj]
+            # A[ind_jj, ind_kk] = Ajk * AlphaBlocks[kk]
+            # A[ind_kk, ind_jj] = transpose(Ajk) * AlphaBlocks[jj]
+            # use views to avoid copies (?)
+            Av1 = @view A[ind_jj, ind_kk]
+            Av2 = @view A[ind_kk, ind_jj]
+            fill!(Av1, Ajk * AlphaBlocks[kk])
+            fill!(Av2, transpose(Ajk) * AlphaBlocks[jj])
 
         end
     end
@@ -137,8 +147,15 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
         E2_r = Rm * Evec2
         for kk = 1:N_dip
             kR = dot(k_hat, R[kk]) # everything real
-            Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
-            Ein[kk*3-2:kk*3, jj+N_inc] =  E2_r * exp(im * kR)
+
+            # use views to avoid copies (?)
+            Ev1 = @view Ein[kk*3-2:kk*3, jj]
+            Ev2 = @view Ein[kk*3-2:kk*3, jj+N_inc]
+            fill!(Ev1, E1_r * exp(im * kR))
+            fill!(Ev2, E2_r * exp(im * kR))
+
+            # Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
+            # Ein[kk*3-2:kk*3, jj+N_inc] =  E2_r * exp(im * kR)
         end
     end
     return Ein
@@ -161,7 +178,12 @@ function polarisation!(P, E, AlphaBlocks)
     # loop over N_dip particles
     for ii in eachindex(AlphaBlocks)
         ind = 3ii-2:3ii
-        P[ind, :] = AlphaBlocks[ii] * E[ind, :] # all incidence angles at once
+        # use views to avoid copies (?)
+        Pv = @view P[ind, :]
+        Ev = @view E[ind, :]
+        fill!(Pv, AlphaBlocks[ii] * Ev)
+
+        # P[ind, :] = AlphaBlocks[ii] * E[ind, :] # all incidence angles at once
     end
 
     return P

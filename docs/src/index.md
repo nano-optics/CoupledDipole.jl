@@ -10,5 +10,5 @@ Documentation for [CoupledDipole](https://github.com/nano-optics/CoupledDipole.j
 ```
 
 ```@autodocs
-Modules = [CoupledDipole]
+# Modules = [CoupledDipole] # seems to duplicate everything
 ```
