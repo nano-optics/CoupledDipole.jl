@@ -6,7 +6,7 @@ using CoupledDipole
 # using LinearAlgebra
 using StaticArrays
 # using FastGaussQuadrature
-# using DataFrames
+using DataFrames
 using VegaLite
 
 ## materials

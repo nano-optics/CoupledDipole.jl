@@ -84,14 +84,14 @@ end
 
 
 """
-    cluster_helix(N, a, b, c, R, λ, δ = π/4, δ_0 = 0, handedness="left",
+    cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left",
         material = "Au", type="particle")
 
 Helical cluster of N identical particles with axis along z
 - `N`: number of particles
 - `a,b,c`: semi-axes along x,y,z
 - `R`: helix radius
-- `λ`: helix pitch
+- `Λ`: helix pitch
 - `δ`: angle between subsequent particles
 - `δ`: starting angle
 - `handedness`: "left" or "right"
