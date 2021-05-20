@@ -3,10 +3,10 @@ push!(LOAD_PATH, expanduser( "~/Documents/nano-optics/CoupledDipole.jl/"))
 using Revise
 using CoupledDipole
 
-using LinearAlgebra
+# using LinearAlgebra
 using StaticArrays
-using FastGaussQuadrature
-using DataFrames
+# using FastGaussQuadrature
+# using DataFrames
 using VegaLite
 
 ## materials
