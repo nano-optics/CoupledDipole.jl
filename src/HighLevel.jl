@@ -16,7 +16,7 @@ Simulating far-field cross-sections for multiple wavelengths and directions of i
 function spectrum_dispersion(
     cl::Cluster,
     mat::Material,
-    Incidence,
+    Incidence;
     N_sca::Int = 36,
     method = "direct",
 )
@@ -115,10 +115,10 @@ function spectrum_dispersion(
             extinction!(tmpcext, kn, P, Ein)
 
         elseif method == "oos" # udpate E, P, α_ext iteratively by order-of-scattering
-
-            E = Ein
-            polarisation!(P, E, AlphaBlocks)
-            extinction!(tmpcext, kn, P, Ein)
+            # 
+            # E[:] = Ein
+            # polarisation!(P, E, AlphaBlocks)
+            # extinction!(tmpcext, kn, P, Ein)
             iterate_field!(
                 E,
                 P,
@@ -126,11 +126,8 @@ function spectrum_dispersion(
                 Ein,
                 F,
                 kn,
-                AlphaBlocks,
-                tol = 1e-8,
-                maxiter = 1000,
+                AlphaBlocks
             )
-
         end
 
         # remaining cross-sections for cubature angles
@@ -169,11 +166,11 @@ Orientation-averaged far-field cross-sections for multiple wavelengths
 """
 function spectrum_oa(
     cl::Cluster,
-    mat::Material,
+    mat::Material;
     cubature = "gl",
     N_inc = 36,
     N_sca = 36,
-    method = "direct",
+    method = "direct"
 )
 
     quad_inc = cubature_sphere(N_inc, cubature)
@@ -281,9 +278,7 @@ function spectrum_oa(
                 Ein,
                 F,
                 kn,
-                AlphaBlocks,
-                tol = 1e-8,
-                maxiter = 1000,
+                AlphaBlocks
             )
 
         end

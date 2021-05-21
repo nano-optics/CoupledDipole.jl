@@ -156,7 +156,7 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
             # fill!(Ev2, E2_r * exp(im * kR))
 
             Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
-            Ein[kk*3-2:kk*3, jj+N_inc] =  E2_r * exp(im * kR)
+            Ein[kk*3-2:kk*3, jj+N_inc] = E2_r * exp(im * kR)
         end
     end
     return Ein
@@ -201,21 +201,39 @@ Order-of-scattering iteration of the total field
 - `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
 
 """
-function iterate_field!(E, P, σ_ext, Ein, F, kn, AlphaBlocks, tol=1e-8, maxiter=1000)
+function iterate_field!(
+    E,
+    P,
+    σ_ext,
+    Ein,
+    F,
+    kn,
+    AlphaBlocks;
+    tol = 1e-4,
+    maxiter = 1000,
+)
 
     error = Inf
     niter = 1
-    Etmp = copy(E) # is this needed? "aliasing"?
-    σ_prev = copy(σ_ext)
+
+    # initialise, first interaction
+    Etmp = deepcopy(Ein)
+    E[:] = Ein
+    polarisation!(P, Ein, AlphaBlocks)
+    extinction!(σ_ext, kn, P, Ein)
+    σ_prev = deepcopy(σ_ext)
 
     while (error > tol) && (niter < maxiter)
 
-        E +=  F * Etmp # add new order contribution
+        Etmp = (I-F) * Etmp
+        E = E + Etmp # add new order contribution
         polarisation!(P, E, AlphaBlocks)
         extinction!(σ_ext, kn, P, Ein)
-        error = max(abs.((σ_ext - σ_prev)) ./ abs.(σ_ext))
-
+        error = maximum(abs.((σ_ext - σ_prev)) ./ abs.(σ_ext + σ_prev))
+        # println(error)
+        # println(niter)
         niter += 1
+
 
     end
 
