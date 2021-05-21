@@ -44,7 +44,7 @@ d1 = oa_df(oa1, mat.wavelengths)
 d2 = [insertcols!(d1, :cluster => "dimer");
       insertcols!(d0, :cluster => "single")]
 
-d2 |> @vlplot(
+p = d2 |> @vlplot(
  width= 120,
  height =  100,
      mark = {:line, clip = true},
@@ -53,8 +53,10 @@ d2 |> @vlplot(
      encoding = {x = "wavelength:q", y = "value:q",
       strokeDash = "cluster:n",  color = "hand:n"}
  )
+ 
+p |> save("dimer-plot.svg")
 
-savefig("dimer-plot.svg"); nothing # hide
+nothing # hide
 ```
 
 
