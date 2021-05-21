@@ -44,7 +44,7 @@ d1 = oa_df(oa1, mat.wavelengths)
 d2 = [insertcols!(d1, :cluster => "helix");
       insertcols!(d0, :cluster => "single")]
 
-p = d2 |> @vlplot(
+d2 |> @vlplot(
  width= 120,
  height =  100,
      mark = {:line, clip = true},
@@ -53,10 +53,7 @@ p = d2 |> @vlplot(
      encoding = {x = "wavelength:q", y = "value:q",
       strokeDash = "cluster:n",  color = "hand:n"}
  )
- 
-p |> save("helix-plot.svg")
 
-nothing # hide
 ```
 
 
