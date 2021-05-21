@@ -33,10 +33,6 @@ lorentzian
 ```
 
 ```@docs
-lorentzian
-```
-
-```@docs
 alpha_bare
 ```
 
@@ -47,4 +43,3 @@ alpha_embedded
 ```@docs
 alpha_rescale_molecule
 ```
-
