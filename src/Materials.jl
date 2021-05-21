@@ -75,7 +75,7 @@ end
 
 
 """
-    lorentzian(λ::T, α_k::T, λ_k::T, µ_k::T) where T <: Real
+    lorentzian(λ::Real, α_k::Real, λ_k::Real, µ_k::Real)
 
 Complex Lorentz function, to describe polarisabilities
 - `λ`: wavelength in nm
