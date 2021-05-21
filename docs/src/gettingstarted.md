@@ -45,13 +45,13 @@ d2 = [insertcols!(d1, :cluster => "helix");
       insertcols!(d0, :cluster => "single")]
 
 d2 |> @vlplot(
- width= 120,
- height =  100,
+ width= 200,
+ height =  150,
      mark = {:line, clip = true},
      row = "type", column="variable",
      resolve={scale={y="independent"}},
      encoding = {x = "wavelength:q", y = "value:q",
-      strokeDash = "cluster:n",  color = "hand:n"}
+      strokeDash = "cluster:n"}
  )
 
 ```
