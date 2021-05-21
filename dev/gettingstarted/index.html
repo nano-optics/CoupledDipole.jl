@@ -3,19 +3,19 @@
 using DataFrames
 using VegaLite
 
-## materials
-wavelength = collect(400:2:1000.0)
-media = Dict([(&quot;Au&quot;, epsilon_Au), (&quot;medium&quot;, x -&gt; 1.33)])
-mat = Material(wavelength, media)
-
-## dimer geometry
+## cluster geometry
 cl1 = cluster_helix(4, 20, 20, 40, 200, 400, π/4, 0)
-cl0 = cluster_single(20, 20, 40)
-</code></pre><p>From these two objects we can simply call a high-level function to simulate optical properties. The following lines simulate the orientation-averaged optical response,</p><pre><code class="language-">oa0 = spectrum_oa(cl0, mat)
+cl0 = cluster_single(20, 20, 40) # reference: single-particle
+
+## materials
+wavelengths = collect(400:2:1000.0)
+media = Dict([(&quot;Au&quot;, epsilon_Au), (&quot;medium&quot;, x -&gt; 1.33)])
+mat = Material(wavelengths, media)
+</code></pre><p>From these two objects we can simply call a high-level function to simulate optical properties. The following lines simulate the orientation-averaged optical response,</p><pre><code class="language-">oa0 = spectrum_oa(cl0, mat) # reference: just one particle
 oa1 = spectrum_oa(cl1, mat)</code></pre><p>From there we combine the cross-sections in long-format dataframes for plotting,</p><pre><code class="language-">d0 = oa_df(oa0, mat.wavelengths)
 d1 = oa_df(oa1, mat.wavelengths)
 
-d2 = [insertcols!(d1, :cluster =&gt; &quot;dimer&quot;);
+d2 = [insertcols!(d1, :cluster =&gt; &quot;helix&quot;);
       insertcols!(d0, :cluster =&gt; &quot;single&quot;)]
 
 p = d2 |&gt; @vlplot(
@@ -28,6 +28,6 @@ p = d2 |&gt; @vlplot(
       strokeDash = &quot;cluster:n&quot;,  color = &quot;hand:n&quot;}
  )
  
-p |&gt; save(&quot;dimer-plot.svg&quot;)
+p |&gt; save(&quot;helix-plot.svg&quot;)
 
-nothing # hide</code></pre><p><img src="dimer-plot.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../background/">Background and Motivation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 21 May 2021 03:25">Friday 21 May 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+nothing # hide</code></pre><p><img src="helix-plot.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../background/">Background and Motivation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 21 May 2021 03:26">Friday 21 May 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
