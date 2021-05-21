@@ -25,6 +25,7 @@ include("PostProcessing.jl")
 export propagator_freespace_labframe!
 export incident_field!
 export polarisation!
+export iterate_field!
 export Cluster
 export cluster_single
 export cluster_helix
@@ -189,6 +190,36 @@ function polarisation!(P, E, AlphaBlocks)
     return P
 end
 
+"""
+    iterate_field!(E, P, σ_ext, Ein, G, kn, AlphaBlocks, tol=1e-8, maxiter=1000)
+
+Order-of-scattering iteration of the total field
+
+- `E`: `3N_dip x N_inc` matrix, total field for all incidences
+- `P`: `3N_dip x N_inc` matrix, polarisations for all incidences
+- `Ein`: `3N_dip x N_inc` matrix, total field for all incidences
+- `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
+
+"""
+function iterate_field!(E, P, σ_ext, Ein, F, kn, AlphaBlocks, tol=1e-8, maxiter=1000)
+
+    error = Inf
+    niter = 1
+    Etmp = copy(E) # is this needed? "aliasing"?
+    σ_prev = copy(σ_ext)
+
+    while (error > tol) && (niter < maxiter)
+
+        E +=  F * Etmp # add new order contribution
+        polarisation!(P, E, AlphaBlocks)
+        extinction!(σ_ext, kn, P, Ein)
+        error = max(abs.((σ_ext - σ_prev)) ./ abs.(σ_ext))
+
+        niter += 1
+
+    end
+
+end
 
 
 end

@@ -17,7 +17,8 @@ function spectrum_dispersion(
     cl::Cluster,
     mat::Material,
     Incidence,
-    N_sca::Int = 36
+    N_sca::Int = 36,
+    method = "direct",
 )
 
     # what is the type of arrays to initialise?
@@ -90,7 +91,8 @@ function spectrum_dispersion(
         # we'd compute rotation matrices on the fly
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
         # but instead we've prestored them, since wavelength-independent
-        AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        AlphaBlocks =
+            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
         # Interaction matrix (F = I - G0 alpha_eff)
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
@@ -101,15 +103,46 @@ function spectrum_dispersion(
         # but instead we've prestored them, since wavelength-independent
         incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
-        # solve
-        # TODO provide iterative solver alternative
-        E = F \ Ein
-        polarisation!(P, E, AlphaBlocks)
 
-        # cross-sections for multiple angles
-        extinction!(tmpcext, kn, P, Ein)
+        # solve
+
+        if method == "direct" # brute-force solve linear system
+
+            E = F \ Ein
+            polarisation!(P, E, AlphaBlocks)
+
+            # cross-section for cubature angles
+            extinction!(tmpcext, kn, P, Ein)
+
+        elseif method == "oos" # udpate E, P, α_ext iteratively by order-of-scattering
+
+            E = Ein
+            polarisation!(P, E, AlphaBlocks)
+            extinction!(tmpcext, kn, P, Ein)
+            iterate_field!(
+                E,
+                P,
+                tmpcext,
+                Ein,
+                F,
+                kn,
+                AlphaBlocks,
+                tol = 1e-8,
+                maxiter = 1000,
+            )
+
+        end
+
+        # remaining cross-sections for cubature angles
         absorption!(tmpcabs, kn, P, E)
-        scattering!(tmpcsca, cl.positions, ScatteringVectors, quad_sca.weights, kn, P)
+        scattering!(
+            tmpcsca,
+            cl.positions,
+            ScatteringVectors,
+            quad_sca.weights,
+            kn,
+            P,
+        )
 
         cext[ii, :] = tmpcext
         cabs[ii, :] = tmpcabs
@@ -140,6 +173,7 @@ function spectrum_oa(
     cubature = "gl",
     N_inc = 36,
     N_sca = 36,
+    method = "direct",
 )
 
     quad_inc = cubature_sphere(N_inc, cubature)
@@ -217,7 +251,8 @@ function spectrum_oa(
 
         # update the rotated blocks
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
-        AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        AlphaBlocks =
+            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 
@@ -225,14 +260,44 @@ function spectrum_oa(
         incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
         # solve
-        # TODO provide iterative solver alternative
-        E = F \ Ein
-        polarisation!(P, E, AlphaBlocks)
 
-        # cross-sections for cubature angles
-        extinction!(tmpcext, kn, P, Ein)
+        if method == "direct" # brute-force solve linear system
+
+            E = F \ Ein
+            polarisation!(P, E, AlphaBlocks)
+
+            # cross-section for cubature angles
+            extinction!(tmpcext, kn, P, Ein)
+
+        elseif method == "oos" # udpate E, P, α_ext iteratively by order-of-scattering
+
+            E = Ein
+            polarisation!(P, E, AlphaBlocks)
+            extinction!(tmpcext, kn, P, Ein)
+            iterate_field!(
+                E,
+                P,
+                tmpcext,
+                Ein,
+                F,
+                kn,
+                AlphaBlocks,
+                tol = 1e-8,
+                maxiter = 1000,
+            )
+
+        end
+
+        # remaining cross-sections for cubature angles
         absorption!(tmpcabs, kn, P, E)
-        scattering!(tmpcsca, cl.positions, ScatteringVectors, quad_sca.weights, kn, P)
+        scattering!(
+            tmpcsca,
+            cl.positions,
+            ScatteringVectors,
+            quad_sca.weights,
+            kn,
+            P,
+        )
 
 
         #  perform cubature for angular averaging
