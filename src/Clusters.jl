@@ -115,6 +115,7 @@ function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left"
     x = R * cos.(ϕ)
     y = R * sin.(ϕ)
     z = s * ϕ * Λ/(2π)
+    z .-= s*maximum(s * z)/2 # if <0, add, else remove
 
     # angles calculation
     x′ =  - y

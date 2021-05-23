@@ -1,6 +1,7 @@
 function visualise(cl)
 
         s = []
+
         for i ∈ 1:length(cl.positions)
                 x = cl.positions[i][1]
                 y = cl.positions[i][2]
@@ -10,7 +11,7 @@ function visualise(cl)
                 b = cl.sizes[i][2]
                 c = cl.sizes[i][3]
 
-                α = cl.angles[i][1]
+                α = pi/2+cl.angles[i][1]
                 β = cl.angles[i][2]
                 γ = cl.angles[i][3]
                 push!(s,
@@ -19,9 +20,10 @@ function visualise(cl)
                    sphere$i.position.y = $y;
                    sphere$i.position.z = $z;
                    sphere$i.scale.set($a,$b,$c);
-                   sphere$i.rotation.x = $α;
-                   sphere$i.rotation.y = $β;
-                   sphere$i.rotation.z = $γ;
+                   sphere$i.rotation.z = $α;
+                   sphere$i.rotation.x = $β;
+                   sphere$i.rotation.y = $γ;
+                   sphere$i.rotation.order = 'ZXY';
                    scene.add(sphere$i);\n",
                 )
         end
@@ -34,22 +36,26 @@ end
 cl =cluster_helix(10, 20, 20, 40, 50, 300)
 
 
-visualise(cl)
+p = visualise(cl)
 
+
+io = open("myfile.txt", "w");
+write(io, broadcast(*, p...));
+close(io);
 
 function euler_to_axisangle(e)
         M = euler_passive(e...)
-        θ = acos((M[1, 1] + M[2, 2] + M[3, 3] - 1) / 2)
+        θ = acos((M[1, 1] + M[2, 2] + M[3, 3] - 1) / 2)+1e-5
         e1 = (M[3, 2] - M[2, 3]) / (2sin(θ))
         e2 = (M[1, 3] - M[3, 1]) / (2sin(θ))
         e3 = (M[2, 1] - M[1, 2]) / (2sin(θ))
 
-        θ .* Vec3f0(e1, e2, e3)
+        θ .* Vec3f0(e1, e2, e3+1e-5)
 end
 
 # euler_to_axisangle([0,pi/2,0])
 
-cl = cluster_dimer(10, 1, 2, 3)
+cl = cluster_dimer(10, 1, 2, 3, pi/4)
 
 meshscatter(
     Point3f0.(cl.positions),
@@ -57,7 +63,7 @@ meshscatter(
     markersize = 1.0.*Vec3f0.(cl.sizes),
     #markersize = [Vec3f0(10,10,20) for i in 1:length(cl.positions)],
     rotation = euler_to_axisangle.(cl.angles),
-    color=:red
+    color=:red, limits = Rect([0,0,0],[1,1,1])
 )
 
 
