@@ -33,15 +33,21 @@ function visualise(cl)
 
 end
 
-cl =cluster_helix(10, 20, 20, 40, 50, 300)
+cl = cluster_helix(10, 10, 10, 20, 50, 200)
 
 
 p = visualise(cl)
 
-
 io = open("myfile.txt", "w");
 write(io, broadcast(*, p...));
 close(io);
+
+
+
+using WebIO
+Asset("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js")
+
+
 
 function euler_to_axisangle(e)
         M = euler_passive(e...)
