@@ -10,6 +10,11 @@
 <script src="https://unpkg.com/three@0.85.0/examples/js/Detector.js"></script>
 
 <script>
+define('three', ['../assets/three.js'], function ( THREE ) {
+  window.THREE = THREE;
+  return THREE;
+});
+
 (function () {
 
 var webglEl = document.getElementById('webgl');
