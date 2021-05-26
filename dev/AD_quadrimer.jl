@@ -50,6 +50,30 @@ d = map(θ -> DataFrame(wavelength = collect(400:5:800.0),
 m = vcat(d...)
 
 
+function axis_angle(v = SVector(0, 1, 0), θ)
+
+    cosθ = cos(θ); sinθ = sin(θ)
+
+    R = SMatrix{3,3}(
+        cosθ + v[1]^2 * (1 - cosθ),
+        v[2] * v[1] * (1 - cosθ) + v[3] * sinθ,
+        v[3] * v[1] * (1 - cosθ) - v[2] * sinθ,
+        #
+        v[1] * v[2] * (1 - cosθ) - v[3] * sinθ,
+        cosθ + v[2]^2 * (1 - cosθ),
+        v[3] * v[2] * (1 - cosθ) + v[1] * sinθ,
+        #
+        v[1] * v[3] * (1 - cosθ) + v[2] * sinθ,
+        v[2] * v[3] * (1 - cosθ) - v[1] * sinθ,
+        cosθ + v[3]^2 * (1 - cosθ)
+    )
+
+    return R
+end
+
+# axis_angle(SVector(0, 1, 0), π/4)
+
+
 dich = model([0,π/4,0])
 # sum(abs.(dich))
 

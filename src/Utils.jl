@@ -136,6 +136,48 @@ end
 euler_unitvector(v::SVector) = euler_unitvector(v[1],v[2]) # ψ irrelevant here
 
 
+
+"""
+    axis_angle(v = SVector(0, 1, 0), θ)
+
+3D rotation matrix from axis-angle representation
+
+- `v`: SVector
+- `θ`: rotation angle
+
+# Examples
+
+```
+julia> axis_angle(SVector(0, 1, 0), π/4)
+3×3 SMatrix{3, 3, Float64, 9} with indices SOneTo(3)×SOneTo(3):
+  0.707107  0.0  0.707107
+  0.0       1.0  0.0
+ -0.707107  0.0  0.707107
+```
+
+"""
+function axis_angle(v = SVector(0, 1, 0), θ)
+
+    cosθ = cos(θ); sinθ = sin(θ)
+
+    R = SMatrix{3,3}(
+        cosθ + v[1]^2 * (1 - cosθ),
+        v[2] * v[1] * (1 - cosθ) + v[3] * sinθ,
+        v[3] * v[1] * (1 - cosθ) - v[2] * sinθ,
+        #
+        v[1] * v[2] * (1 - cosθ) - v[3] * sinθ,
+        cosθ + v[2]^2 * (1 - cosθ),
+        v[3] * v[2] * (1 - cosθ) + v[1] * sinθ,
+        #
+        v[1] * v[3] * (1 - cosθ) + v[2] * sinθ,
+        v[2] * v[3] * (1 - cosθ) - v[1] * sinθ,
+        cosθ + v[3]^2 * (1 - cosθ)
+    )
+
+    return R
+end
+
+
 ## orientation-averaging
 
 @doc raw"""

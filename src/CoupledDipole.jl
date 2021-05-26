@@ -50,6 +50,7 @@ export quadrature_lgwt
 export euler_active
 export euler_passive
 export euler_unitvector
+export axis_angle
 export cubature_sphere
 export spectrum_dispersion
 export spectrum_oa
