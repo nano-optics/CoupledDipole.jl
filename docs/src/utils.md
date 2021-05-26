@@ -12,10 +12,15 @@ euler_active
 euler_passive
 ```
 
+```@docs
+axis_angle
+```
+
 
 ```@docs
 euler_unitvector
 ```
+
 
 ## Spherical cubature
 
