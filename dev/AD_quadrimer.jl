@@ -45,9 +45,13 @@ using Iterators
 # collect(product([1,2,3], [4,5,6]))
 
 d = map(θ -> DataFrame(wavelength = collect(400:5:800.0),
-                    cd = model([0,θ*pi/180,0]), theta=θ), 0:15:90)
+                    cd = model([0,θ*pi/180,0.3]), theta=θ), 0:15:90)
 
 m = vcat(d...)
+
+
+dich = model([0,π/4,0])
+# sum(abs.(dich))
 
 @vlplot(data=m,
 width= 400,
@@ -57,9 +61,17 @@ height =  300,
 )
 
 
+combine(groupby(m, :theta), :cd => x -> sum(abs.(x)))
 
-dich = model([0,π/4,0])
-# sum(abs.(dich))
+
+x0 = [0.1]
+function cost_1d(x)
+    -sum(abs.(model([0,x,0])))
+end
+
+pf = optimize(cost_1d, 0, π/2, Brent())
+# pf.minimizer
+# 0.7857593236287779
 
 
 # function to minimise
