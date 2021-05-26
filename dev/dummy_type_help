@@ -1,0 +1,41 @@
+
+# this helper function updates existing A
+function blind_helper!(A, x, y)
+   k = 0.1im + pi/12
+   A[1,1] = exp( k*x[1] * y[1])
+   return A
+end
+
+function dummy(x, y)
+
+    # what is the type of arrays to initialise?
+    proto_x = x[1]
+    proto_y = y[1]
+    proto_α = 0.1 + 0.1im # dummy internal variable, complex
+    T1 = typeof(proto_x * imag(proto_α * proto_y)) # e.g Float64 in normal use
+    T2 = typeof(proto_x * proto_α * proto_y) # e.g Complex{Float64} in normal use
+
+    # initialise some identity matrix with the Complex{"something"} type
+   A = Matrix{T2}(I, 3, 3)
+   results = Array{T1}(undef, (3)) # array of results, e.g. Float64 in normal use
+
+   # update some matrix elements that depend on x and y
+   blind_helper!(A, x, y)
+   for i in 1:3
+      results[i] = imag(dot(A[:,i], A[:,1]))
+   end
+
+   return results
+end
+
+dummy([1.0, 2.0], [3.0, 4.0])
+
+# but then I might need to run it through AD, which will feed Dual types
+
+using ForwardDiff
+function cost(p)
+   res = dummy(p, [3.0, 4.0])
+   return res[1]
+end
+
+grad = ForwardDiff.gradient(cost, [0.0,0.0])

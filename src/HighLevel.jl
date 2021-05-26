@@ -22,10 +22,13 @@ function spectrum_dispersion(
 )
 
     # what is the type of arrays to initialise?
-    proto_r = cl.positions[1][1]
+    proto_r = cl.positions[1][1] # position type
+    proto_a = cl.angles[1][1] # angle type
+    proto_α = 0.1 + 0.1im # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
-    T = typeof(proto_k * proto_r)
-    # note: cross-sections are typeof(imag(P*E)), which boils down to T, hopefully
+    T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
+    # note: cross-sections are typeof(imag(P*E)), which boils down to T1, hopefully
+    T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
 
     N_dip = length(cl.positions)
     N_lam = length(mat.wavelengths)
@@ -36,8 +39,8 @@ function spectrum_dispersion(
 
     # initialise
     # https://discourse.julialang.org/t/initialise-array-without-specific-types/60204/3
-    F = Matrix{Complex{T}}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
-    Ein = Array{Complex{T}}(undef, (3N_dip, 2N_inc))
+    F = Matrix{T2}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
+    Ein = Array{T2}(undef, (3N_dip, 2N_inc))
     E = similar(Ein)
     P = similar(Ein)
 
@@ -55,14 +58,16 @@ function spectrum_dispersion(
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
     # NOTE: we only need the third column to rotate kz, should specialise
 
+    # AlphaBlocks = [@SMatrix zeros(T2, 3, 3) for ii = 1:N_dip]
+
     ## loop over wavelengths
 
     # use type T for containers, inferred from positions
     # this is to be compatible with autodiff when optimising cluster geometry
-    cext = Array{T}(undef, (N_lam, 2 * N_inc))
+    cext = Array{T1}(undef, (N_lam, 2 * N_inc))
     cabs = similar(cext)
     csca = similar(cext)
-    tmpcext = Vector{T}(undef, 2N_inc)
+    tmpcext = Vector{T1}(undef, 2N_inc)
     tmpcabs = similar(tmpcext)
     tmpcsca = similar(tmpcext)
 
@@ -115,7 +120,7 @@ function spectrum_dispersion(
             extinction!(tmpcext, kn, P, Ein)
 
         elseif method == "oos" # udpate E, P, α_ext iteratively by order-of-scattering
-            # 
+            #
             # E[:] = Ein
             # polarisation!(P, E, AlphaBlocks)
             # extinction!(tmpcext, kn, P, Ein)
@@ -178,22 +183,27 @@ function spectrum_oa(
 
     # setting up constants
 
+
     # what is the type of arrays to initialise?
-    proto_r = cl.positions[1][1]
+    proto_r = cl.positions[1][1] # position type
+    proto_a = cl.angles[1][1] # angle type
+    proto_α = 0.1 + 0.1im # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
-    T = typeof(proto_k * proto_r)
-    # note: cross-sections are typeof(imag(P*E)), which boils down to T, hopefully
+    T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
+    # note: cross-sections are typeof(imag(P*E)), which boils down to T1, hopefully
+    T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
+
 
     N_dip = length(cl.positions)
     N_lam = length(mat.wavelengths)
     N_inc = length(quad_inc.weights) # update with actual number of angles
 
-    F = Matrix{Complex{T}}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
-    Ein = Array{Complex{T}}(undef, (3N_dip, 2N_inc))
+    F = Matrix{T2}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
+    Ein = Array{T2}(undef, (3N_dip, 2N_inc))
     E = similar(Ein)
     P = similar(Ein)
 
-    AlphaBlocks = [@SMatrix zeros(Complex{T}, 3, 3) for ii = 1:N_dip]
+    # AlphaBlocks = [@SMatrix zeros(T2, 3, 3) for ii = 1:N_dip]
     # block_array = BlockArray{Float32}(undef_blocks, [1,2], [3,2])
     # setblock!(block_array, rand(2,2), 2, 1)
     # block_array[Block(1, 1)]
@@ -215,14 +225,14 @@ function spectrum_oa(
 
     # use type T for containers, inferred from positions
     # this is to be compatible with autodiff when optimising cluster geometry
-    cext = Vector{T}(undef, N_lam)
+    cext = Vector{T1}(undef, N_lam)
     cabs = similar(cext)
     csca = similar(cext)
     dext = similar(cext)
     dabs = similar(cext)
     dsca = similar(cext)
 
-    tmpcext = Vector{T}(undef, 2N_inc)
+    tmpcext = Vector{T1}(undef, 2N_inc)
     tmpcabs = similar(tmpcext)
     tmpcsca = similar(tmpcext)
 
