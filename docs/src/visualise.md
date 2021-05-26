@@ -3,6 +3,15 @@
 
 ```@raw html
 
+<script type="module">
+
+  import * as THREE from 'https://cdn.skypack.dev/three';
+
+import  { TrackballControls }  from 'https://cdn.skypack.dev/three-trackballcontrols';
+
+</script>
+
+
 <div id="webgl"></div>
 
 
