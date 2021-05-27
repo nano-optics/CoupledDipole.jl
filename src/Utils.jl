@@ -137,7 +137,7 @@ euler_unitvector(v::SVector) = euler_unitvector(v[1],v[2]) # ψ irrelevant here
 
 
 
-"""
+@doc raw"""
     axis_angle(v = SVector(0, 1, 0), θ)
 
 3D rotation matrix from axis-angle representation
@@ -156,7 +156,7 @@ julia> axis_angle(SVector(0, 1, 0), π/4)
 ```
 
 """
-function axis_angle(v = SVector(0, 1, 0), θ)
+function axis_angle(v, θ)
 
     cosθ = cos(θ); sinθ = sin(θ)
 
