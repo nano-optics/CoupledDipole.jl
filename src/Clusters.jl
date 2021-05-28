@@ -39,9 +39,8 @@ Particle cluster consisting of a single particle at the origin
 
 # Examples
 
-```jldoctest
-julia> cluster_single(1.0,2.0,3.0)
-Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Float64}[[1.0, 2.0, 3.0]], ["Au"], ["particle"])
+```
+cluster_single(1.0,2.0,3.0)
 ```
 
 """
@@ -66,9 +65,8 @@ Particle cluster consisting of 2 identical particles separated along y
 
 # Examples
 
-```jldoctest
-julia> cluster_dimer(80, 10, 10, 20)
-Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -40.0, 0.0], [0.0, 40.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Int64}[[10, 10, 20], [10, 10, 20]], ["Au", "Au"], ["particle", "particle"])
+```
+cluster_dimer(80, 10, 10, 20)
 ```
 
 """
@@ -152,9 +150,8 @@ Line of N identical particles in the x direction
 
 # Examples
 
-```jldoctest
-julia> cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
-Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[-500.0, 0.0, 0.0], [0.0, 0.0, 0.0], [500.0, 0.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Int64}[[20, 20, 30], [20, 20, 30], [20, 20, 30]], ["Au", "Au", "Au"], ["particle", "particle", "particle"])
+```
+cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
 ```
 
 """
@@ -183,9 +180,8 @@ Square array of N identical particles in the xy plane
 
 # Examples
 
-```jldoctest
-julia> cluster_array(4, 500, 20, 20, 30, 0, 0, 0)
-Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[-250.0, -250.0, 0.0], [250.0, -250.0, 0.0], [-250.0, 250.0, 0.0], [250.0, 250.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Int64}[[20, 20, 30], [20, 20, 30], [20, 20, 30], [20, 20, 30]], ["Au", "Au", "Au", "Au"], ["particle", "particle", "particle", "particle"])
+```
+cluster_array(4, 500, 20, 20, 30, 0, 0, 0)
 ```
 
 """
