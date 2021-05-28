@@ -26,6 +26,7 @@ function spectrum_dispersion(
     proto_a = cl.rotations[1][1] # angle type
     proto_α = 0.1 + 0.1im # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
+    # CHECK: is picking the first element of quaternion a sensible idea
     T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
     # note: cross-sections are typeof(imag(P*E)), which boils down to T1, hopefully
     T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
@@ -73,16 +74,17 @@ function spectrum_dispersion(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type[ii] == "point"
+        # TODO: map over type and material
+        if cl.type[1] == "point"
 
-            α_name = cl.material[ii] # e.g. "alpha" to refer to mat Dict
+            α_name = cl.material[1] # e.g. "alpha" to refer to mat Dict
             α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
 
-        elseif cl.type[ii] == "particle"
+        elseif cl.type[1] == "particle"
 
-            ε_name = cl.material[ii] # e.g. "Au" to refer to epsilon_Au in mat Dict
+            ε_name = cl.material[1] # e.g. "Au" to refer to epsilon_Au in mat Dict
             ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
@@ -241,16 +243,17 @@ function spectrum_oa(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type[ii] == "point"
+                # TODO: map over type and material
+        if cl.type[1] == "point"
 
-            α_name = cl.material[ii] # e.g. "alpha" to refer to mat Dict
+            α_name = cl.material[1] # e.g. "alpha" to refer to mat Dict
             α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
 
-        elseif cl.type[ii] == "particle"
+        elseif cl.type[1] == "particle"
 
-            ε_name = cl.material[ii] # e.g. "Au" to refer to epsilon_Au in mat Dict
+            ε_name = cl.material[1] # e.g. "Au" to refer to epsilon_Au in mat Dict
             ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
