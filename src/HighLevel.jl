@@ -81,13 +81,13 @@ function spectrum_dispersion(
             α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
-
+            # Alpha = map((m,s) -> alpha_rescale_molecule(alpha_embedded(mat.media[m](λ), n_medium), s), cl.material, cl.sizes)
         elseif cl.type[1] == "particle"
 
             ε_name = cl.material[1] # e.g. "Au" to refer to epsilon_Au in mat Dict
             ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
-
+            # Alpha = map((m,s) -> alpha_kuwata(λ, mat.media[m](λ), ε_m, s), cl.material, cl.sizes)
         end
 
         # update the rotated blocks

@@ -17,11 +17,11 @@ using DataFrames
 using VegaLite
 
 ## cluster geometry
-cl1 = cluster_helix(4, 20, 20, 40, 200, 400, π/4, 0)
+cl1 = cluster_helix(8, 30, 30, 50, 200, 400, π/2, 0)
 cl0 = cluster_single(20, 20, 40) # reference: single-particle
 
 ## materials
-wavelengths = collect(400:2:1000.0)
+wavelengths = collect(400:2:800.0)
 media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelengths, media)
 
@@ -51,10 +51,8 @@ d2 |> @vlplot(
      row = "type", column="variable",
      resolve={scale={y="independent"}},
      encoding = {x = "wavelength:q", y = "value:q",
-      strokeDash = "cluster:n"}
+      strokeDash = "cluster:n", color = "cluster:n"}
  )
 
 ```
 
-
-![](helix-plot.svg)
