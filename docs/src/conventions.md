@@ -1,6 +1,44 @@
 # Conventions
 
 
+## Code design and conventions
+
+From a user's perspective the code provides 2 high-level functions to perform calculations of:
+
+1. Fixed orientation far-field cross-sections (extinction, absorption and scattering), for multiple wavelengths and incidence directions
+2. Orientation-averaged cross-sections (extinction, absorption and scattering) and associated circular dichroism spectra, using numerical cubature over the full solid angle
+
+The high-level functions require at least 2 inputs: 
+
+- A `Cluster` object, describing the geometry of the particle cluster
+- A `Material` object, describing the wavelength-dependent optical properties of the various media
+
+### Geometry description
+
+`Cluster` is a structure comprising 4 fields,
+
+- `positions`, a vector of N particle positions stored as 3-vectors storing cartesian coordinates x,y,z
+
+- `orientations`, a vector of N particle orientations stored as quaternions (4 components, $\cos\phi/2; \sin\phi/2 \mathbf{v}$ with $\mathbf{v}$ the rotation axis). The quaternions are automatically converted into rotation matrices with the `Rotations.jl` package.
+
+- `material`, a string reference the material of the particles.
+
+
+### Material description
+
+### High level functions
+
+#### Fixed orientation cross-sections
+
+#### Angular averaging and circular dichroism
+
+### Rotations
+
+### Angular averaging
+
+
+
+
 ```@raw html
 
 <div id="webgl"></div>

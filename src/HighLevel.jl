@@ -73,16 +73,16 @@ function spectrum_dispersion(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type == "point"
+        if cl.type[ii] == "point"
 
-            α_name = cl.material # e.g. "alpha" to refer to mat Dict
+            α_name = cl.material[ii] # e.g. "alpha" to refer to mat Dict
             α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
 
-        elseif cl.type == "particle"
+        elseif cl.type[ii] == "particle"
 
-            ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
+            ε_name = cl.material[ii] # e.g. "Au" to refer to epsilon_Au in mat Dict
             ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
@@ -241,16 +241,16 @@ function spectrum_oa(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type == "point"
+        if cl.type[ii] == "point"
 
-            α_name = cl.material # e.g. "alpha" to refer to mat Dict
+            α_name = cl.material[ii] # e.g. "alpha" to refer to mat Dict
             α_bare = mat.media[α_name](λ)
             α = alpha_embedded(α_bare, n_medium)
             Alpha = alpha_rescale_molecule(α, cl.sizes)
 
-        elseif cl.type == "particle"
+        elseif cl.type[ii] == "particle"
 
-            ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
+            ε_name = cl.material[ii] # e.g. "Au" to refer to epsilon_Au in mat Dict
             ε = mat.media[ε_name](λ)
             Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
