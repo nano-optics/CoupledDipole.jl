@@ -28,11 +28,13 @@ function visualise(cl)
                 # or .setRotationFromAxisAngle( axis : Vector3, angle : Float )
                 # note: now active rotations so need inverse
                 q = Rotations.params(inv(cl.rotations[i]))
-                # q = Rotations.params(cl.rotations[i])
+
+                # testing fixed angles
                 # alpha=pi/2
                 # q = Rotations.params(UnitQuaternion(cos(alpha/2),  0,0,sin(alpha/2)))
                 # q = Rotations.params(UnitQuaternion(cos(alpha/2),  0,0,sin(alpha/2)))
                 q1 = q[1]; q2 = q[2]; q3 = q[3]; q4 = q[4]
+                # note threejs orders them differently (last)
                 push!(s,
               "var particle$i = createSphere(radius, segments);
                    particle$i.position.x = $x;
