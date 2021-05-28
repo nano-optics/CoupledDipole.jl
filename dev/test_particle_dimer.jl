@@ -15,14 +15,15 @@ media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
 ## dimer geometry
-cl1 = cluster_dimer(80, 20, 20, 40, π/4)
-cl2 = cluster_single(20, 20, 40)
+cl0 = cluster_single(20, 20, 40)
+cl1 = cluster_dimer(80, 20, 20, 40, 0)
+cl2 = cluster_dimer(80, 20, 20, 40, π/4)
 
 ## incidence: along z, along x, along y
 Incidence = [SVector(0,0,0),SVector(0,π/2,0),SVector(π/2,π/2,0)]
 
-disp1 = spectrum_dispersion(cl1, mat, Incidence)
-disp2 = spectrum_dispersion(cl2, mat, Incidence)
+disp1 = spectrum_dispersion(cl0, mat, Incidence)
+disp2 = spectrum_dispersion(cl1, mat, Incidence)
 
 d1 = dispersion_df(disp1, mat.wavelengths)
 d2 = dispersion_df(disp2, mat.wavelengths)
@@ -41,7 +42,7 @@ d = [insertcols!(d1, :cluster => "dimer");
 
 
 
-oa1 = spectrum_oa(cl1, mat)
+oa1 = spectrum_oa(cl0, mat)
 oa2 = spectrum_oa(cl2, mat)
 
 
@@ -51,7 +52,6 @@ d4 = oa_df(oa2, mat.wavelengths)
 d5 = [insertcols!(d3, :cluster => "dimer");
      insertcols!(d4, :cluster => "single")]
 
-# filter(row -> row[:type] == "average" , d5)
 d5 |> @vlplot(
  width= 400,
  height =  300,

@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>WebGL SH</title>
+	<style>
+		body { margin: 0; overflow: hidden; background-color: #fff; }
+		.tm  { position: absolute; top: 10px; right: 10px; }
+		.webgl-error { font: 15px/30px monospace; text-align: center; color: #fff; margin: 50px; }
+		.webgl-error a { color: #fff; }
+    </style>
+</head>
+<body>
+<div id="webgl"></div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+	<script src="https://unpkg.com/three@0.85.0/examples/js/controls/TrackballControls.js"></script>		
+	<script src="https://unpkg.com/three@0.85.0/examples/js/Detector.js"></script>		
+	
+	<script>
+// Created by Bjorn Sandvik - thematicmapping.org
+(function () {
+
+	var webglEl = document.getElementById('webgl');
+
+	if (!Detector.webgl) {
+		Detector.addGetWebGLMessage(webglEl);
+		return;
+	}
+
+	var width  = 600,
+		height = 600;
+
+	// sphere params
+	var radius   = 1,
+		segments = 36,
+		rotation = 6;  
+
+	var scene = new THREE.Scene();
+scene.background = new THREE.Color( 0xeeeeee );
+
+
+	var camera = new THREE.PerspectiveCamera(100, width / height, 0.01, 1000);
+	
+	camera.position.z = 200;
+
+	var renderer = new THREE.WebGLRenderer();
+	renderer.setSize(width, height);
+
+const frontSpot = new THREE.SpotLight(0xeeeece);
+frontSpot.position.set(1000, 1000, 1000);
+scene.add(frontSpot);
+
+const frontSpot2 = new THREE.SpotLight(0xddddce);
+frontSpot2.position.set(-500, -500, -500);
+scene.add(frontSpot2);
+
+
+	scene.add(new THREE.AmbientLight(0xffffff, 1));
+
+     	var xDistance = 2;
+       var yDistance = 2;
+         //initial offset so does not start in middle.
+         var xOffset = 0;
+         var yOffset = 1;
+     
+     ///////////////////
+     ///////////////////
+     ///////////////////
+     var particle1 = createSphere(radius, segments);
+                   particle1.position.x = 35.35533905932738;
+                   particle1.position.y = 35.35533905932737;
+                   particle1.position.z = 99.99999999999999;
+                   particle1.scale.set(10,10,20);
+                   particle1.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.8099186831656617,0.33547930298657486,0.44450547494094406,0.18412019626963297);
+                   particle1.applyQuaternion(qm);
+                   particle1.quaternion.normalize();
+                   scene.add(particle1);
+var particle2 = createSphere(radius, segments);
+                   particle2.position.x = 3.061616997868383e-15;
+                   particle2.position.y = 50.0;
+                   particle2.position.z = 74.99999999999999;
+                   particle2.scale.set(10,10,20);
+                   particle2.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.876649665529599,5.367931034322106e-17,0.48112925906334403,2.94606703544031e-17);
+                   particle2.applyQuaternion(qm);
+                   particle2.quaternion.normalize();
+                   scene.add(particle2);
+var particle3 = createSphere(radius, segments);
+                   particle3.position.x = -35.35533905932737;
+                   particle3.position.y = 35.35533905932738;
+                   particle3.position.z = 49.999999999999986;
+                   particle3.scale.set(10,10,20);
+                   particle3.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.8099186831656617,-0.33547930298657486,0.44450547494094406,-0.18412019626963297);
+                   particle3.applyQuaternion(qm);
+                   particle3.quaternion.normalize();
+                   scene.add(particle3);
+var particle4 = createSphere(radius, segments);
+                   particle4.position.x = -50.0;
+                   particle4.position.y = 6.123233995736766e-15;
+                   particle4.position.z = 24.999999999999986;
+                   particle4.scale.set(10,10,20);
+                   particle4.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.6198849232208983,-0.6198849232208982,0.34020976171094974,-0.34020976171094974);
+                   particle4.applyQuaternion(qm);
+                   particle4.quaternion.normalize();
+                   scene.add(particle4);
+var particle5 = createSphere(radius, segments);
+                   particle5.position.x = -35.355339059327385;
+                   particle5.position.y = -35.35533905932737;
+                   particle5.position.z = 0.0;
+                   particle5.scale.set(10,10,20);
+                   particle5.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.3354793029865749,-0.8099186831656617,0.18412019626963302,-0.44450547494094406);
+                   particle5.applyQuaternion(qm);
+                   particle5.quaternion.normalize();
+                   scene.add(particle5);
+var particle6 = createSphere(radius, segments);
+                   particle6.position.x = -9.184850993605149e-15;
+                   particle6.position.y = -50.0;
+                   particle6.position.z = -25.000000000000014;
+                   particle6.scale.set(10,10,20);
+                   particle6.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-8.051896551483158e-17,-0.876649665529599,4.4191005531604644e-17,-0.48112925906334403);
+                   particle6.applyQuaternion(qm);
+                   particle6.quaternion.normalize();
+                   scene.add(particle6);
+var particle7 = createSphere(radius, segments);
+                   particle7.position.x = 35.35533905932737;
+                   particle7.position.y = -35.355339059327385;
+                   particle7.position.z = -49.999999999999986;
+                   particle7.scale.set(10,10,20);
+                   particle7.useQuaternion = true;
+                   var qm = new THREE.Quaternion(0.3354793029865748,-0.8099186831656618,-0.18412019626963294,-0.4445054749409441);
+                   particle7.applyQuaternion(qm);
+                   particle7.quaternion.normalize();
+                   scene.add(particle7);
+var particle8 = createSphere(radius, segments);
+                   particle8.position.x = 50.0;
+                   particle8.position.y = -1.2246467991473532e-14;
+                   particle8.position.z = -75.00000000000001;
+                   particle8.scale.set(10,10,20);
+                   particle8.useQuaternion = true;
+                   var qm = new THREE.Quaternion(0.619884923220898,-0.6198849232208983,-0.3402097617109497,-0.34020976171094974);
+                   particle8.applyQuaternion(qm);
+                   particle8.quaternion.normalize();
+                   scene.add(particle8);
+var particle9 = createSphere(radius, segments);
+                   particle9.position.x = 35.355339059327385;
+                   particle9.position.y = 35.35533905932737;
+                   particle9.position.z = -100.00000000000001;
+                   particle9.scale.set(10,10,20);
+                   particle9.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.8099186831656617,0.33547930298657486,0.44450547494094406,0.18412019626963297);
+                   particle9.applyQuaternion(qm);
+                   particle9.quaternion.normalize();
+                   scene.add(particle9);
+var particle10 = createSphere(radius, segments);
+                   particle10.position.x = 1.5308084989341916e-14;
+                   particle10.position.y = 50.0;
+                   particle10.position.z = -124.99999999999999;
+                   particle10.scale.set(10,10,20);
+                   particle10.useQuaternion = true;
+                   var qm = new THREE.Quaternion(-0.876649665529599,5.367931034322106e-17,0.48112925906334403,2.94606703544031e-17);
+                   particle10.applyQuaternion(qm);
+                   particle10.quaternion.normalize();
+                   scene.add(particle10);
+
+        		
+        		
+     ///////////////////
+     ///////////////////
+     ///////////////////
+        		
+//var axesHelper = new THREE.AxesHelper( 5 );
+//scene.add( axesHelper );
+
+				scene.add( new THREE.AxesHelper( 100 ) );
+	var controls = new THREE.TrackballControls(camera);
+
+	webglEl.appendChild(renderer.domElement);
+
+	render();
+
+	function render() {
+		controls.update();
+		requestAnimationFrame(render);
+		renderer.render(scene, camera);
+	}
+
+
+ 
+	function createSphere(radius, segments) {
+	// material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+//	 const material = new THREE.MeshLambertMaterial({
+//  color: 0xdaa520,
+//  emissive: 0x111111,
+//});
+const material = new THREE.MeshStandardMaterial({
+  color: 0xfcc742,
+  emissive: 0x111111,
+  specular: 0xffffff,
+  metalness: 0.8,
+  roughness: 0.6,
+});
+		return new THREE.Mesh(
+			new THREE.SphereGeometry(radius, segments, segments),
+			material
+		);
+	}
+
+
+}());
+</script>
+</body>
+</html>

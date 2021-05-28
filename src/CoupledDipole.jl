@@ -21,6 +21,7 @@ include("Utils.jl")
 include("CrossSections.jl")
 include("HighLevel.jl")
 include("PostProcessing.jl")
+include("Visual.jl")
 
 
 export propagator_freespace_labframe!
@@ -57,6 +58,7 @@ export spectrum_dispersion
 export spectrum_oa
 export dispersion_df
 export oa_df
+export visualise
 
 ## core functions
 

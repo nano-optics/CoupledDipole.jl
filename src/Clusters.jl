@@ -136,7 +136,8 @@ function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left"
     ψ = 0.0 # don't care for axisymmetric particles
 
     positions = SVector.(x,y,z)
-    rotations = UnitQuaternion.(RotZYZ.(φ, θ, ψ))
+    # rotations = UnitQuaternion.(RotZYZ.(φ, θ, ψ))
+    rotations = UnitQuaternion.(inv.(RotZYZ.(φ, θ, ψ)))
 
     Cluster(positions, rotations, sizes, material, type)
 end
