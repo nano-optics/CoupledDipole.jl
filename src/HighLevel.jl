@@ -44,8 +44,6 @@ function spectrum_dispersion(
     E = similar(Ein)
     P = similar(Ein)
 
-    # AlphaBlocks = [@SMatrix zeros(Complex{T}, 3, 3) for ii = 1:N_dip]
-
     # incident field
     Ejones = [
         SVector{2}(1.0 + 0im, 0.0), # Jones vector, first polar
@@ -53,12 +51,11 @@ function spectrum_dispersion(
     ]
 
     # store all rotation matrices
-    ParticleRotations = map(euler_passive, cl.angles)
-    IncidenceRotations = map(euler_active, Incidence)
+    # ParticleRotations = map(euler_passive, cl.angles)
+    ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
+    IncidenceRotations = map(euler_active, Incidence) # same, no longer needed
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
     # NOTE: we only need the third column to rotate kz, should specialise
-
-    # AlphaBlocks = [@SMatrix zeros(T2, 3, 3) for ii = 1:N_dip]
 
     ## loop over wavelengths
 
@@ -96,8 +93,10 @@ function spectrum_dispersion(
         # we'd compute rotation matrices on the fly
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
         # but instead we've prestored them, since wavelength-independent
-        AlphaBlocks =
-            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # AlphaBlocks =
+        #     map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+            AlphaBlocks =
+                map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
         # Interaction matrix (F = I - G0 alpha_eff)
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
@@ -186,7 +185,7 @@ function spectrum_oa(
 
     # what is the type of arrays to initialise?
     proto_r = cl.positions[1][1] # position type
-    proto_a = cl.angles[1][1] # angle type
+    proto_a = cl.rotations[1][1] # angle type
     proto_α = 0.1 + 0.1im # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
     T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
@@ -210,12 +209,13 @@ function spectrum_oa(
 
     # incident field
     Ejones = 1.0 / sqrt(2.0) .* [
-        SVector{2}(1im, 1.0), # Jones vector, first polar
-        SVector{2}(1.0, 1im), # Jones vector, second polar
+        SVector(1im, 1.0), # Jones vector, first polar
+        SVector(1.0, 1im), # Jones vector, second polar
     ]
 
     # store all rotation matrices
-    ParticleRotations = map(euler_passive, cl.angles)
+    # ParticleRotations = map(euler_passive, cl.angles)
+    ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
     IncidenceRotations = map(euler_active, quad_inc.nodes)
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
 
@@ -258,9 +258,11 @@ function spectrum_oa(
 
         # update the rotated blocks
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
+        # AlphaBlocks =
+        #     map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
         AlphaBlocks =
-            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
-
+            map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+            
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 
         # incident_field!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)

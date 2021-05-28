@@ -16,8 +16,8 @@ struct Cluster{T1,T2,T3}
     "positions::Vector{SVector{3,T1}}"
     positions::Vector{SVector{3,T1}}
 
-    "angles::Vector{SVector{3,T2}}"
-    angles::Vector{SVector{3,T2}}
+    "rotations::Vector{UnitQuaternion{T2}}"
+    rotations::Vector{UnitQuaternion{T2}}
 
     "sizes::Vector{SVector{3,T3}}"
     sizes::Vector{SVector{3,T3}}
@@ -42,7 +42,8 @@ Particle cluster consisting of a single particle at the origin
 
 # Examples
 
-```jldoctest
+```
+#jldoctest
 julia> cluster_single(1.0,2.0,3.0)
 Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector{3, Float64}[[1.0, 2.0, 3.0]], "Au", "particle")
 ```
@@ -51,8 +52,9 @@ Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector
 function cluster_single(a, b, c, α = 0.0, β = 0.0, γ = 0.0, material = "Au", type="particle")
     sizes = [SVector(a, b, c)]
     positions = [SVector(0.0, 0.0, 0.0)]
-    angles = [SVector(α, β, γ)]
-    Cluster(positions, angles, sizes, material, type)
+    # input parameters are Euler angles
+    rotations = [UnitQuaternion(RotZYZ(α,β,γ))]
+    Cluster(positions, rotations, sizes, material, type)
 end
 
 
@@ -61,7 +63,8 @@ end
 
 Particle cluster consisting of 2 identical particles separated along y
 - `a,b,c`: semi-axes along x,y,z
-- `dihedral`: angle between both particles seen along the y-axis
+- `ϕ`: dihedral angle between both particles seen along the y-axis
+- `α_1,α_2`: angle of each particle with the y axis
 - `material`: String referencing the material
 - `type`: String, "point" dipole or "particle"
 
@@ -73,12 +76,16 @@ Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -5.0, 0.0], [0.0, 5.0
 ```
 
 """
-function cluster_dimer(d, a, b, c, dihedral = 0.0, material = "Au", type="particle")
+function cluster_dimer(d, a, b, c, ϕ = 0.0, α_1 = 0.0, α_2 = 0.0, material = "Au", type="particle")
     sizes = [SVector(a, b, c) for ii in 1:2] # identical particles
     positions = [SVector(0.0, y, 0.0) for y in (-d/2, d/2)]
-    angles = [SVector(0.0, dihedral, 0.0),
-              SVector(0.0, 0.0, 0.0)]
-    Cluster(positions, angles, sizes, material, type)
+    q1 = UnitQuaternion(cos(α_1/2), sin(α_1/2), 0, 0) # rotation α_1 about x
+    q2 = UnitQuaternion(cos(α_2/2), sin(α_2/2), 0, 0) # rotation α_2 about x
+    q3 = UnitQuaternion(cos(ϕ/2), 0, sin(ϕ/2), 0) # rotation ϕ about y
+    # rotate particle 1 by q1 only (stays in yz plane)
+    # rotate particle 2 by q2, then q3 but in original frame so order swapped
+    rotations = [q1, q2*q3]
+    Cluster(positions, rotations, sizes, material, type)
 end
 
 
@@ -128,9 +135,9 @@ function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left"
     ψ = 0.0 # don't care for axisymmetric particles
 
     positions = SVector.(x,y,z)
-    angles = SVector.(φ,θ,ψ)
+    rotations = UnitQuaternion.(RotZYZ.(φ, θ, ψ))
 
-    Cluster(positions, angles, sizes, material, type)
+    Cluster(positions, rotations, sizes, material, type)
 end
 
 
@@ -156,11 +163,11 @@ cluster_line(10, 500, 20, 20, 30, 0, 0, 0)
 function  cluster_line(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
 
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
-    angles = [SVector(φ, θ, ψ) for ii in 1:N] # identical particles
+    rotations = [UnitQuaternion(RotZYZ(φ, θ, ψ)) for ii in 1:N] # identical particles
 
     positions = SVector.(-(N-1)*Λ/2:Λ:(N-1)*Λ/2, 0.0, 0.0)
 
-    Cluster(positions, angles, sizes, material, type)
+    Cluster(positions, rotations, sizes, material, type)
 end
 
 
@@ -188,10 +195,10 @@ function  cluster_array(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="parti
     N′ = floor(sqrt(N)) # may have fewer than N particles
 
     sizes = [SVector(a, b, c) for ii in 1:N′^2] # identical particles
-    angles = [SVector(φ, θ, ψ) for ii in 1:N′^2] # identical particles
+    rotations = [UnitQuaternion(RotZYZ(φ, θ, ψ)) for ii in 1:N′^2] # identical particles
 
     x =  -(N′-1)*Λ/2:Λ:(N′-1)*Λ/2
     positions = SVector.(Iterators.product(x, x, 0.0))[:]
 
-    Cluster(positions, angles, sizes, material, type)
+    Cluster(positions, rotations, sizes, material, type)
 end
