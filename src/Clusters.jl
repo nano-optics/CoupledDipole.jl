@@ -7,9 +7,6 @@
 
 Particle cluster specification.
 
-NOTE: for now all particles have the same material;
-easy to extend if needed, by making it a vector
-and matching a dictionary in HighLevel functions
 """
 struct Cluster{T1,T2,T3}
 
@@ -42,10 +39,9 @@ Particle cluster consisting of a single particle at the origin
 
 # Examples
 
-```
-#jldoctest
+```jldoctest
 julia> cluster_single(1.0,2.0,3.0)
-Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector{3, Float64}[[0.0, 0.0, 0.0]], SVector{3, Float64}[[1.0, 2.0, 3.0]], "Au", "particle")
+Cluster{Float64, Float64, Float64}(SVector{3, Float64}[[0.0, 0.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Float64}[[1.0, 2.0, 3.0]], ["Au"], ["particle"])
 ```
 
 """
@@ -59,7 +55,7 @@ end
 
 
 """
-    cluster_dimer(d::T, a::T, b::T, c::T, dihedral::T = 0.0, α_1::T = 0.0, α_2::T = 0.0) where T <: Real
+    cluster_dimer(d::T, a::T, b::T, c::T, ϕ::T = 0.0, α_1::T = 0.0, α_2::T = 0.0) where T <: Real
 
 Particle cluster consisting of 2 identical particles separated along y
 - `a,b,c`: semi-axes along x,y,z
@@ -70,10 +66,9 @@ Particle cluster consisting of 2 identical particles separated along y
 
 # Examples
 
-```
-#jldoctest
-julia> cluster_dimer(10, 1, 2, 3)
-Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -5.0, 0.0], [0.0, 5.0, 0.0]], SVector{3, Float64}[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], SVector{3, Int64}[[1, 2, 3], [1, 2, 3]], "Au", "particle")
+```jldoctest
+julia> cluster_dimer(80, 10, 10, 20)
+Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -40.0, 0.0], [0.0, 40.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Int64}[[10, 10, 20], [10, 10, 20]], ["Au", "Au"], ["particle", "particle"])
 ```
 
 """
@@ -109,7 +104,7 @@ Helical cluster of N identical particles with axis along z
 # Examples
 
 ```
-cluster_helix(5, 20, 20, 30, 50, 300)
+cluster_helix(4, 20, 20, 30, 50, 300)
 ```
 
 """
@@ -157,8 +152,9 @@ Line of N identical particles in the x direction
 
 # Examples
 
-```
-cluster_line(10, 500, 20, 20, 30, 0, 0, 0)
+```jldoctest
+julia> cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
+Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[-500.0, 0.0, 0.0], [0.0, 0.0, 0.0], [500.0, 0.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Int64}[[20, 20, 30], [20, 20, 30], [20, 20, 30]], ["Au", "Au", "Au"], ["particle", "particle", "particle"])
 ```
 
 """
@@ -187,8 +183,9 @@ Square array of N identical particles in the xy plane
 
 # Examples
 
-```
-cluster_array(10, 500, 20, 20, 30, 0, 0, 0)
+```jldoctest
+julia> cluster_array(4, 500, 20, 20, 30, 0, 0, 0)
+Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[-250.0, -250.0, 0.0], [250.0, -250.0, 0.0], [-250.0, 250.0, 0.0], [250.0, 250.0, 0.0]], UnitQuaternion{Float64}[[1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0], [1.0 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 1.0]], SVector{3, Int64}[[20, 20, 30], [20, 20, 30], [20, 20, 30], [20, 20, 30]], ["Au", "Au", "Au", "Au"], ["particle", "particle", "particle", "particle"])
 ```
 
 """
