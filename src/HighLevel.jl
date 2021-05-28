@@ -23,7 +23,7 @@ function spectrum_dispersion(
 
     # what is the type of arrays to initialise?
     proto_r = cl.positions[1][1] # position type
-    proto_a = cl.angles[1][1] # angle type
+    proto_a = cl.rotations[1][1] # angle type
     proto_α = 0.1 + 0.1im # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
     T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
@@ -262,7 +262,7 @@ function spectrum_oa(
         #     map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
         AlphaBlocks =
             map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
-            
+
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 
         # incident_field!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)

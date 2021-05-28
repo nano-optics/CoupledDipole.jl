@@ -21,11 +21,41 @@ cl2 = cluster_single(20, 20, 40)
 ## incidence: along z, along x, along y
 Incidence = [SVector(0,0,0),SVector(0,π/2,0),SVector(π/2,π/2,0)]
 
+@time spectrum_dispersion(cl1, mat, Incidence)
+@time spectrum_oa(cl1, mat)
+
+using Profile
+@profile spectrum_dispersion(cl1, mat, Incidence)
+# Juno.@profiler spectrum_dispersion(cl1, mat, Incidence)
+
 disp1 = spectrum_dispersion(cl1, mat, Incidence)
 disp2 = spectrum_dispersion(cl2, mat, Incidence)
 
-d1 = dispersion_df(disp1, mat.wavelengths)
-d2 = dispersion_df(disp2, mat.wavelengths)
+function dispersion_df(x, wavelength)
+
+    e = insertcols!(
+        DataFrame(x.extinction, :auto),
+        :wavelength => wavelength,
+        :crosstype => "extinction"
+    )
+    a = insertcols!(
+        DataFrame(x.absorption, :auto),
+        :wavelength => wavelength,
+        :crosstype => "absorption"
+    )
+
+    s = insertcols!(
+        DataFrame(x.scattering, :auto),
+        :wavelength => wavelength,
+        :crosstype => "scattering"
+    )
+
+    stack([e;a;s], Not([:wavelength,:crosstype]))
+
+end
+
+d1 = dispersion_df(disp1, mat.wavelength)
+d2 = dispersion_df(disp2, mat.wavelength)
 
 d = [insertcols!(d1, :cluster => "dimer");
      insertcols!(d2, :cluster => "single")]
@@ -45,8 +75,24 @@ oa1 = spectrum_oa(cl1, mat)
 oa2 = spectrum_oa(cl2, mat)
 
 
-d3 = oa_df(oa1, mat.wavelengths)
-d4 = oa_df(oa2, mat.wavelengths)
+# Juno.@enter spectrum_oa(cl1, mat)
+
+
+
+# aa = DataFrame(:wavelength => mat.wavelength, :value => oa1.average.absorption)
+# @vlplot(data=aa,
+# width= 400,
+# height =  300,
+#     mark = {:line},
+#     encoding = {x = "wavelength:q", y = "value:q"}
+# )
+#
+
+
+
+
+d3 = oa_df(oa1, mat.wavelength)
+d4 = oa_df(oa2, mat.wavelength)
 
 d5 = [insertcols!(d3, :cluster => "dimer");
      insertcols!(d4, :cluster => "single")]

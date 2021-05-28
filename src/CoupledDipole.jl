@@ -4,6 +4,7 @@ module CoupledDipole
 
 using LinearAlgebra
 using StaticArrays
+using Rotations
 using FastGaussQuadrature: gausslegendre
 using DataFrames
 
