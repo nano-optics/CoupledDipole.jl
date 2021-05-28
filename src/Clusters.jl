@@ -70,7 +70,8 @@ Particle cluster consisting of 2 identical particles separated along y
 
 # Examples
 
-```jldoctest
+```
+#jldoctest
 julia> cluster_dimer(10, 1, 2, 3)
 Cluster{Float64, Float64, Int64}(SVector{3, Float64}[[0.0, -5.0, 0.0], [0.0, 5.0, 0.0]], SVector{3, Float64}[[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]], SVector{3, Int64}[[1, 2, 3], [1, 2, 3]], "Au", "particle")
 ```
@@ -84,7 +85,7 @@ function cluster_dimer(d, a, b, c, ϕ = 0.0, α_1 = 0.0, α_2 = 0.0, material = 
     q3 = UnitQuaternion(cos(ϕ/2), 0, sin(ϕ/2), 0) # rotation ϕ about y
     # rotate particle 1 by q1 only (stays in yz plane)
     # rotate particle 2 by q2, then q3 but in original frame so order swapped
-    rotations = [q1, q2*q3]
+    rotations = [q1, q3*q2]
     Cluster(positions, rotations, sizes, material, type)
 end
 
@@ -124,7 +125,7 @@ function cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left"
     z = s * ϕ * Λ/(2π)
     z .-= s*maximum(s * z)/2 # if <0, add, else remove
 
-    # angles calculation
+    # euler angles calculation
     x′ =  - y
     y′ =   x
     z′ =  s * Λ / (2π)
