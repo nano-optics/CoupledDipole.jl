@@ -17,8 +17,8 @@ using DataFrames
 using VegaLite
 
 ## cluster geometry
-cl1 = cluster_helix(8, 30, 30, 50, 200, 400, π/2, 0)
-cl0 = cluster_single(20, 20, 40) # reference: single-particle
+cl1 = cluster_helix(8, 20, 20, 50, 200, 300, π/2, 0)
+cl0 = cluster_single(20, 20, 50) # reference: single-particle
 
 ## materials
 wavelengths = collect(400:2:800.0)
