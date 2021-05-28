@@ -21,10 +21,21 @@ The high-level functions require at least 2 inputs:
 
 - `orientations`, a vector of N particle orientations stored as quaternions (4 components, $\cos\phi/2; \sin\phi/2 \mathbf{v}$ with $\mathbf{v}$ the rotation axis). The quaternions are automatically converted into rotation matrices with the `Rotations.jl` package.
 
-- `material`, a string reference the material of the particles.
+- `material`, a string referencing the material for each particle; the corresponding dielectric functions are stored as a dictionary in the `Material` object
+
+- `type`, a string indicating whether the polarisability corresponds to a `point` dipole, or to a `particle`. For the former, a local-field correction needs to be applied to convert the polarisability into an effective one responding to macroscopic fields.
 
 
 ### Material description
+
+The `Material` structure contains two fields:
+
+- `wavelengths`, array-like wavelengths to use in the calculations
+- `media`, a dictionary containing:
+   - the different dielectric functions, such as `"Au" => epsAu`
+   - the _refractive index_ of the embedding medium, stored under the name `"medium" => (x -> 1.33)`
+   - for point dipoles, a wavelength-dependent polarisability function `"alpha" => alpha_dye`
+   
 
 ### High level functions
 
