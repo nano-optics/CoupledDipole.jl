@@ -5,11 +5,8 @@
 """
     Material(wavelength, media)
 
-Particle cluster specification.
+Wavelength-dependent optical properties.
 
-NOTE: for now all particles have the same material;
-easy to extend if needed, by making it a vector
-and matching a dictionary in HighLevel functions
 """
 struct Material{T}
     wavelengths::Vector{T}
