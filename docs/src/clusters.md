@@ -12,6 +12,8 @@ cluster_single
 cluster_dimer
 ```
 
+![helix cluster](helix.png)
+
 ```@docs
 cluster_helix
 ```
