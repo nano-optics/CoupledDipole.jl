@@ -128,7 +128,7 @@ end
 
 
 """
-    alpha_embedded(α::Complex{T}, medium::T) where T <: Real
+    alpha_embed(α::Complex{T}, medium::T) where T <: Real
 
 Effective point polarisability in medium, rescaled by local field correction
 - `α`: bare polarisabilty
@@ -139,12 +139,12 @@ Default values mimic the main resonance of Rhodamine 700
 # Examples
 
 ```jldoctest
-julia> round(alpha_embedded(alpha_bare(632.8)), digits=5)
+julia> round(alpha_embed(alpha_bare(632.8)), digits=5)
 0.12976 + 0.0109im
 ```
 
 """
-function alpha_embedded(α, medium = 1.33)
+function alpha_embed(α, medium = 1.33)
     ε_m = medium^2
     L = (ε_m + 2) / 3
     1 / ε_m * L^2 * α
@@ -152,15 +152,15 @@ end
 
 
 """
-    alpha_rescale_molecule(alpha, sizes::Vector{SVector{3}})
+    alpha_scale(alpha, sizes::SVector{3})
 
 Principal polarisability components of a particle, rescaled along each principal axis
 - `α`: scalar polarisabilty
-- `sizes`: array of 3-vectors to scale along each principal axis
+- `sizes`: 3-vector to scale along each principal axis
 
 """
-function alpha_rescale_molecule(alpha, sizes)
-    @. alpha * (sizes / sum(sizes))
+function alpha_scale(alpha, sizes)
+    alpha .* (sizes / sum(sizes))
 end
 
 

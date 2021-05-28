@@ -74,20 +74,22 @@ function spectrum_dispersion(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        # TODO: map over type and material
-        if cl.type[1] == "point"
+        if cl.type == "point"
 
-            α_name = cl.material[1] # e.g. "alpha" to refer to mat Dict
-            α_bare = mat.media[α_name](λ)
-            α = alpha_embedded(α_bare, n_medium)
-            Alpha = alpha_rescale_molecule(α, cl.sizes)
-            # Alpha = map((m,s) -> alpha_rescale_molecule(alpha_embedded(mat.media[m](λ), n_medium), s), cl.material, cl.sizes)
-        elseif cl.type[1] == "particle"
+            Alpha = map(
+                (m, s) ->
+                    alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+                cl.materials,
+                cl.sizes,
+            )
+            
+        elseif cl.type == "particle"
 
-            ε_name = cl.material[1] # e.g. "Au" to refer to epsilon_Au in mat Dict
-            ε = mat.media[ε_name](λ)
-            Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
-            # Alpha = map((m,s) -> alpha_kuwata(λ, mat.media[m](λ), ε_m, s), cl.material, cl.sizes)
+            Alpha = map(
+                (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
+                cl.materials,
+                cl.sizes,
+            )
         end
 
         # update the rotated blocks
@@ -95,10 +97,8 @@ function spectrum_dispersion(
         # we'd compute rotation matrices on the fly
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
         # but instead we've prestored them, since wavelength-independent
-        # AlphaBlocks =
-        #     map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
-            AlphaBlocks =
-                map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+        AlphaBlocks =
+            map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
         # Interaction matrix (F = I - G0 alpha_eff)
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
@@ -125,15 +125,7 @@ function spectrum_dispersion(
             # E[:] = Ein
             # polarisation!(P, E, AlphaBlocks)
             # extinction!(tmpcext, kn, P, Ein)
-            iterate_field!(
-                E,
-                P,
-                tmpcext,
-                Ein,
-                F,
-                kn,
-                AlphaBlocks
-            )
+            iterate_field!(E, P, tmpcext, Ein, F, kn, AlphaBlocks)
         end
 
         # remaining cross-sections for cubature angles
@@ -176,14 +168,13 @@ function spectrum_oa(
     cubature = "gl",
     N_inc = 36,
     N_sca = 36,
-    method = "direct"
+    method = "direct",
 )
 
     quad_inc = cubature_sphere(N_inc, cubature)
     quad_sca = cubature_sphere(N_sca, cubature)
 
     # setting up constants
-
 
     # what is the type of arrays to initialise?
     proto_r = cl.positions[1][1] # position type
@@ -243,20 +234,31 @@ function spectrum_oa(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-                # TODO: map over type and material
-        if cl.type[1] == "point"
+        if cl.type == "point"
 
-            α_name = cl.material[1] # e.g. "alpha" to refer to mat Dict
-            α_bare = mat.media[α_name](λ)
-            α = alpha_embedded(α_bare, n_medium)
-            Alpha = alpha_rescale_molecule(α, cl.sizes)
+            # old version: only one material per cluster
+            # α_name = cl.material # e.g. "alpha" to refer to mat Dict
+            # α_bare = mat.media[α_name](λ)
+            # α = alpha_embedded(α_bare, n_medium)
+            # Alpha = alpha_rescale_molecule(α, cl.sizes)
 
-        elseif cl.type[1] == "particle"
+            Alpha = map(
+                (m, s) ->
+                    alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+                cl.materials,
+                cl.sizes,
+            )
 
-            ε_name = cl.material[1] # e.g. "Au" to refer to epsilon_Au in mat Dict
-            ε = mat.media[ε_name](λ)
-            Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
+        elseif cl.type == "particle"
 
+            # ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
+            # ε = mat.media[ε_name](λ)
+            # Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
+            Alpha = map(
+                (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
+                cl.materials,
+                cl.sizes,
+            )
         end
 
         # update the rotated blocks
@@ -286,15 +288,7 @@ function spectrum_oa(
             E = Ein
             polarisation!(P, E, AlphaBlocks)
             extinction!(tmpcext, kn, P, Ein)
-            iterate_field!(
-                E,
-                P,
-                tmpcext,
-                Ein,
-                F,
-                kn,
-                AlphaBlocks
-            )
+            iterate_field!(E, P, tmpcext, Ein, F, kn, AlphaBlocks)
 
         end
 

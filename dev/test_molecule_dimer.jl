@@ -10,14 +10,15 @@ using DataFrames
 using VegaLite
 
 ## materials
-wavelength = collect(450:2:850.0)
-media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
+wavelength = collect(400:1:700.0)
+media = Dict([("Rhodamine", alpha_bare), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
+
 ## dimer geometry
-cl0 = cluster_single(20, 20, 40)
-cl1 = cluster_dimer(80, 20, 20, 40, 0)
-cl2 = cluster_dimer(80, 20, 20, 40, π/4)
+cl0 = cluster_single(0, 0, 1, 0, 0, 0, "Rhodamine", "point")
+cl1 = cluster_dimer(0.8, 0, 0, 1, 0, 0,0, "Rhodamine", "point")
+cl2 = cluster_dimer(0.8, 0, 0, 1, π/4, 0,0, "Rhodamine", "point")
 
 ## incidence: along z, along x, along y
 Incidence = [SVector(0,0,0),SVector(0,π/2,0),SVector(π/2,π/2,0)]

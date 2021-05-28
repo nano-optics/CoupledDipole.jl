@@ -37,9 +37,9 @@ alpha_bare
 ```
 
 ```@docs
-alpha_embedded
+alpha_embed
 ```
 
 ```@docs
-alpha_rescale_molecule
+alpha_scale
 ```

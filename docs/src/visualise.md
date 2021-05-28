@@ -1,4 +1,8 @@
-# Conventions
+# Visualise
+
+```@docs
+visualise
+```
 
 
 ```@raw html

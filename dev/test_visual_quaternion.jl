@@ -27,6 +27,7 @@ end
 
 cl = cluster_cone(18, 5,5,50,π/4, 60*pi/180)
 
+ cl = cluster_helix(13, 10, 10, 20, 50, 200)
 p = visualise(cl)
 
 io = open("mycluster.html", "w");

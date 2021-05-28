@@ -8,12 +8,6 @@ using Rotations
 using FastGaussQuadrature: gausslegendre
 using DataFrames
 
-#using BlockArrays
-#using Base.Threads
-#using DataFrames
-#using VegaLite
-#using Gadfly
-
 
 include("Clusters.jl")
 include("Materials.jl")
@@ -30,10 +24,10 @@ export polarisation!
 export iterate_field!
 export Cluster
 export cluster_single
+export cluster_dimer
 export cluster_helix
 export cluster_line
 export cluster_array
-export cluster_dimer
 export extinction!
 export absorption!
 export scattering!
@@ -42,11 +36,11 @@ export epsilon_Ag
 export epsilon_Au
 export lorentzian
 export alpha_bare
+export alpha_embed
+export alpha_scale
 export alpha_kuwata
 export alpha_blocks!
-export alpha_embedded
 export alpha_spheroids
-export alpha_rescale_molecule
 export depolarisation_spheroid
 export quadrature_lgwt
 export euler_active
@@ -59,6 +53,7 @@ export spectrum_oa
 export dispersion_df
 export oa_df
 export visualise
+
 
 ## core functions
 
