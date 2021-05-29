@@ -1,4 +1,4 @@
-## Helix of gold nanorods
+# Helix of gold nanorods
 
 This example considers a short helix of gold nanorods, and simulates its orientation-averaged circular dichroism. Two helices are modelled, with opposite handedness, to verify that they produce mirror-image dichroism spectra.
 
@@ -32,7 +32,7 @@ d = [insertcols!(d1, :cluster => "helix", :hand => "left");
       insertcols!(d0, :cluster => "single", :hand => "_")]
 
 
-d5 |> @vlplot(
+d |> @vlplot(
  width= 120,
  height =  100,
      mark = {:line},

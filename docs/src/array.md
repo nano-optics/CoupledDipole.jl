@@ -1,4 +1,4 @@
-## Diffractive array of gold nanorods
+# Diffractive array of gold nanorods
 
 This example considers a square array of 200 Au nanorods with a large pitch (550nm); this configuration can lead to a diffractive coupling effect that strongly modifies the resonance of individual rods, despite their wide separation.
 

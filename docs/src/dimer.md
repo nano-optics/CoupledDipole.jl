@@ -1,7 +1,7 @@
-## Chiral dimer of gold nanorods
+# Chiral dimer of gold nanorods
 
 This example considers the "fingers-crossed" configuration of two gold nanorods arranged in a chiral dimer, with a `pi/4` dihedral angle. The dipole-dipole interaction leads to circular dichroism with a characteristic bisignate lineshape.
-
+ 
 
 ```@example 1
 using CoupledDipole

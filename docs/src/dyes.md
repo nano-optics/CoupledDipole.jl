@@ -1,4 +1,4 @@
-## Dimer of uniaxial dye molecules
+# Dimer of uniaxial dye molecules
 
 This example considers the coupling between two uniaxial dye molecules in close proximity, with a side-by-side configuration.
 
@@ -40,3 +40,4 @@ d = [insertcols!(d1, :cluster => "dimer");
 
 ```
 
+Note that there is essentially zero scattering since the molecules are _much_ smaller than the wavelength.
