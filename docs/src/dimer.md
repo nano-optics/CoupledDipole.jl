@@ -39,7 +39,7 @@ d1 = oa_df(oa1, mat.wavelengths)
 d = [insertcols!(d1, :cluster => "dimer");
      insertcols!(d0, :cluster => "single")]
 
-d5 |> @vlplot(
+d |> @vlplot(
  width= 400,
  height =  300,
      mark = {:line},
