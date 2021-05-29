@@ -17,11 +17,17 @@ makedocs(;
         asset("assets/TrackballControls.js", class=:js, islocal=true)],
     ),
     pages=[
-        "Home" => "index.md",        
+        "Home" => "index.md",
         "gettingstarted.md",
         "Introduction" => [
             "background.md",
             "theory.md"
+        ],
+        "Examples" => [
+            "dimer.md",
+            "helix.md",
+            "array.md",
+            "dyes.md"
         ],
         "Implementation" => [
             "conventions.md",
