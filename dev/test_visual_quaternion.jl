@@ -129,13 +129,60 @@ const material = new THREE.MeshStandardMaterial({
 
 }());"""
 
-function WebIO.render(cl::Cluster)
+
+using StaticArrays
+using WebIO
+
+struct Stuff{T}
+   positions::Vector{SVector{3,T}}
+   sizes::Vector{SVector{3,T}}
+   angles::Vector{SVector{3,T}}
+end
+
+
+cl = Stuff([@SVector rand(3) for _ in 1:4],
+[@SVector rand(3) for _ in 1:4],
+[@SVector rand(3) for _ in 1:4])
+
+function WebIO.render(cl::Stuff)
     return dom"div"(
         dom"p"(header),
-        dom"p"(visualise(cl)),
+        dom"p"(cl.positions),
         dom"p"(footer)    ,
     )
 end
 
 cl
 WebIO.render(cl)
+
+
+using WebIO
+w = Scope(imports=["//cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"])
+w(dom"div.container"(dom"p"("this is a test")))
+
+
+
+
+
+dom"script"(js"""test""")
+
+
+using WebIO, JSExpr
+
+w = Scope(imports=["//cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/p5.js"])
+onmount(w, @js function (p5)
+    function sketch(s)
+        s.setup = () -> s.createCanvas(640, 480)
+
+        s.draw = function ()
+          if s.mouseIsPressed
+            s.fill(0)
+          else
+            s.fill(255)
+          end
+          s.ellipse(s.mouseX, s.mouseY, 80, 80)
+        end
+    end
+    @new p5(sketch, this.dom.querySelector(".container"))
+end)
+w(dom"div.container"())

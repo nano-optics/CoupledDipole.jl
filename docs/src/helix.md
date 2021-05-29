@@ -33,8 +33,8 @@ d = [insertcols!(d1, :cluster => "helix", :hand => "left");
 
 
 d |> @vlplot(
- width= 120,
- height =  100,
+ width= 200,
+ height =  150,
      mark = {:line},
      row = "type", column="variable",
      resolve={scale={y="independent"}},
