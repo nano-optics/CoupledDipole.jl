@@ -198,3 +198,54 @@ function  cluster_array(N, Λ, a, b, c, α = 0.0, β = 0.0, γ = 0.0, material =
 
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
 end
+
+function  sample_fibonacci(N)
+
+    N = ifelse(mod(N,2) == 0, N+1, N)
+
+    j = 0:N-1
+    β = @. acos(1 - (2*j+1)/N)
+    ϕ = (1+√5)/2
+    α = @. (2π*j / ϕ) % 2π
+
+    positions = @. SVector(cos(α)*sin(β), sin(α)*sin(β), cos(β))
+    return positions
+
+end
+
+function  cluster_shell(N, a, b, c, R; orientation = "radial", material = "Rhodamine", type="point")
+
+    sizes = [SVector(a, b, c) for  _ ∈ 1:N] # identical particles
+
+    positions = R .* sample_fibonacci(N)
+
+    if orientation == "radial"
+
+        rotations = map(x -> SVector(atan(x[2], x[1]), acos(x[3]/R), 0), positions)
+
+    elseif orientation == "flat"
+
+        # strategy a bit suboptimal but doesn't matter
+        # first find the normal vector
+        # then create two basis vectors in the tangent plane
+        # sample a random linear combination of the two as our flat-random direction
+
+        φ = map(x -> atan(x[2], x[1]), positions)
+        θ = map(x -> acos(x[3]/R), positions)
+        τ_1 = map(φ -> SVector(-sin(φ), cos(φ), 0), φ)
+        τ_2 = map((φ,θ) -> SVector(cos(θ)*cos(φ), cos(θ)*sin(φ), -sin(θ)), φ, θ)
+        τ   = map((τ_1,τ_2) -> rand(1) .* τ_1 .+ rand(1) .* τ_2, τ_1, τ_2)
+        rotations = map(τ -> SVector(atan(τ[2], τ[1]),
+                                     acos(τ[3]/sqrt(sum(τ.^2))), 0), τ)
+
+    else
+        @info "No orientation means random orientation"
+        rotations = [@SVector rand(3) for _ ∈ 1:N]
+
+    end
+
+    quaternions = [UnitQuaternion(RotZYZ(r[1],r[2],r[3])) for r in rotations]
+
+    Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
+
+end

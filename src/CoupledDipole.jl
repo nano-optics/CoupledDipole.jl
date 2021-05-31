@@ -29,6 +29,7 @@ export cluster_dimer
 export cluster_helix
 export cluster_line
 export cluster_array
+export cluster_shell
 export extinction!
 export absorption!
 export scattering!

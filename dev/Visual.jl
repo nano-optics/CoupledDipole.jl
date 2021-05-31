@@ -29,12 +29,19 @@ function Makie_rotation(q)
 end
 
 
-function visualise_makie(cl; colour=:gold)
+function visualise_makie2(cl; colour=:gold, R=1.0)
+
+positions = cl.positions
+positions = push!(positions, 0 .* positions[1])
+sizes = cl.sizes
+sizes = push!(sizes, (0 .* sizes[1]) .+ R)
+rotations = cl.rotations
+rotations = push!(rotations, rotations[1])
 
         meshscatter(
-                Point3f0.(cl.positions),
-                markersize = Vec3f0.(cl.sizes),
-                rotations = Makie_rotation.(cl.rotations),
+                Point3f0.(positions),
+                markersize = Vec3f0.(sizes),
+                rotations = Makie_rotation.(rotations),
                 color = colour,
         )
 
@@ -42,13 +49,21 @@ end
 
 # using GLMakie
 # GLMakie.activate!()
-using CairoMakie
+using GLMakie
 
-CairoMakie.activate!()
-
-visualise_makie(cl, colour = :gold)
+GLMakie.activate!()
 
 
+# cl = cluster_array(5,100,1,2,3)
+
+cl = cluster_shell(300, 1.0, 1, 5, 30, orientation = "radial")
+cl = cluster_shell(200, 1.0, 1, 3, 30, orientation = "flat")
+
+# cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
+
+visualise_makie2(cluster_shell(300, 1.0, 1, 5, 30, orientation = "flat"), colour = :gold, R=30)
+
+meshscatter(Point3f0(0,0,0), markersize =  Vec3f0(30,30,30), color=:red, overdraw=true)
 
 meshscatter(
     Point3f0.(cl.positions),
