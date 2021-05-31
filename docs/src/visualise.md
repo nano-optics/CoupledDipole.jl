@@ -16,6 +16,7 @@ cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
 visualise_makie(cl, colour = :gold)
 ```
 
+![](makie.png)
 
 We're hoping to use `three.js` to provide interactive 3D visualisations of the cluster geometries, but at present this functionality is not integrated with the Documentation or with the IDE. A basic wrapper is provided to generate self-contained `html` pages that can be viewed in a web browser.
 
@@ -24,6 +25,8 @@ We're hoping to use `three.js` to provide interactive 3D visualisations of the c
 visualise_threejs
 ```
 
+
+![](helix.png)
 
 
 ```@raw html
