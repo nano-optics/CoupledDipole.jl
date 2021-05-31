@@ -9,7 +9,8 @@ visualise_makie
 
 ```@example 1
 using CoupledDipole
-using Makie
+using CairoMakie #hide
+CairoMakie.activate!() #hide
 
 cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
 visualise_makie(cl, colour = :gold)
