@@ -18,12 +18,13 @@ epsilon_Au
 
 ## Particle polarisabilities
 
+
 ```@docs
-alpha_kuwata
+depolarisation_spheroid
 ```
 
 ```@docs
-alpha_spheroids
+alpha_kuwata
 ```
 
 ## Molecular polarisabilities
