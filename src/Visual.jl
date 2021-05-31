@@ -167,12 +167,14 @@ function visualise_threejs(cl; out = "cluster.html")
 end
 
 
+
 function Makie_rotation(q)
         q = inv(q) # passify
         v = Rotations.rotation_axis(q)
         θ = Rotations.rotation_angle(q)
-        AbstractPlotting.qrotation(Vec3f0(v...), θ)
+        qrotation(Vec3f0(v...), θ)
 end
+
 
 """
      visualise_makie(cl; colour=:gold)

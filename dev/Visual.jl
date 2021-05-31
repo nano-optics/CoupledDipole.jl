@@ -85,7 +85,7 @@ function Makie_rotation(q)
         q = inv(q) # passify
         v = Rotations.rotation_axis(q)
         θ = Rotations.rotation_angle(q)
-        AbstractPlotting.qrotation(Vec3f0(v...), θ)
+        qrotation(Vec3f0(v...), θ)
 end
 
 
@@ -99,6 +99,8 @@ function visualise_makie(cl; colour=:gold)
         )
 
 end
+using WGLMakie
+WGLMakie.activate!()
 
 visualise_makie(cl, colour = :silver)
 
