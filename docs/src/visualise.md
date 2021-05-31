@@ -1,8 +1,28 @@
-# Visualise
+# Visualisation of cluster geometries
+
+Static 3D visualisations can be shown with a simple wrapper around `Makie.meshscatter`.
 
 ```@docs
-visualise
+visualise_makie
 ```
+
+
+```@example 1
+using CoupledDipole
+using Makie
+
+cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
+visualise_makie(cl, colour = :gold)
+```
+
+
+We're hoping to use `three.js` to provide interactive 3D visualisations of the cluster geometries, but at present this functionality is not integrated with the Documentation or with the IDE. A basic wrapper is provided to generate self-contained `html` pages that can be viewed in a web browser.
+
+
+```@docs
+visualise_threejs
+```
+
 
 
 ```@raw html

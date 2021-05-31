@@ -20,7 +20,6 @@ makedocs(;
         "Home" => "index.md",
         "gettingstarted.md",
         "Introduction" => [
-            "background.md",
             "theory.md"
         ],
         "Examples" => [
@@ -36,7 +35,8 @@ makedocs(;
             "materials.md",
             "system.md",
             "cross_sections.md",
-            "utils.md"
+            "utils.md",
+            "visualise.md"
         ],
     ],
 )
