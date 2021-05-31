@@ -7,6 +7,7 @@ using StaticArrays
 using Rotations
 using FastGaussQuadrature: gausslegendre
 using DataFrames
+using Makie
 
 
 include("Clusters.jl")
@@ -52,7 +53,8 @@ export spectrum_dispersion
 export spectrum_oa
 export dispersion_df
 export oa_df
-export visualise
+export visualise_makie
+export visualise_threejs
 
 
 ## core functions

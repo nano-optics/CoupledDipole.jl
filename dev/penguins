@@ -1,0 +1,18 @@
+using PalmerPenguins, DataFrames
+
+penguins = dropmissing(DataFrame(PalmerPenguins.load()))
+first(penguins, 6)
+
+
+using AlgebraOfGraphics, CairoMakie
+set_aog_theme!()
+
+axis = (width = 225, height = 225)
+penguin_bill = data(penguins) * mapping(
+    :bill_length_mm => (t -> t / 10) => "bill length (cm)",
+    :bill_depth_mm => (t -> t / 10) => "bill depth (cm)",
+)
+
+layers = linear() + mapping()
+plt = penguin_bill * layers * mapping(color = :species, col = :sex)
+draw(plt; axis)
