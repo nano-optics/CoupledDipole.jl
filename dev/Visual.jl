@@ -40,8 +40,11 @@ function visualise_makie(cl; colour=:gold)
 
 end
 
-using GLMakie
-GLMakie.activate!()
+# using GLMakie
+# GLMakie.activate!()
+using CairoMakie
+
+CairoMakie.activate!()
 
 visualise_makie(cl, colour = :gold)
 

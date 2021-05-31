@@ -7,7 +7,7 @@ using StaticArrays
 using Rotations
 using FastGaussQuadrature: gausslegendre
 using DataFrames
-using Makie
+using CairoMakie
 
 
 include("Clusters.jl")
