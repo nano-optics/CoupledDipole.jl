@@ -24,6 +24,7 @@ struct Cluster{T1,T2,T3}
 
     "type::String"
     type::String
+
 end
 
 

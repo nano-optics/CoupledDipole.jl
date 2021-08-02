@@ -28,6 +28,27 @@ function Makie_rotation(q)
         qrotation(Vec3f0(v...), θ)
 end
 
+meshscatter(
+        Point3f0.(positions),
+        markersize = Vec3f0.(sizes),
+        rotations = Makie_rotation.(rotations),
+        color = colour,
+)
+
+
+
+using WGLMakie
+xs = cos.(1:0.5:20)
+ys = sin.(1:0.5:20)
+zs = LinRange(0, 3, length(xs))
+
+
+fig, ax,p = WGLMakie.meshscatter(xs, ys, zs, markersize = 0.1, color = zs)
+WGLMakie.meshscatter!(ax, [2], [0], [0], markersize = 2, color = :black)
+
+
+# display(p)
+
 
 function visualise_makie2(cl; colour=:gold, R=1.0)
 
