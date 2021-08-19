@@ -4,6 +4,7 @@ using Revise
 using CoupledDipole
 
 using LinearAlgebra
+using Rotations
 using StaticArrays
 using FastGaussQuadrature
 using DataFrames
@@ -11,6 +12,28 @@ using VegaLite
 using ForwardDiff
 
 
+
+"""
+    tetramer of identical spheres, with 3 fixed lengths (d)
+    3 free parameters x1..x3
+    1st at 0,0,0
+    2nd at d,0,0
+    3rd at d*cos(x1), d*cos(x1), 0
+    4th at d*cos(x2)*sin(x3), d*sin(x2)*sin(x3), d*cos(x3)
+
+"""
+function cluster_tethered(x; r = 5, d = 15, material = "Au", type = "particle")
+    sizes = [SVector(r, r, r) for _ ∈ 1:4] # identical spheres
+    angles = [zero(UnitQuaternion) for _ ∈ 1:4] # angles irrelevant for spheres
+    positions = [
+        SVector(0.0, 0.0, 0.0),
+        SVector(d, 0.0, 0.0),
+        SVector(d*cos(x[1]), d*sin(x[1]), 0.0),
+        SVector(d*cos(x[2])*sin(x[3]), d*sin(x[2])*sin(x[3]), d*cos(x[3])),
+    ]
+
+    Cluster(positions, angles, sizes, [material for _ ∈ 1:4], type)
+end
 
 """
     tetramer of identical spheres, 6 params
@@ -39,12 +62,13 @@ From parameters p, create the desired physical model
 Here:  circular dichroism spectrum with 4 spherical particles
 free parameters are 6 coordinates
 """
-function model(x)
+function model_tetramer(x)
 
     wavelength = collect(400:5:800.0)
     media = Dict([("Au", epsilon_Au), ("medium", _ -> 1.33)])
     mat = Material(wavelength, media)
     cl = cluster_tetramer(x)
+
     oa = spectrum_oa(cl, mat)
 
     return oa.dichroism.extinction ./ oa.average.extinction # g-factor
@@ -60,11 +84,32 @@ using GLMakie
 GLMakie.activate!()
 display(pl)
 
-dich = model(p0)
+dich = model_tetramer(p0)
  sum(abs.(dich))
 
+ function model_tethered(x)
+
+     wavelength = collect(400:5:800.0)
+     media = Dict([("Au", epsilon_Au), ("medium", _ -> 1.33)])
+     mat = Material(wavelength, media)
+     cl = cluster_tethered(x)
+
+     oa = spectrum_oa(cl, mat)
+
+     return oa.dichroism.extinction ./ oa.average.extinction # g-factor
+ end
 
 
+ p0 = [pi/4, pi/3, pi/5]
+
+ using CairoMakie
+ CairoMakie.activate!()
+ cl = cluster_tethered(p0)
+ pl = visualise_makie(cl)
+ display(pl)
+
+ dich = model_tethered(p0)
+  sum(abs.(dich))
 
 ## testing the model works as expected
 
