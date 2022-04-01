@@ -56,6 +56,8 @@ export dispersion_df
 export oa_df
 export visualise_makie
 export visualise_threejs
+export expand_grid
+export pmap_df
 
 
 ## core functions

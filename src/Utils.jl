@@ -1,6 +1,57 @@
 
 ## utils
 
+
+"""
+expand_grid(; kws...)
+
+Expand all combinations of named arguments
+
+- `kws...`: named parameters
+
+# Examples
+
+```jldoctest
+julia> expand_grid(a=[0.1,0.2,0.3], b = [1,2])
+6×2 DataFrame
+ Row │ a        b     
+     │ Float64  Int64 
+─────┼────────────────
+   1 │     0.1      1
+   2 │     0.2      1
+   3 │     0.3      1
+   4 │     0.1      2
+   5 │     0.2      2
+   6 │     0.3      2
+```
+
+"""
+function expand_grid(; kws...)
+    names, vals = keys(kws), values(kws)
+    return DataFrame(NamedTuple{names}(t) for t in Iterators.product(vals...))
+end
+
+"""
+pmap_df(p, f, kws...; join = true)
+
+Expand all combinations of named arguments
+
+- `p`: DataFrame-like array of parameters
+- `f`: function to apply to each row vector
+- `kws...`: extra arguments passed to f
+- `join`: logical, join parameters and results
+
+"""
+function pmap_df(p, f, kws...; join = true)
+    tmp = map(f, eachrow(p), kws...)
+    all = reduce(vcat, tmp, source="id")
+    if !join
+     return all
+    end
+    p[!, :id] = 1:nrow(p)
+    return DataFrames.leftjoin(p, all, on=:id)
+ end
+
 """
     euler_active(φ::Real, θ::Real, ψ::Real)
 

@@ -8,7 +8,7 @@ using StaticArrays
 using FastGaussQuadrature
 using DataFrames
 using VegaLite
-# using Gadfly
+using Gadfly
 
 ## variables
 
@@ -28,15 +28,15 @@ cl = cluster_dimer(100, 20, 20, 40, π/4)
 
 ii=1;
 
-λ = mat.wavelength[ii]
-n_medium = mat.medium["medium"](λ)
+λ = mat.wavelengths[ii]
+n_medium = medium["medium"](λ)
 kn = n_medium * 2π / λ
 
-ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
-ε = mat.medium[ε_name](λ)
+
+ε = medium["Au"](λ)
 Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
 
-ParticleRotations = map(euler_passive, cl.angles)
+ParticleRotations = cl.rotations
 AlphaBlocks = map((R, A) -> R' * diagm(A) * R, ParticleRotations, Alpha)
 
 ## propagator
