@@ -115,14 +115,14 @@ julia> round(alpha_bare(632.8), digits=5)
 """
 function alpha_bare(λ, α_∞ = 9.6e-39, α_k = 5.76e-38, λ_k = 526.0, µ_k = 1.0e4)
 
-    ε_0 = 8.8541878128e-12
+    ε₀ = 8.8541878128e-12
     nm3 = 1e27
 
-    α = α_∞
+    α = α_∞ 
     for kk = 1:length(α_k)
         α += lorentzian(λ, α_k[kk], λ_k[kk], µ_k[kk])
     end
-    prefact = nm3 / (4π * ε_0)
+    prefact = nm3 / (4π * ε₀)
     prefact * α
 end
 

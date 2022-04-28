@@ -11,23 +11,21 @@ using VegaLite
 # using Gadfly
 
 
-julia> using Random
+using Random
 
-julia> x = randn(1_000_000);
+x = randn(1_000_000);
 
-julia> inds = shuffle(1:1_000_000)[1:800000];
+inds = shuffle(1:1_000_000)[1:800000];
 
-julia> A = randn(50, 1_000_000);
+A = randn(50, 1_000_000);
 
-julia> xtmp = zeros(800_000);
+xtmp = zeros(800_000);
 
-julia> Atmp = zeros(50, 800_000);
+Atmp = zeros(50, 800_000);
 
-julia> @time sum(view(A, :, inds) * view(x, inds))
-  0.412156 seconds (14 allocations: 960 bytes)
--4256.759568345458
+@time sum(view(A, :, inds) * view(x, inds))
 
-julia> @time begin
+ @time begin
            copyto!(xtmp, view(x, inds))
            copyto!(Atmp, view(A, :, inds))
            sum(Atmp * xtmp)

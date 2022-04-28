@@ -19,7 +19,7 @@ function expand_grid(; kws...)
     return DataFrame(NamedTuple{names}(t) for t in Iterators.product(vals...))
 end
 
-function mymodel(;x = range(0, 10, length = 100), a = 1, b = 1, c = 2, fun = sin, kws...)
+function mymodel(;x = range(0, 10, length = 3), a = 1, b = 1, c = 2, fun = sin, kws...)
     DataFrame(x = x, y = a .* sin.(b .* x) .+ c, z = a .* fun.(b .* x) .+ c)
 end
 
@@ -42,10 +42,18 @@ function pmap_df2(p, f, kws...; join=true)
     return DataFrames.leftjoin(p, all, on=:id)
  end
 
- 
-params = expand_grid(a=[0.1,0.2,0.3], b = [1,2,3], c = [0,0.5]);
 
-pmap_df2(params, p -> mymodel(;p..., fun=tanh))
+d = pmap_df2(params, p -> mymodel(;p...))
+# d = pmap_df(params, p -> mymodel(;p..., fun=tanh))
+
+using VegaLite
+
+d |> @vlplot(
+     mark = {:line},
+     row = "c",
+     resolve={scale={y="independent"}},
+     encoding = {x = "x:q", y = "z:q", color = "b:n", strokeDash="a:n"}
+ )
 
 
 

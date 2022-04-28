@@ -10,6 +10,51 @@ using DataFrames
 using VegaLite
 # using Gadfly
 
+function lorentzian(λ, α_k, λ_k, µ_k)
+    -α_k * λ_k / µ_k * (1.0 - 1.0 / (1.0 - (λ_k / λ)^2 - 1im * (λ_k^2 / (µ_k * λ))))
+end
+
+function polarisability(λ, α_∞, α_k, λ_k, µ_k)
+
+    α = α_∞ 
+    for kk = 1:length(α_k)
+        α += lorentzian(λ, α_k[kk], λ_k[kk], µ_k[kk])
+    end
+    
+    ε₀ = 8.8541878128e-12
+    α / (4π * ε₀) 
+end
+
+
+
+function propagator!(A, kn, R, AlphaBlocks)
+
+    N = length(R)
+    for jj = 1:N
+        for kk = (jj+1):N
+
+            rk_to_rj = R[jj] - R[kk]
+            rjk = norm(rk_to_rj, 2)
+            rjkhat = rk_to_rj / rjk
+            rjkrjk = rjkhat * transpose(rjkhat)
+
+            Ajk = exp(im * kn * rjk) / rjk * (
+                kn * kn * (rjkrjk - I) +
+                (im * kn * rjk - 1.0) / (rjk * rjk) * (3 * rjkrjk - I)
+            )
+
+            # assign blocks
+            A[3jj-2:3jj, 3kk-2:3kk] = Ajk * AlphaBlocks[kk]
+            A[3kk-2:3kk, 3jj-2:3jj] = transpose(Ajk) * AlphaBlocks[jj]
+
+        end
+    end
+
+    return A
+end
+
+
+
 
 # a =  cubature_sphere(12, "gl")
 
