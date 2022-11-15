@@ -13,24 +13,34 @@ Long format dataframe for dispersion spectra
 """
 function dispersion_df(x, wavelength)
 
-    e = insertcols!(
-        DataFrame(x.extinction, :auto),
-        :wavelength => wavelength,
-        :crosstype => "extinction"
-    )
-    a = insertcols!(
-        DataFrame(x.absorption, :auto),
-        :wavelength => wavelength,
-        :crosstype => "absorption"
-    )
+    N_l, N_2a = size(x.extinction)
 
-    s = insertcols!(
-        DataFrame(x.scattering, :auto),
-        :wavelength => wavelength,
-        :crosstype => "scattering"
-    )
+    res =  DataFrame(wavelength = repeat(wavelength, outer = 3*N_2a),
+    value = vcat(vec(x.extinction), vec(x.absorption), vec(x.scattering)),
+    polarisation = repeat(["s", "p"], outer = Int(3*N_2a/2), inner = N_l),
+    angle = repeat(repeat(1:Int(N_2a/2),outer=2), inner=N_l, outer=3),
+    crosstype = repeat(["extinction", "absorption", "scattering"], inner = N_2a*N_l))
+    
+    return(res)
 
-    stack([e;a;s], Not([:wavelength,:crosstype]))
+    # e = insertcols!(
+    #     DataFrame(x.extinction,  [:s, :p]),
+    #     :wavelength => wavelength,
+    #     :crosstype => "extinction"
+    # )
+    # a = insertcols!(
+    #     DataFrame(x.absorption,  [:s, :p]),
+    #     :wavelength => wavelength,
+    #     :crosstype => "absorption"
+    # )
+
+    # s = insertcols!(
+    #     DataFrame(x.scattering,  [:s, :p]),
+    #     :wavelength => wavelength,
+    #     :crosstype => "scattering"
+    # )
+
+    # stack([e;a;s], Not([:wavelength,:crosstype]), variable_name="polarisation")
 
 end
 

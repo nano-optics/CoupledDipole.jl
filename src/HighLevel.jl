@@ -9,7 +9,7 @@ Simulating far-field cross-sections for multiple wavelengths and directions of i
 
 - `cl`: cluster of particles
 - `mat`: dielectric functions
-- `Incidence`: N_inc vector of 3-Svectors of incidence Euler angles
+- `Incidence`: N_inc vector of quaternions describing incidence directions
 - `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
 
 """
@@ -54,7 +54,8 @@ function spectrum_dispersion(
     # store all rotation matrices
     # ParticleRotations = map(euler_passive, cl.angles)
     ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
-    IncidenceRotations = map(euler_active, Incidence) # same, no longer needed
+    # IncidenceRotations = map(euler_active, Incidence) # old Euler, no longer needed
+    IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
     # NOTE: we only need the third column to rotate kz, should specialise
 
@@ -171,8 +172,8 @@ function spectrum_oa(
     method = "direct",
 )
 
-    quad_inc = cubature_sphere(N_inc, cubature)
-    quad_sca = cubature_sphere(N_sca, cubature)
+    quad_inc = cubature_sphere(N_inc, cubature)  
+    quad_sca = cubature_sphere(N_sca, cubature)  
 
     # setting up constants
 
@@ -207,9 +208,10 @@ function spectrum_oa(
     ]
 
     # store all rotation matrices
-    # ParticleRotations = map(euler_passive, cl.angles)
+    # ParticleRotations = map(euler_passive, cl.angles) # old version
     ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
-    IncidenceRotations = map(euler_active, quad_inc.nodes)
+    # IncidenceRotations = map(euler_active, quad_inc.nodes) # old version, replaced by RotZYZ
+    IncidenceRotations = map(RotZYZ, quad_inc.nodes) 
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
 
     # average both polarisations, so divide by two

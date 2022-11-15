@@ -20,8 +20,9 @@ aa = AngleAxis(r)
 
 test_clust([r,q,e,aa])
 
+RotMatrix(RotZYZ(0,0,0))
 
-
+RotMatrix(UnitQuaternion(1,0,0,0))
 
 e1 = RotZYZ(0.1,0.2,0.3)
 # 3×3 RotZYZ{Float64} with indices SOneTo(3)×SOneTo(3)(0.1, 0.2, 0.3):

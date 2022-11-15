@@ -23,7 +23,7 @@ function model(;d=80, ϕ=0)
     oa_df(oa, mat.wavelengths)
 end
 
-# model()
+model()
 
 params = expand_grid(d = range(80, 200, step = 20), ϕ = (0,45))
 
@@ -32,13 +32,15 @@ all = pmap_df(params, p -> model(;p...))
 s = spectrum_oa(cl0, mat)
 single = oa_df(s, mat.wavelengths)
 
-# using AlgebraOfGraphics, CairoMakie
+using AlgebraOfGraphics, CairoMakie
+
 # set_aog_theme!()
 
 
-# xy = data(all) * mapping(:wavelength, :value, color = :d => nonnumeric, col=:variable, row=:type, linestyle=:ϕ  => nonnumeric)
-# layer = visual(Lines)
-# AlgebraOfGraphics.draw(layer * xy, facet = (;  linkyaxes = :none))
+xy = data(all) * mapping(:wavelength, :value, color = :d => nonnumeric, col=:variable, row=:type, linestyle=:ϕ  => nonnumeric)
+layer = visual(Lines)
+draw(layer * xy, facet = (;  linkyaxes = :none))
+
 
 x = repeat(LinRange(-5,5,100), inner=2)
 df = DataFrame(x=x, y=x.^2, z=x.^3, col=repeat(1:2, outer=100))
