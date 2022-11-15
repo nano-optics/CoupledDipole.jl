@@ -54,7 +54,7 @@ function model(; d=80, orientation="head-to-tail")
         Incidence = [RotZ(0.)]
         res = spectrum_dispersion(cl, mat, Incidence)
         d = dispersion_df(res, mat.wavelengths)
-        return(d) # filter(:polarisation => ==("s"), d)
+        return(filter(:polarisation => ==("p"), d))
     elseif orientation == "side-by-side"
         # dimer axis along y, particle axis along z
         cl = cluster_dimer(d, 20., 20, 40, 0)
@@ -62,42 +62,36 @@ function model(; d=80, orientation="head-to-tail")
         Incidence = [RotY(π/2)]
         res = spectrum_dispersion(cl, mat, Incidence)
         d = dispersion_df(res, mat.wavelengths)
-        return(d) # filter(:polarisation => ==("s"), d)
+        return(filter(:polarisation => ==("s"), d))
     end
     
     error("unknown orientation given")
 end
 
 
-# wavelength = collect(450:2:850.0)
-# cl0 = cluster_single(20, 20, 40)
-# Incidence = [RotY(π/2)]
-# x = spectrum_dispersion(cl0, mat, Incidence)
-# N_l, N_2a = size(x.extinction)
-# wavelength = repeat(wavelength, outer = 3*N_2a)
-# value = vcat(vec(x.extinction), vec(x.absorption), vec(x.scattering))
-# repeat(["s", "p"], outer = Int(3*N_2a/2), inner = N_l)
+wavelength = collect(400:2:800.0)
+media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
+mat = Material(wavelength, media)
+# cl = cluster_dimer(80, 20., 40, 20, 0)
+# Incidence = [RotZ(0.),RotZ(π/2.),RotZ(0.),RotZ(π/2.),RotZ(0.)]
+# res = spectrum_dispersion(cl, mat, Incidence)
+# d = dispersion_df(res, mat.wavelengths)
+# print(d)
 
-
-
-test = model()
-
-
-unique(test.variable)
-
-params = expand_grid(d=range(80, 200, step=20), ϕ=(0, 45))
+params = expand_grid(d=range(80, 200, step=20), orientation=("head-to-tail", "side-by-side"))
 
 all = pmap_df(params, p -> model(; p...))
 
-s = spectrum_oa(cl0, mat)
-single = oa_df(s, mat.wavelengths)
+
+s = spectrum_dispersion(cl0, mat, [RotZ(0.)])
+single = dispersion_df(s, mat.wavelengths)
 
 using AlgebraOfGraphics, CairoMakie
 
 # set_aog_theme!()
 
 
-xy = data(all) * mapping(:wavelength, :value, color=:d => nonnumeric, col=:variable, row=:type, linestyle=:ϕ => nonnumeric)
+xy = data(all) * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation, row=:crosstype, linestyle=:crosstype => nonnumeric)
 layer = visual(Lines)
 draw(layer * xy, facet=(; linkyaxes=:none))
 

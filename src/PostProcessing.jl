@@ -16,9 +16,9 @@ function dispersion_df(x, wavelength)
     N_l, N_2a = size(x.extinction)
 
     res =  DataFrame(wavelength = repeat(wavelength, outer = 3*N_2a),
-    value = vcat(vec(x.extinction), vec(x.absorption), vec(x.scattering)),
-    polarisation = repeat(["s", "p"], outer = Int(3*N_2a/2), inner = N_l),
-    angle = repeat(repeat(1:Int(N_2a/2),outer=2), inner=N_l, outer=3),
+    value = vcat(vec(x.extinction), vec(x.absorption), vec(x.scattering)), # ext,abs,sca
+    polarisation = repeat(["s", "p"], outer = 3, inner = N_l*Int(N_2a/2)), # Nl wavelengths, Na angles | ext,abs,sca
+    angle = repeat(repeat(1:Int(N_2a/2),outer=2), inner=N_l, outer=3),     # 2 pol, Nl wavelengths | ext,abs,sca
     crosstype = repeat(["extinction", "absorption", "scattering"], inner = N_2a*N_l))
     
     return(res)
