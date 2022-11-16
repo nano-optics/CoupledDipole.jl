@@ -151,7 +151,8 @@ end
 euler_passive(v::SVector) = euler_passive(v...)
 
 
-
+# splatted version
+RotZYZ(v::SVector) = RotZYZ(v...)
 
 """
     euler_unitvector(φ::Real, θ::Real)

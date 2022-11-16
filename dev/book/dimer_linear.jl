@@ -86,6 +86,18 @@ all = pmap_df(params, p -> model(; p...))
 s = spectrum_dispersion(cl0, mat, [RotZ(0.)])
 single = dispersion_df(s, mat.wavelengths)
 
+
+s = spectrum_oa(cl0, mat)
+single = oa_df(s, mat.wavelengths)
+
+
+xy = data(single) * mapping(:wavelength, :value, color=:type, row=:crosstype,col=:type)
+layer = visual(Lines)
+draw(layer * xy, facet=(; linkyaxes=:none))
+
+
+
+
 using AlgebraOfGraphics, CairoMakie
 
 # set_aog_theme!()
@@ -96,69 +108,3 @@ layer = visual(Lines)
 draw(layer * xy, facet=(; linkyaxes=:none))
 
 
-x = repeat(LinRange(-5, 5, 100), inner=2)
-df = DataFrame(x=x, y=x .^ 2, z=x .^ 3, col=repeat(1:2, outer=100))
-
-df |>
-@vlplot(facet = {column = {field = :col, typ = :nominal}}) +
-(
-    @vlplot(x = :x) +
-    @vlplot(:line, y = :y) +
-    @vlplot(mark = {:line, color = :black}, strokeDash = {value = [2, 2]}, y = :z)
-)
-
-single |>
-@vlplot(facet = {column = {field = :variable, typ = :nominal},
-    row = {field = :type, typ = :nominal}}) +
-(
-    @vlplot() +
-    @vlplot(mark = {:line}, data = all, row = :type, column = :variable,
-        encoding = {x = "wavelength:q", y = "value:q", color = "d:n", strokeDash = "ϕ:n"}
-    ) +
-    @vlplot(mark = {:line, color = :black}, data = single,
-        strokeDash = {value = [2, 2]}, row = :type, column = :variable,
-        encoding = {x = "wavelength:q", y = "value:q"}
-    )
-)
-
-@vlplot(mark = {:line}, data = all, row = :type, column = :variable,
-    encoding = {x = "wavelength:q", y = "value:q", color = "d:n", strokeDash = "ϕ:n"}
-)
-
-
-using VegaDatasets
-dataset("weather.csv") |>
-@vlplot(repeat = {column = [:temp_max, :precipitation, :wind]}) +
-(
-    @vlplot() +
-    @vlplot(
-        :line,
-        y = {field = {repeat = :column}, aggregate = :mean, typ = :quantitative},
-        x = "month(date):o",
-        detail = "year(date):t",
-        color = :location,
-        opacity = {value = 0.2}
-    ) +
-    @vlplot(
-        :line,
-        y = {field = {repeat = :column}, aggregate = :mean, typ = :quantitative},
-        x = "month(date):o",
-        color = :location
-    )
-)
-
-# using Gadfly
-
-# plot(all, x=:wavelength, y=:value, linestyle = :ϕ, color=:d,
-#     ygroup=:type, xgroup=:variable,
-#      Geom.subplot_grid(Geom.line, free_y_axis=true))
-
-
-using RDatasets: dataset
-using AlgebraOfGraphics, CairoMakie
-mpg = dataset("ggplot2", "mpg");
-cols = mapping(:Displ, :Hwy);
-grp = mapping(color=:Cyl => nonnumeric);
-scat = visual(Scatter)
-pipeline = cols * scat
-data(mpg) * pipeline |> draw

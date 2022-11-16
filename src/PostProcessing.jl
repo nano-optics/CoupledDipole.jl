@@ -23,25 +23,6 @@ function dispersion_df(x, wavelength)
     
     return(res)
 
-    # e = insertcols!(
-    #     DataFrame(x.extinction,  [:s, :p]),
-    #     :wavelength => wavelength,
-    #     :crosstype => "extinction"
-    # )
-    # a = insertcols!(
-    #     DataFrame(x.absorption,  [:s, :p]),
-    #     :wavelength => wavelength,
-    #     :crosstype => "absorption"
-    # )
-
-    # s = insertcols!(
-    #     DataFrame(x.scattering,  [:s, :p]),
-    #     :wavelength => wavelength,
-    #     :crosstype => "scattering"
-    # )
-
-    # stack([e;a;s], Not([:wavelength,:crosstype]), variable_name="polarisation")
-
 end
 
 """
@@ -56,18 +37,18 @@ Long format dataframe for orientation-averaged spectra
 """
 function oa_df(x, wavelength)
 
-    a = DataFrame(:extinction => x.average.extinction,
-            :absorption => x.average.absorption,
-            :scattering => x.average.scattering,
-            :wavelength => wavelength,
-            :type => "average")
+    N_l = length(wavelength)
 
-        d = DataFrame(:extinction => x.dichroism.extinction,
-                :absorption => x.dichroism.absorption,
-                :scattering => x.dichroism.scattering,
-                :wavelength => wavelength,
-                :type => "dichroism")
-
-    stack([a;d], Not([:wavelength,:type]))
+    res =  DataFrame(wavelength = repeat(wavelength, outer = 6),
+    value = vcat(x.average.extinction, 
+                 x.average.absorption, 
+                 x.average.scattering,
+                 x.dichroism.extinction,
+                 x.dichroism.absorption,
+                 x.dichroism.scattering), 
+    type = repeat(["average", "dichroism"],inner=3*N_l), 
+    crosstype = repeat(["extinction", "absorption", "scattering"], inner = N_l, outer = 2))
+    
+    return(res)
 
 end
