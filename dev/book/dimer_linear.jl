@@ -10,6 +10,8 @@ using FastGaussQuadrature
 using DataFrames
 using VegaLite
 
+using AlgebraOfGraphics, CairoMakie
+
 
 
 # dimer_model <- function(d, orientation = c("head-to-tail", "side-by-side"), 
@@ -95,10 +97,16 @@ wavelength = collect(450:2:850.0)
 media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
+sizes = [SVector(0.0, 0.0, 0.0)]
+positions = [SVector(0.0, 0.0, 0.0)]
+# input parameters are Euler angles
+rotations = [UnitQuaternion(RotZYZ(0.0, 0.0, 0.0))]
+Cluster(positions, rotations, sizes, ["Au"], "particle")
+
 cl0 = cluster_single(20.0, 50.0, 20.0)
 # cl0 = cluster_single(50.0, 20.0, 20.0)
-# s = spectrum_dispersion(cl0, mat, [UnitQuaternion(RotZ(0.0))])
-s = spectrum_dispersion(cl0, mat, [SVector(0.0, 0.0, 0.0)])
+
+s = spectrum_dispersion(cl0, mat, [UnitQuaternion(RotZ(0.0))])
 single = dispersion_df(s, mat.wavelengths)
 
 
@@ -118,8 +126,6 @@ draw(layer * xy, facet=(; linkyaxes=:none))
 #     resolve = {scale = {y = "independent"}},
 #     encoding = {x = "wavelength:q", y = "value:q", color = "d:n", strokeDash = "cluster:n"}
 # )
-
-using AlgebraOfGraphics, CairoMakie
 
 # set_aog_theme!()
 

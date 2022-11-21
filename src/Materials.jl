@@ -265,7 +265,7 @@ function alpha_kuwata(λ, ε, ε_m, Size)
 
     V = 4π / 3 * prod(Size)
     x = @. 2π / λ * Size
-    χ = depolarisation_spheroid(Size...)
+    χ = depolarisation_ellipsoid(Size...)
 
     A = @. -0.4865 * χ - 1.046 * χ^2 + 0.8481 * χ^3
     B = @. 0.01909 * χ + 0.19999 * χ^2 + 0.6077 * χ^3

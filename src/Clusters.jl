@@ -49,7 +49,7 @@ function cluster_single(a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="pa
     sizes = [SVector(a, b, c)]
     positions = [SVector(0.0, 0.0, 0.0)]
     # input parameters are Euler angles
-    rotations = [UnitQuaternion(RotZYZ([α, β, γ]))]
+    rotations = [Rotations.UnitQuaternion(Rotations.RotZYZ(α, β, γ))]
     Cluster(positions, rotations, sizes, [material], type)
 end
 
@@ -159,7 +159,7 @@ cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
 function cluster_line(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="particle")
 
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
-    rotations = [UnitQuaternion(RotZYZ([α, β, γ])) for _ ∈ 1:N] # identical particles
+    rotations = [UnitQuaternion(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
 
     positions = SVector.(-(N - 1)*Λ/2:Λ:(N-1)*Λ/2, zero(eltype(Λ)), zero(eltype(Λ)))
 
@@ -192,7 +192,7 @@ function cluster_array(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", ty
     N = N′^2 # actual number,  may have fewer than original N particles
 
     sizes = [SVector(a, b, c) for _ ∈ 1:N] # identical particles
-    rotations = [UnitQuaternion(RotZYZ([α, β, γ])) for _ ∈ 1:N] # identical particles
+    rotations = [UnitQuaternion(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
 
     x = -(N′ - 1)*Λ/2:Λ:(N′-1)*Λ/2
     positions = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
@@ -245,7 +245,7 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
 
     end
 
-    quaternions = [UnitQuaternion(RotZYZ([r[1], r[2], r[3]])) for r in rotations]
+    quaternions = [UnitQuaternion(RotZYZ(r[1], r[2], r[3])) for r in rotations]
 
     Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
 

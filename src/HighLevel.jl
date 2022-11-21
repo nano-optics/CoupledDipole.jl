@@ -54,8 +54,8 @@ function spectrum_dispersion(
     # store all rotation matrices
     # ParticleRotations = map(euler_passive, cl.angles)
     ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
-    IncidenceRotations = map(euler_active, Incidence) # old Euler, no longer needed
-    #IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
+    # IncidenceRotations = map(euler_active, Incidence) # old Euler, no longer needed
+    IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
     # NOTE: we only need the third column to rotate kz, should specialise
 
