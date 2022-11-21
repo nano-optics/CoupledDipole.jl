@@ -6,8 +6,9 @@ using LinearAlgebra
 using StaticArrays
 using Rotations
 using FastGaussQuadrature: gausslegendre
-using DataFrames
+using QuadGK # for ellipsoids, should use GL as well to reduce deps
 using Makie
+using DataFrames
 
 
 include("Clusters.jl")
@@ -58,7 +59,7 @@ export visualise_makie
 export visualise_threejs
 export expand_grid
 export pmap_df
-
+export depolarisation_ellipsoid
 
 ## core functions
 
@@ -213,8 +214,8 @@ function iterate_field!(
     F,
     kn,
     AlphaBlocks;
-    tol = 1e-4,
-    maxiter = 1000,
+    tol=1e-4,
+    maxiter=1000
 )
 
     error = Inf
@@ -229,7 +230,7 @@ function iterate_field!(
 
     while (error > tol) && (niter < maxiter)
 
-        Etmp = (I-F) * Etmp
+        Etmp = (I - F) * Etmp
         E = E + Etmp # add new order contribution
         polarisation!(P, E, AlphaBlocks)
         extinction!(σ_ext, kn, P, Ein)

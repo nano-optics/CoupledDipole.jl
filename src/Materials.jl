@@ -1,7 +1,6 @@
 
 ## material functions
 
-
 """
     Material(wavelength, media)
 
@@ -10,7 +9,7 @@ Wavelength-dependent optical properties.
 """
 struct Material{T}
     wavelengths::Vector{T}
-    media::Dict{String, Function}
+    media::Dict{String,Function}
 end
 
 
@@ -61,11 +60,11 @@ function epsilon_Au(λ)
 
     ε_∞ * (1 - 1 / (λ_p^2 * ((1 / λ)^2 + 1im / (μ_p * λ)))) +
     A1 / λ1 * (
-        exp( 1im * φ) / (1 / λ1 - 1 / λ - 1im / μ_p1) +
+        exp(1im * φ) / (1 / λ1 - 1 / λ - 1im / μ_p1) +
         exp(-1im * φ) / (1 / λ1 + 1 / λ + 1im / μ_p1)
     ) +
     A2 / λ2 * (
-        exp( 1im * φ) / (1 / λ2 - 1 / λ - 1im / μ_p2) +
+        exp(1im * φ) / (1 / λ2 - 1 / λ - 1im / μ_p2) +
         exp(-1im * φ) / (1 / λ2 + 1 / λ + 1im / μ_p2)
     )
 end
@@ -88,7 +87,7 @@ julia> round(lorentzian(632.8)*1e39, digits=5)
 ```
 
 """
-function lorentzian(λ, α_k = 5.76e-38, λ_k = 526.0, µ_k = 1.0e4)
+function lorentzian(λ, α_k=5.76e-38, λ_k=526.0, µ_k=1.0e4)
     -α_k * λ_k / µ_k *
     (1.0 - 1.0 / (1.0 - (λ_k / λ)^2 - 1im * (λ_k^2 / (µ_k * λ))))
 end
@@ -113,13 +112,13 @@ julia> round(alpha_bare(632.8), digits=5)
 ```
 
 """
-function alpha_bare(λ, α_∞ = 9.6e-39, α_k = 5.76e-38, λ_k = 526.0, µ_k = 1.0e4)
+function alpha_bare(λ, α_∞=9.6e-39, α_k=5.76e-38, λ_k=526.0, µ_k=1.0e4)
 
     ε₀ = 8.8541878128e-12
     nm3 = 1e27
 
-    α = α_∞ 
-    for kk = 1:length(α_k)
+    α = α_∞
+    for kk = eachindex(α_k)
         α += lorentzian(λ, α_k[kk], λ_k[kk], µ_k[kk])
     end
     prefact = nm3 / (4π * ε₀)
@@ -144,7 +143,7 @@ julia> round(alpha_embed(alpha_bare(632.8)), digits=5)
 ```
 
 """
-function alpha_embed(α, medium = 1.33)
+function alpha_embed(α, medium=1.33)
     ε_m = medium^2
     L = (ε_m + 2) / 3
     1 / ε_m * L^2 * α
@@ -165,17 +164,16 @@ end
 
 
 """
-    depolarisation_spheroid(a, b, c)
+    depolarisation_spheroid(a, c)
 
 Depolarisation factor of a spheroid
 - `a`: semi-axis along x and y
-- `b`: semi-axis along x and y (unused)
 - `c`: semi-axis along z
 
 # Examples
 
 ```jldoctest
-julia> round.(depolarisation_spheroid(1, 1, 1.5), digits=5)
+julia> round.(depolarisation_spheroid(1, 1.5), digits=5)
 3-element SVector{3, Float64} with indices SOneTo(3):
  0.38351
  0.38351
@@ -183,7 +181,7 @@ julia> round.(depolarisation_spheroid(1, 1, 1.5), digits=5)
 ```
 
 """
-function depolarisation_spheroid(a, b, c)
+function depolarisation_spheroid(a, c)
     if (c == a)# sphere
         Lz = 1 / 3
     end
@@ -203,6 +201,45 @@ function depolarisation_spheroid(a, b, c)
     return (SVector(Lx, Lx, Lz))
 end
 
+"""
+  depolarisation_ellipsoid(a, b, c)
+
+Depolarisation factor of an ellipsoid
+- `a`: semi-axis along x 
+- `b`: semi-axis along y
+- `c`: semi-axis along z
+
+# Examples
+
+```jldoctest
+julia> round.(depolarisation_ellipsoid(1, 1, 1.5), digits=5)
+3-element SVector{3, Float64} with indices SOneTo(3):
+ 0.38351
+ 0.38351
+ 0.23298
+```
+
+"""
+function depolarisation_ellipsoid(a, b, c)
+    if (c ≈ a) & (b ≈ a) # sphere
+        Lx = 1 / 3.0
+        Ly = Lx
+        Lz = Lx
+    elseif (a ≈ b) # spheroid along z
+        Lx, Ly, Lz = depolarisation_spheroid(a, c)
+    elseif (b ≈ c) # spheroid along x
+        Lz, Ly, Lx = depolarisation_spheroid(b, a) # swap z and x
+    elseif (a ≈ c) # spheroid along y
+        Lx, Lz, Ly = depolarisation_spheroid(a, b)  # swap z and y
+    else # general case (no closed form)
+        V = a * b * c
+        Lx = QuadGK.quadgk(q -> 1.0 / ((1.0 + q) * sqrt((q + 1.0) * (q + (b / a)^2) * (q + (c / a)^2))), 0.0, Inf)[1] * V / 2.0 / a^3
+        Ly = QuadGK.quadgk(q -> 1.0 / ((1.0 + q) * sqrt((q + 1.0) * (q + (a / b)^2) * (q + (c / b)^2))), 0.0, Inf)[1] * V / 2.0 / b^3
+        Lz = QuadGK.quadgk(q -> 1.0 / ((1.0 + q) * sqrt((q + 1.0) * (q + (a / c)^2) * (q + (b / c)^2))), 0.0, Inf)[1] * V / 2.0 / c^3
+    end
+
+    return (SVector(Lx, Ly, Lz))
+end
 
 """
     alpha_kuwata(λ, ε, ε_m, Size)
@@ -216,7 +253,7 @@ Principal polarisability components of a spheroidal particle
 # Examples
 
 ```
-julia> alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
+julia> alpha_kuwata(500, -10+1im, 1.33^2, SVector(30, 30, 50))
 3-element SVector{3, ComplexF64} with indices SOneTo(3):
   77076.04648078184 + 26235.664281642235im
   77076.04648078184 + 26235.664281642235im
@@ -226,15 +263,15 @@ julia> alpha_kuwata(500, -10+1im, SVector(30, 30, 50), 1.33^2)
 """
 function alpha_kuwata(λ, ε, ε_m, Size)
 
-    V = 4π / 3  * prod(Size)
-    x = @. 2π/λ * Size
+    V = 4π / 3 * prod(Size)
+    x = @. 2π / λ * Size
     χ = depolarisation_spheroid(Size...)
 
     A = @. -0.4865 * χ - 1.046 * χ^2 + 0.8481 * χ^3
     B = @. 0.01909 * χ + 0.19999 * χ^2 + 0.6077 * χ^3
 
     denom = @. (χ + ε_m / (ε - ε_m)) + A * ε_m * x^2 + B * ε_m^2 * x^4 -
-       1im / 3 * 4 * π^2 * ε_m^(3 / 2) * V / λ^3
+               1im / 3 * 4 * π^2 * ε_m^(3 / 2) * V / λ^3
 
     return ((V / (4π)) ./ denom)
 end

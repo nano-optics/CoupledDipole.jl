@@ -17,8 +17,8 @@ function spectrum_dispersion(
     cl::Cluster,
     mat::Material,
     Incidence;
-    N_sca::Int = 36,
-    method = "direct",
+    N_sca::Int=36,
+    method="direct"
 )
 
     # what is the type of arrays to initialise?
@@ -54,8 +54,8 @@ function spectrum_dispersion(
     # store all rotation matrices
     # ParticleRotations = map(euler_passive, cl.angles)
     ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
-    # IncidenceRotations = map(euler_active, Incidence) # old Euler, no longer needed
-    IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
+    IncidenceRotations = map(euler_active, Incidence) # old Euler, no longer needed
+    #IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
     # NOTE: we only need the third column to rotate kz, should specialise
 
@@ -83,7 +83,7 @@ function spectrum_dispersion(
                 cl.materials,
                 cl.sizes,
             )
-            
+
         elseif cl.type == "particle"
 
             Alpha = map(
@@ -166,14 +166,14 @@ Orientation-averaged far-field cross-sections for multiple wavelengths
 function spectrum_oa(
     cl::Cluster,
     mat::Material;
-    cubature = "gl",
-    N_inc = 36,
-    N_sca = 36,
-    method = "direct",
+    cubature="gl",
+    N_inc=36,
+    N_sca=36,
+    method="direct"
 )
 
-    quad_inc = cubature_sphere(N_inc, cubature)  
-    quad_sca = cubature_sphere(N_sca, cubature)  
+    quad_inc = cubature_sphere(N_inc, cubature)
+    quad_sca = cubature_sphere(N_sca, cubature)
 
     # setting up constants
 
@@ -211,7 +211,7 @@ function spectrum_oa(
     # ParticleRotations = map(euler_passive, cl.angles) # old version
     ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
     # IncidenceRotations = map(euler_active, quad_inc.nodes) # old version, replaced by RotZYZ
-    IncidenceRotations = map(RotZYZ, quad_inc.nodes) 
+    IncidenceRotations = map(RotZYZ, quad_inc.nodes)
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
 
     # average both polarisations, so divide by two
@@ -319,12 +319,12 @@ function spectrum_oa(
     # dsca = dext - dabs
 
     (
-        average = CrossSections(
+        average=CrossSections(
             1 / N_dip * cext,
             1 / N_dip * cabs,
             1 / N_dip * csca,
         ),
-        dichroism = CrossSections(
+        dichroism=CrossSections(
             1 / N_dip * dext,
             1 / N_dip * dabs,
             1 / N_dip * dsca,

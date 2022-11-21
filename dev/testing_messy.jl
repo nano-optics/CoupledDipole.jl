@@ -1,5 +1,5 @@
 # include("../src/CoupledDipole.jl")
-push!(LOAD_PATH, expanduser( "~/Documents/nano-optics/CoupledDipole.jl/"))
+push!(LOAD_PATH, expanduser("~/Documents/nano-optics/CoupledDipole.jl/"))
 using Revise
 using CoupledDipole
 
@@ -16,13 +16,13 @@ end
 
 function polarisability(λ, α_∞, α_k, λ_k, µ_k)
 
-    α = α_∞ 
-    for kk = 1:length(α_k)
+    α = α_∞
+    for kk = eachindex(α_k)
         α += lorentzian(λ, α_k[kk], λ_k[kk], µ_k[kk])
     end
-    
+
     ε₀ = 8.8541878128e-12
-    α / (4π * ε₀) 
+    α / (4π * ε₀)
 end
 
 
@@ -64,19 +64,19 @@ using Profile
 N_dip = 5
 N_inc = 36
 F = Matrix{Complex{Float64}}(I, 3N_dip, 3N_dip)
-Ein = Array{Complex{Float64}}(undef, (3*N_dip, 2N_inc))
+Ein = Array{Complex{Float64}}(undef, (3 * N_dip, 2N_inc))
 E = similar(Ein)
-E = F\Ein
+E = F \ Ein
 
 
 N_dip = 5
 Ni = 36
-R = [@SVector randn(3) for ii=1:N_dip]
-Angles = [@SVector randn(3) for ii=1:N_dip]
+R = [@SVector randn(3) for ii = 1:N_dip]
+Angles = [@SVector randn(3) for ii = 1:N_dip]
 kn = 0.2
-Alpha = [@SVector randn(Complex{Float64},3) for ii=1:N_dip]
+Alpha = [@SVector randn(Complex{Float64}, 3) for ii = 1:N_dip]
 
-AlphaBlocks = [@SMatrix randn(Complex{Float64},3,3) for ii=1:N_dip]
+AlphaBlocks = [@SMatrix randn(Complex{Float64}, 3, 3) for ii = 1:N_dip]
 
 # function alpha_blocks!(AlphaBlocks::Vector{SMatrix{3,3}},
 #     Alpha::Vector{SVector{3}},
@@ -87,16 +87,16 @@ AlphaBlocks = [@SMatrix randn(Complex{Float64},3,3) for ii=1:N_dip]
 
 
 
-A = Matrix{Complex{Float64}}(I, 3*N_dip, 3*N_dip)
-propagator_freespace_labframe!(A,kn,R,AlphaBlocks)
+A = Matrix{Complex{Float64}}(I, 3 * N_dip, 3 * N_dip)
+propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
 
 
 # Evec = SVector{3, Complex{Float64}}([0.1; 0.1; 0.0])
 
 Ejones = [SVector{2}(1.0, 0.0), SVector{2}(0.0, 1.0)]
-Incidence = [@SVector randn(Float64,3) for ii=1:Ni]
+Incidence = [@SVector randn(Float64, 3) for ii = 1:Ni]
 IncidenceRotations = map(CoupledDipole.euler_active, Incidence)
-Ein = Array{Complex{Float64}}(undef, (3*N_dip, 2Ni))
+Ein = Array{Complex{Float64}}(undef, (3 * N_dip, 2Ni))
 incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
 E = similar(Ein)
 P = similar(Ein)
@@ -131,7 +131,7 @@ medium = Dict([("Au", CoupledDipole.epsilon_Au), ("medium", x -> 1.33)])
 
 mat = Material(wavelength, medium)
 
-cl = cluster_dimer(100, 20, 20, 40, π/4)
+cl = cluster_dimer(100, 20, 20, 40, π / 4)
 # cl = cluster_single(20, 20, 40)
 #
 # Alpha = alpha_spheroids(500, -10+1im, 1.33^2, cl.sizes)
@@ -139,7 +139,7 @@ cl = cluster_dimer(100, 20, 20, 40, π/4)
 # AlphaBlocks = [@SMatrix zeros(Complex{Real},3,3) for ii=1:N_dip]
 #
 # Ni=2
-Incidence = [SVector(0,0,0),SVector(0,π/2,0)]
+Incidence = [SVector(0, 0, 0), SVector(0, π / 2, 0)]
 
 
 typeof(cl)
@@ -155,22 +155,22 @@ testdisp = spectrum_dispersion(cl, mat, Incidence)
 a = DataFrame(testdisp.scattering, :auto)
 b = DataFrame(testdisp.extinction - testdisp.absorption, :auto)
 # c = DataFrame(testdisp.extinction, :auto)
-a[!,:wavelength] = mat.wavelength
-b[!,:wavelength] = mat.wavelength
+a[!, :wavelength] = mat.wavelength
+b[!, :wavelength] = mat.wavelength
 # c[!,:wavelength] = mat.wavelength
 da = stack(a, Not(:wavelength))
 db = stack(b, Not(:wavelength))
 # dc = stack(c, Not(:wavelength))
 
 @vlplot(
-width= 400,
-height =  300,
- tooltip={field="value", type="quantitative"}) +
-@vlplot(data=da, #csca
-    mark = {:line, strokeDash=(5,5)},
+    width = 400,
+    height = 300,
+    tooltip = {field = "value", type = "quantitative"}) +
+@vlplot(data = da, #csca
+    mark = {:line, strokeDash = (5, 5)},
     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
 ) +
-@vlplot(data=db, #cext - cabs
+@vlplot(data = db, #cext - cabs
     mark = :line,
     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n"}
 )
@@ -197,37 +197,38 @@ height =  300,
 d |> @vlplot(
     mark = :line,
     encoding = {x = "wavelength:q", y = "value", color = "variable:n"},
-           tooltip={field="value", typ="quantitative"},
-  width= 400,
-  height =  300,
+    tooltip = {field = "value", typ = "quantitative"},
+    width = 400,
+    height = 300,
 )
 
 
-alpha = quadrature_lgwt( 5, 0, 2*π )
+alpha = quadrature_lgwt(5, 0, 2 * π)
 
-beta  = quadrature_lgwt( 4, 0, 1 )
-a=2.0;b=1.0
-nodes = hcat([SVector{3}(a,acos(2*b - 1),0.0) for b in beta.nodes, a in alpha.nodes]...)
+beta = quadrature_lgwt(4, 0, 1)
+a = 2.0;
+b = 1.0;
+nodes = hcat([SVector{3}(a, acos(2 * b - 1), 0.0) for b in beta.nodes, a in alpha.nodes]...)
 
-weights = SVector([a*b for a in alpha.weights, b in beta.weights]...)
+weights = SVector([a * b for a in alpha.weights, b in beta.weights]...)
 
 quad_inc = cubature_sphere(3, "gl")
 
-cl = cluster_dimer(80, 20, 20, 40, pi/4)
+cl = cluster_dimer(80, 20, 20, 40, pi / 4)
 testoa = spectrum_oa(cl, mat, "gl", 100)
 
 @profile spectrum_oa(cl, mat, "gl", 100)
 
 
-clref = cluster_single(20,20,40,0,0,0)
+clref = cluster_single(20, 20, 40, 0, 0, 0)
 # clref = cluster_single(20,20,40,0,π/2,0)
 
 ref = spectrum_oa(clref, mat, "gl", 300)
 
 
-a = DataFrame(dimer = testoa.average.extinction, single =  ref.average.extinction)
+a = DataFrame(dimer=testoa.average.extinction, single=ref.average.extinction)
 # a = DataFrame(dimer = testoa.dichroism.extinction, single =  ref.dichroism.extinction)
-a[!,:wavelength] = mat.wavelength
+a[!, :wavelength] = mat.wavelength
 d = stack(a, Not(:wavelength))
 
 # plot(d, x=:wavelength, y=:value, colour=:variable, Geom.line)
@@ -235,8 +236,8 @@ d = stack(a, Not(:wavelength))
 d |> @vlplot(
     mark = :line,
     encoding = {x = "wavelength:q", y = "value", color = "variable:n"},
-           tooltip={field="value", typ="quantitative"},
-  width= 400,
-  height = 300,
-  autosize = "fit",
+    tooltip = {field = "value", typ = "quantitative"},
+    width = 400,
+    height = 300,
+    autosize = "fit",
 )
