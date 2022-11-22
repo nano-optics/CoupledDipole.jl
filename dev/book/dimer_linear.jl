@@ -68,6 +68,7 @@ draw(layer * xy, facet=(; linkyaxes=:none))
 # set_aog_theme!()
 
 
+using ColorSchemes
 set_aog_theme!()
 d1 = data(filter(:polarisation => ==("p"), all))
 d2 = data(filter(:polarisation => ==("p"), single))
@@ -75,22 +76,24 @@ m1 = d1 * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation,
 m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
-draw(layer1 + layer2, facet=(; linkyaxes=:none))
+draw(layer1 + layer2, facet=(; linkyaxes=:none), palettes=(; color=cgrad(ColorSchemes.viridis.colors, 12, categorical=true)))
+# https://docs.juliaplots.org/latest/generated/colorschemes/
 
+# cgrad([:purple, :green], 12, categorical=true)
+# ColorSchemes.viridis.colors
+# cgrad(ColorSchemes.viridis.colors, 12, categorical=true)
 
+# d = [insertcols(all, :cluster => "dimer"),
+#     insertcols(single, :cluster => "single", :d => missing, :orientation => missing)]
 
-d = [insertcols(all, :cluster => "dimer"),
-    insertcols(single, :cluster => "single", :d => missing, :orientation => missing)]
-
-
-@vlplot(data = d,
-    width = 400,
-    height = 300,
-    mark = {:line},
-    row = "crosstype",
-    resolve = {scale = {y = "independent"}},
-    encoding = {x = "wavelength:q", y = "value:q", color = "d:n", strokeDash = "cluster:n"}
-)
+# @vlplot(data = d,
+#     width = 400,
+#     height = 300,
+#     mark = {:line},
+#     row = "crosstype",
+#     resolve = {scale = {y = "independent"}},
+#     encoding = {x = "wavelength:q", y = "value:q", color = "d:n", strokeDash = "cluster:n"}
+# )
 
 
 d1 = filter(:polarisation => ==("p"), all)
