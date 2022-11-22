@@ -49,7 +49,7 @@ function cluster_single(a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="pa
     sizes = [SVector(a, b, c)]
     positions = [SVector(0.0, 0.0, 0.0)]
     # input parameters are Euler angles
-    rotations = [Rotations.UnitQuaternion(Rotations.RotZYZ(α, β, γ))]
+    rotations = [UnitQuaternion(Rotations.RotZYZ(α, β, γ))]
     Cluster(positions, rotations, sizes, [material], type)
 end
 

@@ -42,15 +42,15 @@ Expand all combinations of named arguments
 - `join`: logical, join parameters and results
 
 """
-function pmap_df(p, f, kws...; join = true)
+function pmap_df(p, f, kws...; join=true)
     tmp = map(f, eachrow(p), kws...)
     all = reduce(vcat, tmp, source="id")
     if !join
-     return all
+        return all
     end
     p[!, :id] = 1:nrow(p)
     return DataFrames.leftjoin(p, all, on=:id)
- end
+end
 
 """
     euler_active(φ::Real, θ::Real, ψ::Real)
@@ -72,7 +72,7 @@ julia> round.(euler_active(π/2,0,0), digits=5)
 ```
 
 """
-function euler_active(φ, θ, ψ = 0)
+function euler_active(φ, θ, ψ=0)
 
     cosφ = cos(φ)
     cosψ = cos(ψ)
@@ -121,7 +121,7 @@ julia> round.(euler_passive(π/2,0,0), digits=5)
 ```
 
 """
-function euler_passive(φ, θ, ψ = 0)
+function euler_passive(φ, θ, ψ=0)
 
     cosφ = cos(φ)
     cosψ = cos(ψ)
@@ -152,7 +152,8 @@ euler_passive(v::SVector) = euler_passive(v...)
 
 
 # splatted version
-RotZYZ(v::SVector) = RotZYZ(v...)
+RotZYZ(v::SVector) = Rotations.RotZYZ(v...)
+# RotZYZ(v::SVector) = RotZYZ(v...)
 
 """
     euler_unitvector(φ::Real, θ::Real)
@@ -185,7 +186,7 @@ function euler_unitvector(φ, θ)
 
 end
 
-euler_unitvector(v::SVector) = euler_unitvector(v[1],v[2]) # ψ irrelevant here
+euler_unitvector(v::SVector) = euler_unitvector(v[1], v[2]) # ψ irrelevant here
 
 
 
@@ -210,7 +211,8 @@ julia> axis_angle(SVector(0, 1, 0), π/4)
 """
 function axis_angle(v, θ)
 
-    cosθ = cos(θ); sinθ = sin(θ)
+    cosθ = cos(θ)
+    sinθ = sin(θ)
 
     R = SMatrix{3,3}(
         cosθ + v[1]^2 * (1 - cosθ),
@@ -253,8 +255,8 @@ julia> quadrature_lgwt(6,0,3)
 """
 function quadrature_lgwt(N, a, b)
     n, w = gausslegendre(N)
-    (nodes = (b - a) / 2 * n .+ (a + b) / 2,
-     weights = (b - a) / 2 * w)
+    (nodes=(b - a) / 2 * n .+ (a + b) / 2,
+        weights=(b - a) / 2 * w)
 end
 
 """
@@ -279,7 +281,7 @@ julia> cubature_sphere(6)
 ```
 
 """
-function cubature_sphere(N, method = "gl")
+function cubature_sphere(N, method="gl")
     #might have slightly more than N total points
     rndN = Integer(ceil(sqrt(N / 2.0)))
 
@@ -292,5 +294,5 @@ function cubature_sphere(N, method = "gl")
     ]
     weights = hcat([a * b for b in cθ.weights, a in φ.weights]...)
 
-    (nodes = nodes[:], weights = 1 / (2π) * weights[:])
+    (nodes=nodes[:], weights=1 / (2π) * weights[:])
 end
