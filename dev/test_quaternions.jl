@@ -3,9 +3,9 @@ using Rotations
 
 function dimer_rotations(ϕ = 0.0, α_1 = 0.0, α_2 = 0.0)
 
-    q1 = UnitQuaternion(cos(α_1/2), sin(α_1/2), 0, 0) # rotation α_1 about x
-    q2 = UnitQuaternion(cos(α_2/2), sin(α_2/2), 0, 0) # rotation α_2 about x
-    q3 = UnitQuaternion(cos(ϕ/2), 0, sin(ϕ/2), 0) # rotation ϕ about y
+    q1 = QuatRotation(cos(α_1/2), sin(α_1/2), 0, 0) # rotation α_1 about x
+    q2 = QuatRotation(cos(α_2/2), sin(α_2/2), 0, 0) # rotation α_2 about x
+    q3 = QuatRotation(cos(ϕ/2), 0, sin(ϕ/2), 0) # rotation ϕ about y
     # rotate particle 1 by q1 only (stays in yz plane)
     # rotate particle 2 by q2, then q3 but in original frame so order swapped
     return [q1, q3*q2]
@@ -15,7 +15,7 @@ dimer_rotations(0.0, 0.0, 0.0)
 # identities, OK
 
 a = dimer_rotations(pi/2, 0.0, 0.0)
-# 2-element Vector{UnitQuaternion{Float64}}:
+# 2-element Vector{QuatRotation{Float64}}:
 #  [1.0 0.0 0.0;
 #   0.0 1.0 0.0;
 #   0.0 0.0 1.0]

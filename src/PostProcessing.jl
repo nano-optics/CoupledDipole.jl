@@ -11,18 +11,21 @@ Long format dataframe for dispersion spectra
 - `wavelength`: vector of wavelengths
 
 """
-function dispersion_df(x, wavelength)
+function dispersion_df(x, wavelength; format="long")
 
     N_l, N_2a = size(x.extinction)
 
     res =  DataFrame(wavelength = repeat(wavelength, outer = 3*N_2a),
     value = vcat(vec(x.extinction), vec(x.absorption), vec(x.scattering)), # ext,abs,sca
-    polarisation = repeat(["s", "p"], outer = 3, inner = N_l*Int(N_2a/2)), # Nl wavelengths, Na angles | ext,abs,sca
-    angle = repeat(repeat(1:Int(N_2a/2),outer=2), inner=N_l, outer=3),     # 2 pol, Nl wavelengths | ext,abs,sca
+    polarisation = repeat(["pol1", "pol2"], outer = 3, inner = N_l*Int(N_2a/2)), # Nl wavelengths, Na angles | ext,abs,sca
+    angle_id = repeat(repeat(1:Int(N_2a/2),outer=2), inner=N_l, outer=3),     # 2 pol, Nl wavelengths | ext,abs,sca
     crosstype = repeat(["extinction", "absorption", "scattering"], inner = N_2a*N_l))
     
+    if format == "long"
     return(res)
-
+    else
+    return(unstack(res, :polarisation, :value))
+    end
 end
 
 """

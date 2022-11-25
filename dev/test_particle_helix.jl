@@ -37,7 +37,7 @@ d5 |> @vlplot(
  width= 120,
  height =  100,
      mark = {:line},
-     row = "type", column="variable",
+     row = "type", column="crosstype",
      resolve={scale={y="independent"}},
      encoding = {x = "wavelength:q", y = "value:q",
       strokeDash = "cluster:n",  color = "hand:n"}

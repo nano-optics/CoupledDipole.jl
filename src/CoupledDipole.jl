@@ -10,6 +10,7 @@ using QuadGK # for ellipsoids, should use GL as well to reduce deps
 using Makie
 using DataFrames
 
+import Rotations: RotZYZ
 
 include("Clusters.jl")
 include("Materials.jl")
@@ -18,6 +19,7 @@ include("CrossSections.jl")
 include("HighLevel.jl")
 include("PostProcessing.jl")
 include("Visual.jl")
+
 
 
 export propagator_freespace_labframe!
@@ -60,6 +62,7 @@ export visualise_threejs
 export expand_grid
 export pmap_df
 export depolarisation_ellipsoid
+export RotZYZ
 
 ## core functions
 

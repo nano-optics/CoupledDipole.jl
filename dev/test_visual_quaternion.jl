@@ -17,10 +17,10 @@ using Rotations
 function cluster_cone(N, a, b, c, ϕ = 0.0, α = 0.0)
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
     positions = [SVector(0.0, 0.0, 0.0) for i in 1:N]
-    q2 = UnitQuaternion(cos(α/2), sin(α/2), 0, 0) # rotation α about x
+    q2 = QuatRotation(cos(α/2), sin(α/2), 0, 0) # rotation α about x
     # rotate particle 1 by q1 only (stays in yz plane)
     # rotate particle 2 by q2, then q3 but in original frame so order swapped
-    rotations = [q2 * UnitQuaternion(cos(ϕ/2), 0, sin(ϕ/2), 0)  for ϕ in LinRange(0,360,N+1)*pi/180]
+    rotations = [q2 * QuatRotation(cos(ϕ/2), 0, sin(ϕ/2), 0)  for ϕ in LinRange(0,360,N+1)*pi/180]
     Cluster(positions, rotations[2:end], sizes, ["Au" for ii in 1:N], ["particle" for ii in 1:N])
 end
 

@@ -24,7 +24,7 @@ mat = Material(wavelength, medium)
 
 positions = [SVector(x, 0.0, 0.0) for x in (-100.0, 100.0)]
 sizes = [SVector(20.0, 50.0, 20.0), SVector(20.0, 50.0, 20.0)]
-rotations = repeat([UnitQuaternion(1.0, 0.0, 0.0, 0.0)], 2)
+rotations = repeat([QuatRotation(1.0, 0.0, 0.0, 0.0)], 2)
 materials = repeat(["Au"], 2)
 cl = Cluster(positions, rotations, sizes, materials, "particle")
 

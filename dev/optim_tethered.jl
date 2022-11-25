@@ -24,7 +24,7 @@ using ForwardDiff
 """
 function cluster_tethered(x; r = 5, d = 15, material = "Au", type = "particle")
     sizes = [SVector(r, r, r) for _ ∈ 1:4] # identical spheres
-    angles = [zero(UnitQuaternion) for _ ∈ 1:4] # angles irrelevant for spheres
+    angles = [zero(QuatRotation) for _ ∈ 1:4] # angles irrelevant for spheres
     positions = [
         SVector(0.0, 0.0, 0.0),
         SVector(d, 0.0, 0.0),

@@ -1,6 +1,8 @@
 
 ## utils
 
+# splatted version of Rotations.RotZYZ
+RotZYZ(v::SVector) = RotZYZ(v...)
 
 """
 expand_grid(; kws...)
@@ -150,10 +152,6 @@ end
 # splatted version
 euler_passive(v::SVector) = euler_passive(v...)
 
-
-# splatted version
-RotZYZ(v::SVector) = Rotations.RotZYZ(v...)
-# RotZYZ(v::SVector) = RotZYZ(v...)
 
 """
     euler_unitvector(φ::Real, θ::Real)

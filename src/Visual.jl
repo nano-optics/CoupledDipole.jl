@@ -136,7 +136,7 @@ function visualise_threejs(cl; out = "cluster.html")
 
                 # testing fixed angles
                 # alpha=pi/2
-                # q = Rotations.params(UnitQuaternion(cos(alpha/2),  0,0,sin(alpha/2)))
+                # q = Rotations.params(QuatRotation(cos(alpha/2),  0,0,sin(alpha/2)))
                 q1 = q[1]
                 q2 = q[2]
                 q3 = q[3]

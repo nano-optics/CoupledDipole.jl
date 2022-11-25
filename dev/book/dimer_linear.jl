@@ -22,7 +22,7 @@ function model(; d=100, orientation="head-to-tail")
     end
 
     sizes = [SVector(20.0, 50.0, 20.0), SVector(20.0, 50.0, 20.0)]
-    rotations = repeat([UnitQuaternion(1.0, 0.0, 0.0, 0.0)], 2)
+    rotations = repeat([QuatRotation(1.0, 0.0, 0.0, 0.0)], 2)
     materials = repeat(["Au"], 2)
     cl = Cluster(positions, rotations, sizes, materials, "particle")
 
@@ -49,13 +49,13 @@ mat = Material(wavelength, media)
 sizes = [SVector(0.0, 0.0, 0.0)]
 positions = [SVector(0.0, 0.0, 0.0)]
 # input parameters are Euler angles
-rotations = [UnitQuaternion(RotZYZ(0.0, 0.0, 0.0))]
+rotations = [QuatRotation(RotZYZ(0.0, 0.0, 0.0))]
 Cluster(positions, rotations, sizes, ["Au"], "particle")
 
 cl0 = cluster_single(20.0, 50.0, 20.0)
 # cl0 = cluster_single(50.0, 20.0, 20.0)
 
-s = spectrum_dispersion(cl0, mat, [UnitQuaternion(RotZ(0.0))])
+s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))])
 single = dispersion_df(s, mat.wavelengths)
 
 
@@ -186,12 +186,12 @@ eltype.(eachcol(x))
 #   }
 # }
 
-# UnitQuaternion(0, 0, 1, 0) # rotation π/2 about y
-# UnitQuaternion(√2/2, √2/2, 0, 0)
-# rotation_angle(UnitQuaternion(√2/2, √2/2, 0, 0))
-# rotation_axis(UnitQuaternion(√2/2, √2/2, 0, 0))
+# QuatRotation(0, 0, 1, 0) # rotation π/2 about y
+# QuatRotation(√2/2, √2/2, 0, 0)
+# rotation_angle(QuatRotation(√2/2, √2/2, 0, 0))
+# rotation_axis(QuatRotation(√2/2, √2/2, 0, 0))
 # RotZYZ(π/2,0,0)
-# RotMatrix(UnitQuaternion(√2/2, √2/2, 0, 0))
+# RotMatrix(QuatRotation(√2/2, √2/2, 0, 0))
 
 # RotY(π/2)
 

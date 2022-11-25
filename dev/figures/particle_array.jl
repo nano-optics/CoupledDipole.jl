@@ -16,10 +16,11 @@ mat = Material(wavelengths, media)
 ## array geometry
 # N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle"
 cl0 = cluster_single(80, 40, 40)
-cl1 = cluster_array(200, 550, 80, 40, 40)
+cl1 = cluster_array(200, 600, 80, 40, 40)
 
 ## incidence: along z
-Incidence = [SVector(0,0,0)]
+Incidence = [QuatRotation(RotZYZ(0.0, 0.0, 0.0))]
+
 
 disp1 = spectrum_dispersion(cl0, mat, Incidence)
 disp2 = spectrum_dispersion(cl1, mat, Incidence)
@@ -35,7 +36,8 @@ d = [insertcols!(d1, :cluster => "single");
  width= 400,
  height =  300,
      mark = {:line},
-     row = "crosstype",
+     row = "crosstype",column="polarisation",
      resolve={scale={y="independent"}},
-     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n", strokeDash="cluster:n"}
+     encoding = {x = "wavelength:q", y = "value:q", color = "crosstype:n", strokeDash="cluster:n"}
  )
+

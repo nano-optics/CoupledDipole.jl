@@ -5,6 +5,7 @@ using CoupledDipole
 
 using LinearAlgebra
 using StaticArrays
+using Rotations
 using FastGaussQuadrature
 using DataFrames
 using VegaLite
@@ -20,7 +21,8 @@ cl1 = cluster_dimer(80, 20, 20, 40, 0)
 cl2 = cluster_dimer(80, 20, 20, 40, π/4)
 
 ## incidence: along z, along x, along y
-Incidence = [SVector(0,0,0),SVector(0,π/2,0),SVector(π/2,π/2,0)]
+Incidence = QuatRotation.([RotZYZ(0.0, 0.0, 0.0),RotZYZ(0,π/2,0),RotZYZ(π/2,π/2,0)])
+
 
 disp1 = spectrum_dispersion(cl0, mat, Incidence)
 disp2 = spectrum_dispersion(cl1, mat, Incidence)
@@ -35,9 +37,10 @@ d = [insertcols!(d1, :cluster => "dimer");
  width= 400,
  height =  300,
      mark = {:line},
-     row = "crosstype",
+     row = "crosstype",column="polarisation",
      resolve={scale={y="independent"}},
-     encoding = {x = "wavelength:q", y = "value:q", color = "variable:n", strokeDash="cluster:n"}
+     encoding = {x = "wavelength:q", y = "value:q", 
+     color = "angle:n", strokeDash="cluster:n"}
  )
 
 
@@ -56,7 +59,7 @@ d5 |> @vlplot(
  width= 400,
  height =  300,
      mark = {:line},
-     row = "type",
+     row = "type",column="crosstype",
      resolve={scale={y="independent"}},
      encoding = {x = "wavelength:q", y = "value:q", color = "variable:n", strokeDash="cluster:n"}
  )

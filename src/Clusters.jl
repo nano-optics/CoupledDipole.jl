@@ -13,8 +13,8 @@ struct Cluster{T1,T2,T3}
     "positions::Vector{SVector{3,T1}}"
     positions::Vector{SVector{3,T1}}
 
-    "rotations::Vector{UnitQuaternion{T2}}"
-    rotations::Vector{UnitQuaternion{T2}}
+    "rotations::Vector{QuatRotation{T2}}"
+    rotations::Vector{QuatRotation{T2}}
 
     "sizes::Vector{SVector{3,T3}}"
     sizes::Vector{SVector{3,T3}}
@@ -49,7 +49,7 @@ function cluster_single(a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="pa
     sizes = [SVector(a, b, c)]
     positions = [SVector(0.0, 0.0, 0.0)]
     # input parameters are Euler angles
-    rotations = [UnitQuaternion(Rotations.RotZYZ(α, β, γ))]
+    rotations = [QuatRotation(Rotations.RotZYZ(α, β, γ))]
     Cluster(positions, rotations, sizes, [material], type)
 end
 
@@ -74,9 +74,9 @@ cluster_dimer(80, 10, 10, 20)
 function cluster_dimer(d, a, b, c, ϕ=0.0, α_1=0.0, α_2=0.0, material="Au", type="particle")
     sizes = [SVector(a, b, c) for _ ∈ 1:2] # identical particles
     positions = [SVector(zero(eltype(d)), y, zero(eltype(d))) for y in (-d / 2, d / 2)]
-    q1 = UnitQuaternion(cos(α_1 / 2), sin(α_1 / 2), zero(eltype(α_1)), zero(eltype(α_1))) # rotation α_1 about x
-    q2 = UnitQuaternion(cos(α_2 / 2), sin(α_2 / 2), zero(eltype(α_1)), zero(eltype(α_1))) # rotation α_2 about x
-    q3 = UnitQuaternion(cos(ϕ / 2), zero(eltype(α_1)), sin(ϕ / 2), zero(eltype(α_1))) # rotation ϕ about y
+    q1 = QuatRotation(cos(α_1 / 2), sin(α_1 / 2), zero(eltype(α_1)), zero(eltype(α_1))) # rotation α_1 about x
+    q2 = QuatRotation(cos(α_2 / 2), sin(α_2 / 2), zero(eltype(α_1)), zero(eltype(α_1))) # rotation α_2 about x
+    q3 = QuatRotation(cos(ϕ / 2), zero(eltype(α_1)), sin(ϕ / 2), zero(eltype(α_1))) # rotation ϕ about y
     # rotate particle 1 by q1 only (stays in yz plane)
     # rotate particle 2 by q2, then q3 but in original frame so order swapped
     rotations = [q1, q3 * q2]
@@ -117,7 +117,7 @@ function cluster_helix(N, a, b, c, R, Λ, δ, δ_0=0, handedness="left",
     x = R * cos.(ϕ)
     y = R * sin.(ϕ)
     z = s * ϕ * Λ / (2π)
-    z .-= s * maximum(s * z) / 2 # if <0, add, else remove
+    z .-= s * maximum(s * z) / 2 # if < 0, add, else remove
 
     # euler angles calculation
     x′ = -y
@@ -130,8 +130,8 @@ function cluster_helix(N, a, b, c, R, Λ, δ, δ_0=0, handedness="left",
     ψ = 0.0 # don't care for axisymmetric particles
 
     positions = SVector.(x, y, z)
-    # rotations = UnitQuaternion.(RotZYZ.(φ, θ, ψ))
-    rotations = UnitQuaternion.(inv.(RotZYZ.(φ, θ, ψ)))
+    # rotations = QuatRotation.(RotZYZ.(φ, θ, ψ))
+    rotations = QuatRotation.(inv.(RotZYZ.(φ, θ, ψ)))
 
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
 end
@@ -159,7 +159,7 @@ cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
 function cluster_line(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="particle")
 
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
-    rotations = [UnitQuaternion(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
+    rotations = [QuatRotation(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
 
     positions = SVector.(-(N - 1)*Λ/2:Λ:(N-1)*Λ/2, zero(eltype(Λ)), zero(eltype(Λ)))
 
@@ -192,7 +192,7 @@ function cluster_array(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", ty
     N = N′^2 # actual number,  may have fewer than original N particles
 
     sizes = [SVector(a, b, c) for _ ∈ 1:N] # identical particles
-    rotations = [UnitQuaternion(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
+    rotations = [QuatRotation(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
 
     x = -(N′ - 1)*Λ/2:Λ:(N′-1)*Λ/2
     positions = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
@@ -245,7 +245,7 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
 
     end
 
-    quaternions = [UnitQuaternion(RotZYZ(r[1], r[2], r[3])) for r in rotations]
+    quaternions = [QuatRotation(RotZYZ(r[1], r[2], r[3])) for r in rotations]
 
     Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
 
