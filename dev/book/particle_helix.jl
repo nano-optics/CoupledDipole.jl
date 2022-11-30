@@ -34,7 +34,7 @@ cl1 = cluster_helix(5, 15.0 / 2, 15.0 / 2, 15.0, 20, 30, π / 2, 0)
 cl0 = cluster_single(15.0 / 2, 15.0 / 2, 15.0)
 
 
-visualise_threejs(cl1)
+# visualise_threejs(cl1)
 
 ## incidence: along z, along x, along y
 angles = range(0, π / 2, 7)

@@ -20,7 +20,7 @@ function spectrum_dispersion(
     mat::Material,
     Incidence;
     N_sca::Int=36,
-    polarisations = "linear",
+    polarisations="linear",
     method="direct"
 )
 
@@ -50,14 +50,14 @@ function spectrum_dispersion(
 
     # incident field
     if polarisations == "linear"
-    Ejones = [
-        SVector(1.0 + 0im, 0.0), # Jones vector, first polar
-        SVector(0.0, 1.0 + 0im), # Jones vector, second polar
-    ]
-    elseif polarisations == "circular"   
-    Ejones = 1.0 / sqrt(2.0) .* [
-        SVector(1im, 1.0), # Jones vector, first polar
-        SVector(1.0, 1im), # Jones vector, second polar
+        Ejones = [
+            SVector(1.0 + 0im, 0.0), # Jones vector, first polar
+            SVector(0.0, 1.0 + 0im), # Jones vector, second polar
+        ]
+    elseif polarisations == "circular"
+        Ejones = 1.0 / sqrt(2.0) .* [
+            SVector(1im, 1.0), # Jones vector, first polar
+            SVector(1.0, 1im), # Jones vector, second polar
         ]
     end
 
@@ -108,8 +108,10 @@ function spectrum_dispersion(
         # we'd compute rotation matrices on the fly
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
         # but instead we've prestored them, since wavelength-independent
+        # AlphaBlocks =
+        #     map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
         AlphaBlocks =
-            map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
         # Interaction matrix (F = I - G0 alpha_eff)
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
