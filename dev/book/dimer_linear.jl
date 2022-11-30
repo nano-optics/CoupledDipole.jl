@@ -2,7 +2,6 @@
 push!(LOAD_PATH, expanduser("~/Documents/nano-optics/CoupledDipole.jl/"))
 using Revise
 using CoupledDipole
-
 using Rotations
 using LinearAlgebra
 using StaticArrays
@@ -11,6 +10,10 @@ using DataFrames
 using VegaLite
 using AlgebraOfGraphics, CairoMakie
 
+## this example looks at 2 Au nanorods in water
+## contrasting head-t-t and side-b-s configurations
+## extinction spectra for varying distances
+## fixed orientation
 
 function model(; d=100, orientation="head-to-tail")
     if orientation == "head-to-tail"
@@ -59,26 +62,26 @@ s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))])
 single = dispersion_df(s, mat.wavelengths)
 
 
-xy = data(single) * mapping(:wavelength, :value, row=:crosstype, col=:polarisation)
-layer = visual(Lines)
-draw(layer * xy, facet=(; linkyaxes=:none))
-
-
-
+# xy = data(single) * mapping(:wavelength, :value, row=:crosstype, col=:polarisation)
+# layer = visual(Lines)
+# draw(layer * xy, facet=(; linkyaxes=:none))
 # set_aog_theme!()
 
 
 using ColorSchemes
 set_aog_theme!()
-d1 = data(filter(:polarisation => ==("p"), all))
-d2 = data(filter(:polarisation => ==("p"), single))
+d1 = data(filter(:polarisation => ==("pol2"), all))
+d2 = data(filter(:polarisation => ==("pol2"), single))
 m1 = d1 * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation, row=:crosstype)
 m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
-draw(layer1 + layer2, facet=(; linkyaxes=:none), palettes=(; color=cgrad(ColorSchemes.viridis.colors, 12, categorical=true)))
+draw(layer1 + layer2, facet=(; linkyaxes=:none),
+    palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 # https://docs.juliaplots.org/latest/generated/colorschemes/
 
+
+# cgrad(ColorSchemes.viridis.colors, 12, categorical=true)
 # cgrad([:purple, :green], 12, categorical=true)
 # ColorSchemes.viridis.colors
 # cgrad(ColorSchemes.viridis.colors, 12, categorical=true)
@@ -96,53 +99,53 @@ draw(layer1 + layer2, facet=(; linkyaxes=:none), palettes=(; color=cgrad(ColorSc
 # )
 
 
-d1 = filter(:polarisation => ==("p"), all)
-d2 = filter(:polarisation => ==("p"), single)
+# d1 = filter(:polarisation => ==("p"), all)
+# d2 = filter(:polarisation => ==("p"), single)
 
-VegaLite.@vlplot() +
-VegaLite.@vlplot(data = d2,
-    mark = {:line, strokeDash = [5, 2], stroke = "black", strokeWidth = 2},
-    row = "crosstype",
-    resolve = {scale = {y = "independent"}},
-    encoding = {x = "wavelength:q", y = "value:q"}
-) +
-VegaLite.@vlplot(data = d1,
-    mark = {:line},
-    row = "crosstype", column = "orientation",
-    resolve = {scale = {y = "independent"}},
-    encoding = {x = "wavelength:q", y = "value:q", color = "d:n"}
-)
-
-
-
-+
-@vlplot(data = d2,
-    mark = {:line},
-    row = "crosstype", column = "orientation",
-    resolve = {scale = {y = "independent"}},
-    encoding = {x = "wavelength:q", y = "value:q", color = "d:n"}
-)
-
-
-@vlplot(width = 400, height = 400) +
-@vlplot(mark = {:line, color = :red}, data = d1, encoding = {row = "crosstype", x = "wavelength:q", y = "value:q"}) +
-@vlplot(mark = {:line, color = :blue}, data = d2, encoding = {row = "crosstype", x = "wavelength:q", y = "value:q"})
+# VegaLite.@vlplot() +
+# VegaLite.@vlplot(data = d2,
+#     mark = {:line, strokeDash = [5, 2], stroke = "black", strokeWidth = 2},
+#     row = "crosstype",
+#     resolve = {scale = {y = "independent"}},
+#     encoding = {x = "wavelength:q", y = "value:q"}
+# ) +
+# VegaLite.@vlplot(data = d1,
+#     mark = {:line},
+#     row = "crosstype", column = "orientation",
+#     resolve = {scale = {y = "independent"}},
+#     encoding = {x = "wavelength:q", y = "value:q", color = "d:n"}
+# )
 
 
 
-using VegaLite, VegaDatasets
+# +
+# @vlplot(data = d2,
+#     mark = {:line},
+#     row = "crosstype", column = "orientation",
+#     resolve = {scale = {y = "independent"}},
+#     encoding = {x = "wavelength:q", y = "value:q", color = "d:n"}
+# )
 
 
-using VegaLite, Query, VegaDatasets
+# @vlplot(width = 400, height = 400) +
+# @vlplot(mark = {:line, color = :red}, data = d1, encoding = {row = "crosstype", x = "wavelength:q", y = "value:q"}) +
+# @vlplot(mark = {:line, color = :blue}, data = d2, encoding = {row = "crosstype", x = "wavelength:q", y = "value:q"})
 
-goog = dataset("stocks") |> @filter(_.symbol == "GOOG")
-sp500 = dataset("sp500")
-msft = dataset("stocks") |> @filter(_.symbol == "MSFT")
 
-@vlplot(width = 400, height = 400) +
-@vlplot(mark = {:line, color = :red}, data = goog, x = "date:t", y = :price) +
-@vlplot(mark = {:line, color = :black}, data = sp500, x = "date:t", y = :price) +
-@vlplot(mark = {:line, color = :green}, data = msft, x = "date:t", y = :price)
+
+# using VegaLite, VegaDatasets
+
+
+# using VegaLite, Query, VegaDatasets
+
+# goog = dataset("stocks") |> @filter(_.symbol == "GOOG")
+# sp500 = dataset("sp500")
+# msft = dataset("stocks") |> @filter(_.symbol == "MSFT")
+
+# @vlplot(width = 400, height = 400) +
+# @vlplot(mark = {:line, color = :red}, data = goog, x = "date:t", y = :price) +
+# @vlplot(mark = {:line, color = :black}, data = sp500, x = "date:t", y = :price) +
+# @vlplot(mark = {:line, color = :green}, data = msft, x = "date:t", y = :price)
 
 # s = spectrum_oa(cl0, mat)
 # single = oa_df(s, mat.wavelengths)
@@ -152,14 +155,14 @@ msft = dataset("stocks") |> @filter(_.symbol == "MSFT")
 # layer = visual(Lines)
 # draw(layer * xy, facet=(; linkyaxes=:none))
 
-using Arrow
-Arrow.write("test.arrow", single)
-Arrow.write("testc.arrow", single, compress=:lz4)
+# using Arrow
+# Arrow.write("test.arrow", single)
+# Arrow.write("testc.arrow", single, compress=:lz4)
 
 
-y = Arrow.Table("test.arrow") |> DataFrame
-x = Arrow.Table("testr.arrow") |> DataFrame
-eltype.(eachcol(x))
+# y = Arrow.Table("test.arrow") |> DataFrame
+# x = Arrow.Table("testr.arrow") |> DataFrame
+# eltype.(eachcol(x))
 
 # using CSV
 
