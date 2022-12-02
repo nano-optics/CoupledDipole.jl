@@ -108,8 +108,6 @@ function spectrum_dispersion(
         # we'd compute rotation matrices on the fly
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
         # but instead we've prestored them, since wavelength-independent
-        # AlphaBlocks =
-        #     map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
         AlphaBlocks =
             map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
@@ -277,10 +275,8 @@ function spectrum_oa(
 
         # update the rotated blocks
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
-        # AlphaBlocks =
-        #     map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
         AlphaBlocks =
-            map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+             map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 

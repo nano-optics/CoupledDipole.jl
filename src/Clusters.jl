@@ -216,9 +216,9 @@ end
 
 function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine", type="point")
 
-    sizes = [SVector(a, b, c) for _ ∈ 1:N] # identical particles
-
     positions = R .* sample_fibonacci(N)
+    N = length(positions) # might be +1
+    sizes = [SVector(a, b, c) for _ ∈ 1:N] # identical particles
 
     if orientation == "radial"
 

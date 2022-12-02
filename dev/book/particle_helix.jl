@@ -7,6 +7,8 @@ using StaticArrays
 using FastGaussQuadrature
 using DataFrames
 using VegaLite
+using AlgebraOfGraphics
+using Makie
 using Rotations
 
 ## this example looks at a helical strand of Au nanorods in water
