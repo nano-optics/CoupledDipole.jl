@@ -1,8 +1,7 @@
 # include("../src/CoupledDipole.jl")
-push!(LOAD_PATH, expanduser( "~/Documents/nano-optics/CoupledDipole.jl/"))
+push!(LOAD_PATH, expanduser("~/Documents/nano-optics/CoupledDipole.jl/"))
 using Revise
 using CoupledDipole
-
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature
@@ -10,57 +9,61 @@ using DataFrames
 using VegaLite
 using Rotations
 
+## this example looks at 2 uniaxial molecules in water
+## contrasting head-t-t and side-b-s configurations
+## extinction spectra for varying distances
+## fixed orientation, same as Au NP example but different scale
+
+
+function model(; d=100, orientation="head-to-tail")
+    if orientation == "head-to-tail"
+        # dimer axis along y
+        positions = [SVector(0.0, y, 0.0) for y in (-d / 2.0, d / 2.0)]
+    elseif orientation == "side-by-side"
+        # dimer axis along x
+        positions = [SVector(x, 0.0, 0.0) for x in (-d / 2.0, d / 2.0)]
+    end
+
+    sizes = repeat([SVector(0, 1.0, 0.0)], 2)
+    rotations = repeat([QuatRotation(1.0, 0.0, 0.0, 0.0)], 2)
+    materials = repeat(["Rhodamine"], 2)
+    cl = Cluster(positions, rotations, sizes, materials, "point")
+
+    Incidence = [RotZ(0.0)] ## incidence: along z (no rotation)
+    res = spectrum_dispersion(cl, mat, Incidence)
+    d = dispersion_df(res, mat.wavelengths)
+end
+
+
+
 ## materials
-wavelength = collect(400:1:700.0)
+wavelength = collect(450:1:650.0)
 media = Dict([("Rhodamine", alpha_bare), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
 
-## dimer geometry
-cl0 = cluster_single(0, 0, 1, 0, 0, 0, "Rhodamine", "point")
-cl1 = cluster_dimer(0.8, 0, 0, 1, 0, 0,0, "Rhodamine", "point")
-cl2 = cluster_dimer(0.8, 0, 0, 1, π/4, 0,0, "Rhodamine", "point")
+td = [collect(range(0.7, 1.3, step=0.2)); 5]
+params = expand_grid(d=td, orientation=("head-to-tail", "side-by-side"))
 
-## incidence: along z, along x, along y
-Incidence = QuatRotation.([RotZYZ(0.0, 0.0, 0.0),RotZYZ(0,π/2,0),RotZYZ(π/2,π/2,0)])
+all = pmap_df(params, p -> model(; p...))
 
-disp1 = spectrum_dispersion(cl0, mat, Incidence)
-disp2 = spectrum_dispersion(cl1, mat, Incidence)
+## reference molecule
+cl0 = cluster_single(0, 1, 0, 0, 0, 0, "Rhodamine", "point")
 
-d1 = dispersion_df(disp1, mat.wavelengths)
-d2 = dispersion_df(disp2, mat.wavelengths)
+s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))])
+single = dispersion_df(s, mat.wavelengths)
 
-d = [insertcols!(d1, :cluster => "dimer");
-     insertcols!(d2, :cluster => "single")]
-
-     
- 
-     @vlplot(data=filter(:polarisation => ==("s"), d),
- width= 400,
- height =  300,
-     mark = {:line},
-     row = "crosstype", 
-     resolve={scale={y="independent"}},
-     encoding = {x = "wavelength:q", y = "value:q", color = "angle:n", strokeDash="cluster:n"}
- )
+using ColorSchemes
+set_aog_theme!()
+d1 = data(filter(:polarisation => ==("pol2"), all))
+d2 = data(filter(:polarisation => ==("pol2"), single))
+m1 = d1 * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation, row=:crosstype)
+m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
+layer1 = m1 * visual(Lines)
+layer2 = m2 * visual(Lines, linestyle=:dash)
+fg = draw(layer1 + layer2, facet=(; linkyaxes=:none),
+    palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+# https://docs.juliaplots.org/latest/generated/colorschemes/
 
 
-
-oa1 = spectrum_oa(cl0, mat)
-oa2 = spectrum_oa(cl2, mat)
-
-
-d3 = oa_df(oa1, mat.wavelengths)
-d4 = oa_df(oa2, mat.wavelengths)
-
-d5 = [insertcols!(d4, :cluster => "dimer");
-     insertcols!(d3, :cluster => "single")]
-
-d5 |> @vlplot(
- width= 400,
- height =  300,
-     mark = {:line},
-     row = "type",
-     resolve={scale={y="independent"}},
-     encoding = {x = "wavelength:q", y = "value:q", color = "crosstype:n", strokeDash="cluster:n"}
- )
+save("figure.pdf", fg, px_per_unit=3)
