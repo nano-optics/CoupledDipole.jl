@@ -34,14 +34,9 @@ function model(; ρ=1, R0=2, d = 0.5, medium=1.33, orientation="radial")
     if N > 1e4
         @warn "$N dipoles is rather a lot, are you sure? "
     end
-    if orientation == "radial"
-        # cl = cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine", type="point")
-        cl = cluster_shell(N, 0, 0, 1, R; orientation="radial", material="Rhodamine", type="point")
-    elseif orientation == "flat"
-        cl = cluster_shell(N, 1, 1, 0, R; orientation="radial", material="Rhodamine", type="point")
-    else
-        @warn "orientation not recognised"
-    end
+    
+    cl = cluster_shell(N, 0, 0, 1, R; orientation=orientation, material="Rhodamine", type="point")
+    
     # testing
     # cl = cluster_shell(5, 1, 1, 0, R; orientation="radial", material="Rhodamine", type="point")
     res = spectrum_oa(cl, mat)
@@ -63,8 +58,10 @@ single = oa_df(s, mat.wavelengths)
 
 using ColorSchemes
 set_aog_theme!()
-d1 = data(filter(:crosstype => ==("extinction"), all))
-d2 = data(filter(:crosstype => ==("extinction"), single))
+
+
+d1 = data(@rsubset(all, :crosstype  == "extinction", :type == "average" ))
+d2 = data(@rsubset(single, :crosstype  == "extinction", :type == "average" ))
 m1 = d1 * mapping(:wavelength, :value, color=:ρ => nonnumeric, col=:orientation, row=:crosstype)
 m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
