@@ -5,6 +5,7 @@ using CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature
+using DataFramesMeta
 using DataFrames
 using VegaLite
 using Rotations
@@ -21,46 +22,26 @@ mat = Material(wavelengths, media)
 
 ## dimer geometry
 # cluster_dimer(d, a, b, c, ϕ=0.0, α_1=0.0, α_2=0.0, material="Au", type="particle")
-cl1 = cluster_dimer(100.0, 20.0, 20.0, 35.0, π / 4)
+
 cl0 = cluster_single(20.0, 20.0, 35.0)
-
-## incidence: along z, along x, along y
-angles = range(0, π / 2, 7)
-Incidence = QuatRotation.([RotX.(angles); RotY.(angles); RotZ.(angles)])
-
-disp1 = spectrum_dispersion(cl0, mat, Incidence, polarisations="circular")
-disp2 = spectrum_dispersion(cl1, mat, Incidence, polarisations="circular")
-
-dd1 = dispersion_df(disp1, mat.wavelengths, format="wide")
-dd2 = dispersion_df(disp2, mat.wavelengths, format="wide")
+cl1 = cluster_dimer(100.0, 20.0, 20.0, 35.0, π / 4)
+cl2 = cluster_dimer(100.0, 20.0, 20.0, 35.0, -π / 4)
 
 oa0 = spectrum_oa(cl0, mat)
 oa1 = spectrum_oa(cl1, mat)
+oa2 = spectrum_oa(cl2, mat)
 
 d0 = oa_df(oa0, mat.wavelengths)
-d3 = oa_df(oa1, mat.wavelengths)
+d1 = oa_df(oa1, mat.wavelengths)
+d2 = oa_df(oa2, mat.wavelengths)
 
-# d5 = [insertcols!(dd1, :cluster => "dimer", :hand => "left");
-#       insertcols!(dd2, :cluster => "single", :hand => "_")]
+map1 = mapping(:wavelength, :value, row=:type, col=:crosstype)
 
-using DataFramesMeta
-dich = @chain dd2 begin
-    @rsubset :crosstype == "extinction"
-    @transform :dichroism = :pol1 .- :pol2
-end
+m1 = map1 * (data(d1) * visual(Lines) +
+             data(d2) * visual(Lines, linestyle=:dash) +
+             data(d0) * visual(Lines, linestyle=:dot))
+fg = draw(m1, facet=(; linkyaxes=:none))
 
-rotations = DataFrame(:angle => repeat(angles * 180 / π, outer=3),
-    :axis => repeat(["x", "y", "z"], inner=length(angles)),
-    :angle_id => eachindex(Incidence))
+fg
 
-toplot = leftjoin(dich, rotations, on=:angle_id)
-
-toplot |> @vlplot(
-    width = 120,
-    height = 100,
-    mark = {:line},
-    row = "axis",
-    resolve = {scale = {y = "independent"}},
-    encoding = {x = "wavelength:q", y = "dichroism:q",
-        strokeDash = "cluster:n", color = "angle:n"}
-)
+# save("figure.pdf", fg, px_per_unit=3)
