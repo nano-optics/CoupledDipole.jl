@@ -12,6 +12,7 @@ Simulating far-field cross-sections for multiple wavelengths and directions of i
 - `Incidence`: N_inc vector of quaternions describing incidence directions
 - `polarisations`: incident field consists of 2 orthogonal "linear" or "circular" polarisations
 - `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
+- `prescription`: polarisability prescription for particles
 - `method`: direct or iterative solver
 
 """
@@ -21,6 +22,7 @@ function spectrum_dispersion(
     Incidence;
     N_sca::Int=36,
     polarisations="linear",
+    prescription="kuwata",
     method="direct"
 )
 
@@ -96,11 +98,14 @@ function spectrum_dispersion(
 
         elseif cl.type == "particle"
 
-            Alpha = map(
-                (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
-                cl.materials,
-                cl.sizes,
-            )
+            # Alpha = map(
+            #     (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
+            #     cl.materials,
+            #     cl.sizes,
+            # )
+
+            Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+            Alpha = alpha_particles(Epsilon, Sizes, n_medium^2, λ; prescription=prescription)
         end
 
         # update the rotated blocks
@@ -171,6 +176,8 @@ Orientation-averaged far-field cross-sections for multiple wavelengths
 - `Cubature`: spherical cubature method
 - `N_inc`: number of incident angles for spherical cubature
 - `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
+- `prescription`: polarisability prescription for particles
+- `method`: solution of linear system (direct or iterative)
 
 """
 function spectrum_oa(
@@ -179,6 +186,7 @@ function spectrum_oa(
     cubature="gl",
     N_inc=36,
     N_sca=36,
+    prescription="kuwata",
     method="direct"
 )
 
@@ -266,11 +274,13 @@ function spectrum_oa(
             # ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
             # ε = mat.media[ε_name](λ)
             # Alpha = alpha_particles(λ, ε, n_medium^2, cl.sizes)
-            Alpha = map(
-                (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
-                cl.materials,
-                cl.sizes,
-            )
+            # Alpha = map(
+            #     (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
+            #     cl.materials,
+            #     cl.sizes,
+            # )
+            Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+            Alpha = alpha_particles(Epsilon, Sizes, n_medium^2, λ; prescription=prescription)
         end
 
         # update the rotated blocks

@@ -199,16 +199,17 @@ julia> alpha_particles(500, -10+1im, 1.33^3, [SVector(30, 30, 50) for i in 1:4])
 ```
 
 """
-function alpha_particles(λ, ε, ε_m, Sizes; method="kuwata")
-    if method == "kuwata"
-        return (map(s -> alpha_kuwata(λ, ε, ε_m, s), Sizes))
-    elseif method == "majic"
-        return (map(s -> alpha_majic(λ, ε, ε_m, s), Sizes))
-    elseif method == "mie"
-        return (map(s -> alpha_mie(λ, ε, ε_m, s), Sizes))
+function alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="kuwata")
+
+    if prescription == "kuwata"
+        return (map((e, s) -> alpha_kuwata(λ, e, ε_m, s), Epsilon, Sizes))
+    elseif prescription == "majic"
+        return (map((e, s) -> alpha_majic(λ, e, ε_m, s), Epsilon, Sizes))
+    elseif prescription == "mie"
+        return (map((e, s) -> alpha_mie(λ, e, ε_m, s), Epsilon, Sizes))
     else
-        @warning "unknown method $method"
-        return (map(s -> alpha_kuwata(λ, ε, ε_m, s), Sizes))
+        @warning "unknown prescription $prescription"
+        return (map((e, s) -> alpha_kuwata(λ, e, ε_m, s), Epsilon, Sizes))
     end
 end
 

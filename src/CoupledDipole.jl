@@ -13,16 +13,15 @@ using DataFrames
 
 import Rotations: RotZYZ
 
+include("Rotations.jl")
+include("Utils.jl")
 include("Clusters.jl")
+include("Mie.jl")
+include("Materials.jl")
 include("CrossSections.jl")
 include("HighLevel.jl")
-include("Materials.jl")
-include("Mie.jl")
 include("PostProcessing.jl")
-include("Rotations.jl")
 include("Visual.jl")
-include("Utils.jl")
-
 
 
 # CoupledDipole
