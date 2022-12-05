@@ -45,7 +45,7 @@ alpha_kuwata(λ, ε, n_medium^2, SVector(20, 20, 50))
 
 map(s -> alpha_kuwata(λ, ε, n_medium^2, s), cl.sizes)
 
-Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
+Alpha = alpha_particles(λ, ε, n_medium^2, cl.sizes)
 
 
 ParticleRotations = cl.rotations

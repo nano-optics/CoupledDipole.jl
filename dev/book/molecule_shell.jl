@@ -25,7 +25,7 @@ end
 
 ## materials
 wavelength = collect(450:1:650.0)
-media = Dict([("Rhodamine", alpha_bare), ("medium", x -> 1.33)])
+media = Dict([("Rhodamine", alpha_baremolecule), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
 function model(; ρ=1, R0=2, d=0.5, medium=1.33, orientation="radial")

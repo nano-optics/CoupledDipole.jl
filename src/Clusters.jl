@@ -250,3 +250,29 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
     Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
 
 end
+
+
+
+function cluster_ball(N, a, R; material="AuCM", type="point")
+    #example:  N=4169 -> exact for R=10
+    # possible improvement would be to use the inscribed cube
+    # but also only do 1/8 of the solid angle by symmetry, etc.
+    # cube inscribed
+    # s = 2a/√3
+
+    # Gauss approx formula suggests
+    # Ng = π^(3 / 2) * 4 / (3√π) * R^3
+    # so the radius that gives us ≈ N points is 
+    Rg = Int(ceil((N / (π^(3 / 2) * 4 / (3√π)))^(1 / 3)))
+    Rg2 = Rg^2
+    s = R / Rg
+    # integer lattice points within that approximate ball, rescaled to actual ball
+    positions = [SVector(s * x, s * y, s * z) for x in -N:N for y in -N:N for z in -N:N if x^2 + y^2 + z^2 <= Rg2]
+    N = length(positions) # should be similar to N requested
+    @info "$N points generated for that ball"
+    sizes = [SVector(a, a, a) for _ ∈ 1:N] # identical particles
+    rotations = [QuatRotation(1, 0, 0, 0.0) for _ ∈ 1:N]
+
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+
+end

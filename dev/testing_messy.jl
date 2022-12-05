@@ -116,11 +116,11 @@ scattering!(Cabs, cl.positions, q.nodes, q.weights, kn, P)
 wavelength = collect(450:2:850.0)
 epsilon = epsilon_Ag.(wavelength)
 
-alpha_trace = vcat(alpha_bare.(wavelength)...)
+alpha_trace = vcat(alpha_baremolecule.(wavelength)...)
 
 # molecule
 wavelength = collect(450:2:850.0)
-medium = Dict([("alpha", alpha_bare), ("medium", x -> 1.33)])
+medium = Dict([("alpha", alpha_baremolecule), ("medium", x -> 1.33)])
 
 mat = Material(wavelength, medium)
 cl = cluster_dimer(0.5, 1.0, 1.0, 1.0)
@@ -134,7 +134,7 @@ mat = Material(wavelength, medium)
 cl = cluster_dimer(100, 20, 20, 40, π / 4)
 # cl = cluster_single(20, 20, 40)
 #
-# Alpha = alpha_spheroids(500, -10+1im, 1.33^2, cl.sizes)
+# Alpha = alpha_particles(500, -10+1im, 1.33^2, cl.sizes)
 #
 # AlphaBlocks = [@SMatrix zeros(Complex{Real},3,3) for ii=1:N_dip]
 #

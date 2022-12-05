@@ -47,7 +47,7 @@ kn = n_medium * 2*pi / lambda
 
 Alpha = cda::alpha_ellipsoid(sizes = cl0$sizes, material = gold[ii,], medium = n_medium)
 
-# Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
+# Alpha = alpha_particles(λ, ε, n_medium^2, cl.sizes)
 # 2-element Vector{SVector{3, ComplexF64}}:
 # [10898.262981422746 + 18516.11377073886im, -903.6988080340118 + 24897.841185369187im, 10898.262981422744 + 18516.113770738863im]
 # [10898.262981422746 + 18516.11377073886im, -903.6988080340118 + 24897.841185369187im, 10898.262981422744 + 18516.113770738863im]

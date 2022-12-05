@@ -5,6 +5,7 @@ module CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using Rotations
+using SpecialFunctions: besselj, besselh
 using FastGaussQuadrature: gausslegendre
 using QuadGK # for ellipsoids, should use GL as well to reduce deps
 using Makie
@@ -13,19 +14,23 @@ using DataFrames
 import Rotations: RotZYZ
 
 include("Clusters.jl")
-include("Materials.jl")
-include("Utils.jl")
 include("CrossSections.jl")
 include("HighLevel.jl")
+include("Materials.jl")
+include("Mie.jl")
 include("PostProcessing.jl")
+include("Rotations.jl")
 include("Visual.jl")
+include("Utils.jl")
 
 
 
+# CoupledDipole
 export propagator_freespace_labframe!
 export incident_field!
 export polarisation!
 export iterate_field!
+# Clusters
 export Cluster
 export cluster_single
 export cluster_dimer
@@ -33,40 +38,48 @@ export cluster_helix
 export cluster_line
 export cluster_array
 export cluster_shell
+# CrossSections
 export extinction!
 export absorption!
 export scattering!
+# Materials
 export Material
 export epsilon_Ag
 export epsilon_Au
 export lorentzian
-export alpha_bare
+export alpha_baremolecule
 export alpha_embed
 export alpha_scale
 export alpha_kuwata
 export alpha_blocks!
-export alpha_spheroids
+export alpha_particles
 export depolarisation_spheroid
+export depolarisation_ellipsoid
+# Mie
+export mie_susceptibility
+export ricatti_bessel
+export mie_ff
+# HighLevel
+export spectrum_dispersion
+export spectrum_oa
+# PostProcessing
+export dispersion_df
+export oa_df
+# Utils
+export expand_grid
+export pmap_df
 export quadrature_lgwt
+export cubature_sphere
 export euler_active
 export euler_passive
 export euler_unitvector
 export axis_angle
-export cubature_sphere
-export spectrum_dispersion
-export spectrum_oa
-export dispersion_df
-export oa_df
+export RotZYZ
+# Visual
 export visualise_makie
 export visualise_threejs
-export expand_grid
-export pmap_df
-export depolarisation_ellipsoid
-export RotZYZ
 
 ## core functions
-
-
 
 """
     propagator_freespace_labframe!(A,
@@ -85,10 +98,10 @@ function propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
 
     N_dip = length(R)
 
-    # Note: might want/need to try BlockArray.jl
+    # Note: might want to try BlockArray.jl
     # Construct a BlockArray from blocks
     # mortar((A,B),(C,D))
-    # would simply indexing at least..
+    # would simply indexing, at the expense of another dep
 
     # nested for loop over N_dip dipoles
     for jj = 1:N_dip

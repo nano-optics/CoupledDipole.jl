@@ -265,7 +265,7 @@ function spectrum_oa(
 
             # ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
             # ε = mat.media[ε_name](λ)
-            # Alpha = alpha_spheroids(λ, ε, n_medium^2, cl.sizes)
+            # Alpha = alpha_particles(λ, ε, n_medium^2, cl.sizes)
             Alpha = map(
                 (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
                 cl.materials,
@@ -276,7 +276,7 @@ function spectrum_oa(
         # update the rotated blocks
         # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
         AlphaBlocks =
-             map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
         propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
 

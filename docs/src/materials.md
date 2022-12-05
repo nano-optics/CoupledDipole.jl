@@ -34,7 +34,7 @@ lorentzian
 ```
 
 ```@docs
-alpha_bare
+alpha_baremolecule
 ```
 
 ```@docs

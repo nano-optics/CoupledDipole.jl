@@ -12,7 +12,7 @@ visualise_threejs(cl)
 ```
 
 """
-function visualise_threejs(cl; out = "cluster.html")
+function visualise_threejs(cl; out="cluster.html")
 
         header = "<!doctype html>
 <html>
@@ -160,9 +160,9 @@ function visualise_threejs(cl; out = "cluster.html")
 
         push!(s, footer)
 
-        io = open(out, "w");
-        write(io, broadcast(.*, s...));
-        close(io);
+        io = open(out, "w")
+        write(io, broadcast(.*, s...))
+        close(io)
 
 end
 
@@ -193,9 +193,9 @@ function visualise_makie(cl; colour=:gold)
 
         meshscatter(
                 Point3f0.(cl.positions),
-                markersize = Vec3f0.(cl.sizes),
-                rotations = Makie_rotation.(cl.rotations),
-                color = colour,
+                markersize=Vec3f0.(cl.sizes),
+                rotations=Makie_rotation.(cl.rotations),
+                color=colour,
         )
 
 end
