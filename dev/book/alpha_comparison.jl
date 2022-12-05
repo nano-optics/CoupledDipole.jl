@@ -21,35 +21,21 @@ wavelength = collect(450:2:850.0)
 media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
-cl0 = cluster_single(20.0, 20.0, 35.0)
-cl1 = cluster_dimer(100.0, 20.0, 20.0, 35.0, π / 4)
+a = 20.0
+c = 30.0
+cl1 = cluster_dimer(200.0, a, a, c, π / 4)
 
-oa0 = spectrum_oa(cl0, mat)
 oa1 = spectrum_oa(cl1, mat)
 oa2 = spectrum_oa(cl1, mat; prescription="majic")
 oa3 = spectrum_oa(cl1, mat; prescription="mie")
 
-# λ = 633.0
-# e = -10.0 + 1im
-# ε_m = 1.5^2
-# s = SVector(1.0, 1.0, 1.0)
-# CoupledDipole.alpha_majic(λ, e, ε_m, s)
-# CoupledDipole.alpha_mie(λ, e, ε_m, s)
-# Epsilon = [e, e]
-# Sizes = [s, s]
-# CoupledDipole.alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="kuwata")
-# CoupledDipole.alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="majic")
-# CoupledDipole.alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="mie")
+d1 = oa_df(oa1, mat.wavelengths)
+d2 = oa_df(oa2, mat.wavelengths)
+d3 = oa_df(oa3, mat.wavelengths)
 
-
-
-# d1 = data(@rsubset(all, :polarisation == "pol2"))
-# d2 = data(@rsubset(single, :polarisation == "pol2"))
-
-# m1 = d1 * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation, row=:crosstype)
-# m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
-# layer1 = m1 * visual(Lines)
-# layer2 = m2 * visual(Lines, linestyle=:dash)
-# draw(layer1 + layer2, facet=(; linkyaxes=:none),
-#     palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+map = mapping(:wavelength, :value, row=:crosstype, col=:type)
+l1 = data(d1) * map * visual(Lines)
+l2 = data(d2) * map * visual(Lines, linestyle=:dash)
+l3 = data(d3) * map * visual(Lines, linestyle=:dot)
+draw(l1 + l2 + l3, facet=(; linkyaxes=:none))
 
