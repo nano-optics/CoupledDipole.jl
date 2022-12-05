@@ -105,7 +105,7 @@ function spectrum_dispersion(
             # )
 
             Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
-            Alpha = alpha_particles(Epsilon, Sizes, n_medium^2, λ; prescription=prescription)
+            Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
         end
 
         # update the rotated blocks
@@ -280,7 +280,7 @@ function spectrum_oa(
             #     cl.sizes,
             # )
             Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
-            Alpha = alpha_particles(Epsilon, Sizes, n_medium^2, λ; prescription=prescription)
+            Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
         end
 
         # update the rotated blocks

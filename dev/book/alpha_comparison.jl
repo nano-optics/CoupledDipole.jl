@@ -29,6 +29,19 @@ oa1 = spectrum_oa(cl1, mat)
 oa2 = spectrum_oa(cl1, mat; prescription="majic")
 oa3 = spectrum_oa(cl1, mat; prescription="mie")
 
+# λ = 633.0
+# e = -10.0 + 1im
+# ε_m = 1.5^2
+# s = SVector(1.0, 1.0, 1.0)
+# CoupledDipole.alpha_majic(λ, e, ε_m, s)
+# CoupledDipole.alpha_mie(λ, e, ε_m, s)
+# Epsilon = [e, e]
+# Sizes = [s, s]
+# CoupledDipole.alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="kuwata")
+# CoupledDipole.alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="majic")
+# CoupledDipole.alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="mie")
+
+
 
 # d1 = data(@rsubset(all, :polarisation == "pol2"))
 # d2 = data(@rsubset(single, :polarisation == "pol2"))

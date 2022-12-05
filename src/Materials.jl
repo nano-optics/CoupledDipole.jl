@@ -179,7 +179,7 @@ end
 
 
 """
-    alpha_particles(λ, ε, ε_m, Sizes)
+alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="kuwata")
 
 Principal polarisability components of N particles
 - `λ`: wavelength
@@ -208,7 +208,7 @@ function alpha_particles(Epsilon, Sizes, ε_m, λ; prescription="kuwata")
     elseif prescription == "mie"
         return (map((e, s) -> alpha_mie(λ, e, ε_m, s), Epsilon, Sizes))
     else
-        @warning "unknown prescription $prescription"
+        @warn "unknown prescription $prescription"
         return (map((e, s) -> alpha_kuwata(λ, e, ε_m, s), Epsilon, Sizes))
     end
 end
@@ -238,10 +238,11 @@ function alpha_mie(λ, ε, ε_m, Size)
     s = sqrt(ε) / n_medium
     k = n_medium * 2π / λ
     x = k * Size[1]
-    conversion = 2 / 3 * 1i * k^3
+    conversion = 2 / 3 * 1im * k^3
     Γ, Δ, A, B = mie_susceptibility(x, s, 1)
 
-    return Δ / conversion
+    A1 = Δ[1] / conversion
+    return SVector(A1, A1, A1)
 end
 
 """
