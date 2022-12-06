@@ -13,13 +13,16 @@ using AlgebraOfGraphics, CairoMakie
 using ColorSchemes
 set_aog_theme!()
 
-## this example compares various prescriptions of polarisability
-# Mie vs Kuwata vs Majic
+## this example illustrates plasmon resonances in metal nanoparticles
 a
 ## materials
 wavelength = collect(450:2:850.0)
-media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
-mat = Material(wavelength, media)
+media1 = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
+mat1 = Material(wavelength, media1)
+media2 = Dict([("Au", epsilon_Ag), ("medium", x -> 1.33)])
+mat2 = Material(wavelength, media2)
+media3 = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
+mat3 = Material(wavelength, media3)
 
 a = 20.0
 c = 30.0

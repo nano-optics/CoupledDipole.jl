@@ -20,7 +20,7 @@ set_aog_theme!()
 
 ## materials
 wavelength = collect(450:1:650.0)
-media = Dict([("Rhodamine", alpha_baremolecule), ("medium", x -> 1.33)])
+media = Dict([("Rhodamine", alpha_lorentzmolecule), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
 function model(; d=100, orientation="head-to-tail")

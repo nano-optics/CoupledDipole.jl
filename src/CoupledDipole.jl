@@ -7,6 +7,7 @@ using StaticArrays
 using Rotations
 using SpecialFunctions: besselj, besselh
 using FastGaussQuadrature: gausslegendre
+using DataInterpolations
 using QuadGK # for ellipsoids, should use GL as well to reduce deps
 using Makie
 using DataFrames
@@ -45,8 +46,11 @@ export scattering!
 export Material
 export epsilon_Ag
 export epsilon_Au
+export epsilon_Si
+export epsilon_water
 export lorentzian
-export alpha_baremolecule
+export alpha_lorentzmolecule
+export alpha_rh6g
 export alpha_embed
 export alpha_scale
 export alpha_kuwata

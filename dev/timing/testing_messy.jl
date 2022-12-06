@@ -93,11 +93,11 @@ scattering!(Cabs, cl.positions, q.nodes, q.weights, kn, P)
 wavelength = collect(450:2:850.0)
 epsilon = epsilon_Ag.(wavelength)
 
-alpha_trace = vcat(alpha_baremolecule.(wavelength)...)
+alpha_trace = vcat(alpha_lorentzmolecule.(wavelength)...)
 
 # molecule
 wavelength = collect(450:2:850.0)
-medium = Dict([("alpha", alpha_baremolecule), ("medium", x -> 1.33)])
+medium = Dict([("alpha", alpha_lorentzmolecule), ("medium", x -> 1.33)])
 
 mat = Material(wavelength, medium)
 cl = cluster_dimer(0.5, 1.0, 1.0, 1.0)

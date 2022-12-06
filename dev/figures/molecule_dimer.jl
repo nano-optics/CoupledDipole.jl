@@ -11,7 +11,7 @@ using VegaLite
 
 ## materials
 wavelength = collect(400:1:700.0)
-media = Dict([("Rhodamine", alpha_baremolecule), ("medium", x -> 1.33)])
+media = Dict([("Rhodamine", alpha_lorentzmolecule), ("medium", x -> 1.33)])
 mat = Material(wavelength, media)
 
 
