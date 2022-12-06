@@ -38,12 +38,21 @@ end
 
 test = model(; a0=30.0, ar=1.5)
 
-params = expand_grid(a0=[10, 30, 50], ar=[1, 1.2, 1.5, 2], material=["Au", "Si"])
-all = pmap_df(params, p -> model(; p...))
+params = expand_grid(a0=[10, 20, 30, 40], ar=[1, 1.5, 2], material=["Au"])
+gold = pmap_df(params, p -> model(; p...))
 
-all
-map = mapping(:wavelength, :value, row=:crosstype,
-    col=:a0 => nonnumeric => "a0", linestyle=:material, color=:ar => nonnumeric => "ar")
-l1 = data(@rsubset(all, :type == "average")) * map * visual(Lines)
+map = mapping(:wavelength, :value, col=:crosstype,
+    row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar",
+    linestyle=:material)
+l1 = data(@rsubset(gold, :type == "average")) * map * visual(Lines)
+draw(l1, facet=(; linkyaxes=:none))
+
+## non metal
+params2 = expand_grid(a0=[10, 40], ar=[1, 1.5, 2], material=["Si"])
+silicon = pmap_df(params2, p -> model(; p...))
+
+map = mapping(:wavelength, :value, col=:crosstype,
+    row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar")
+l1 = data(@rsubset(silicon, :type == "average")) * map * visual(Lines)
 draw(l1, facet=(; linkyaxes=:none))
 
