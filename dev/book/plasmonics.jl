@@ -14,32 +14,36 @@ using ColorSchemes
 set_aog_theme!()
 
 ## this example illustrates plasmon resonances in metal nanoparticles
-a
+
 ## materials
-wavelength = collect(450:2:850.0)
-media1 = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
-mat1 = Material(wavelength, media1)
-media2 = Dict([("Au", epsilon_Ag), ("medium", x -> 1.33)])
-mat2 = Material(wavelength, media2)
-media3 = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
-mat3 = Material(wavelength, media3)
 
-a = 20.0
-c = 30.0
-# cl1 = cluster_dimer(200.0, a, a, c, π / 4)
-cl1 = cluster_dimer(200.0, a, a, c, π / 4)
+function model(; a0, ar, material="Au", wavelength=collect(450:2:850.0))
+    # options for different materials
+    tab_fun = Dict([("Au", epsilon_Au), ("Ag", epsilon_Ag), ("Si", epsilon_Si)])
+    epsilon_fun = tab_fun[material]
+    media = Dict([(material, epsilon_fun), ("medium", x -> 1.33)])
+    mat = Material(wavelength, media)
 
-oa1 = spectrum_oa(cl1, mat)
-oa2 = spectrum_oa(cl1, mat; prescription="majic")
-oa3 = spectrum_oa(cl1, mat; prescription="mie")
+    a, c = spheroid_ar(a0, ar)
+    cl = cluster_single(a, a, c, 0.0, 0.0, 0.0, material)
 
-d1 = oa_df(oa1, mat.wavelengths)
-d2 = oa_df(oa2, mat.wavelengths)
-d3 = oa_df(oa3, mat.wavelengths)
+    oa = spectrum_oa(cl, mat)
+    d = oa_df(oa, mat.wavelengths)
+    # d[!, :material] .= material
+    # d[!, :ar] .= ar
+    # d[!, :a0] .= a0
+    return d
+end
 
-map = mapping(:wavelength, :value, row=:crosstype, col=:type)
-l1 = data(d1) * map * visual(Lines)
-l2 = data(d2) * map * visual(Lines, linestyle=:dash)
-l3 = data(d3) * map * visual(Lines, linestyle=:dot)
-draw(l1 + l2 + l3, facet=(; linkyaxes=:none))
+
+test = model(; a0=30.0, ar=1.5)
+
+params = expand_grid(a0=[10, 30, 50], ar=[1, 1.2, 1.5, 2], material=["Au", "Si"])
+all = pmap_df(params, p -> model(; p...))
+
+all
+map = mapping(:wavelength, :value, row=:crosstype,
+    col=:a0 => nonnumeric => "a0", linestyle=:material, color=:ar => nonnumeric => "ar")
+l1 = data(@rsubset(all, :type == "average")) * map * visual(Lines)
+draw(l1, facet=(; linkyaxes=:none))
 

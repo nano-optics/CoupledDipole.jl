@@ -114,3 +114,11 @@ function cubature_sphere(N, method="gl")
 
     (nodes=nodes[:], weights=1 / (2π) * weights[:])
 end
+
+function spheroid_ar(a₀, χ)
+
+    a = a₀ * χ^(-1 / 3)
+    c = χ * a
+
+    return a, c
+end

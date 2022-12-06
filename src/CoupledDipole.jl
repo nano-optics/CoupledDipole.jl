@@ -5,9 +5,9 @@ module CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using Rotations
-using SpecialFunctions: besselj, besselh
+using SpecialFunctions: besselj, besselh # for Mie
 using FastGaussQuadrature: gausslegendre
-using DataInterpolations
+using DataInterpolations # for tabulated epsilon and alpha
 using QuadGK # for ellipsoids, should use GL as well to reduce deps
 using Makie
 using DataFrames
@@ -20,6 +20,7 @@ include("Clusters.jl")
 include("Mie.jl")
 include("Materials.jl")
 include("CrossSections.jl")
+include("NearField.jl")
 include("HighLevel.jl")
 include("PostProcessing.jl")
 include("Visual.jl")
@@ -78,9 +79,12 @@ export euler_passive
 export euler_unitvector
 export axis_angle
 export RotZYZ
+export spheroid_ar
 # Visual
 export visualise_makie
 export visualise_threejs
+# NearField
+export scattered_field
 
 ## core functions
 
