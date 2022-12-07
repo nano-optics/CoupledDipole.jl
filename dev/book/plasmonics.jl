@@ -8,7 +8,6 @@ using StaticArrays
 using FastGaussQuadrature
 using DataFrames
 using DataFramesMeta
-using VegaLite
 using AlgebraOfGraphics, CairoMakie
 using ColorSchemes
 set_aog_theme!()
@@ -46,6 +45,16 @@ map = mapping(:wavelength, :value, col=:crosstype,
     linestyle=:material)
 l1 = data(@rsubset(gold, :type == "average")) * map * visual(Lines)
 draw(l1, facet=(; linkyaxes=:none))
+
+# params = expand_grid(a0=[10, 20, 30, 40], ar=[1, 1.5, 2], material=["Ag"])
+
+# silver = pmap_df(params, p -> model(; p...,(wavelength=collect(350:2:850.0))))
+
+# map = mapping(:wavelength, :value, col=:crosstype,
+#     row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar",
+#     linestyle=:material)
+# l1 = data(@rsubset(silver, :type == "average")) * map * visual(Lines)
+# draw(l1, facet=(; linkyaxes=:none))
 
 ## non metal
 params2 = expand_grid(a0=[10, 40], ar=[1, 1.5, 2], material=["Si"])
