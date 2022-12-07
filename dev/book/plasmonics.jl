@@ -10,7 +10,18 @@ using DataFrames
 using DataFramesMeta
 using AlgebraOfGraphics, CairoMakie
 using ColorSchemes
-set_aog_theme!()
+const font_folder = "/Users/baptiste/Library/Fonts/"
+
+firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
+cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
+
+set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+
+# update_theme!(                  # Tweaks the current theme
+#     fonts=[firasans("Regular"), firasans("Light")],
+#     fontsize=12
+# )
+# 
 
 ## this example illustrates plasmon resonances in metal nanoparticles
 
@@ -64,5 +75,5 @@ using LaTeXStrings
 map = mapping(:wavelength, :value, col=:crosstype,
     row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar")
 l1 = data(@rsubset(silicon, :type == "average")) * map * visual(Lines)
-draw(l1, facet=(; linkyaxes=:none), axis=(; ylabel="f(x,a)"))
+draw(l1, facet=(; linkyaxes=:none), axis=(; ylabel=L"\sigma/nm^2"))
 
