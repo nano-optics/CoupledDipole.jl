@@ -10,7 +10,13 @@ using VegaLite
 using Rotations
 using DataFramesMeta
 using ColorSchemes
-set_aog_theme!()
+using LaTeXStrings
+home = homedir()
+const font_folder = "$home/Library/Fonts/"
+firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
+cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
+set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+
 
 ## this example looks at a spherical shell of uniaxial molecules in water
 ## contrasting radial and tangential configurations

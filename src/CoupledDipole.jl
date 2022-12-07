@@ -43,6 +43,7 @@ export cluster_shell
 export extinction!
 export absorption!
 export scattering!
+export oa_c_ext
 # Materials
 export Material
 export epsilon_Ag

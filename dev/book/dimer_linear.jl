@@ -11,7 +11,13 @@ using DataFramesMeta
 using VegaLite
 using AlgebraOfGraphics, CairoMakie
 using ColorSchemes
-set_aog_theme!()
+using LaTeXStrings
+home = homedir()
+const font_folder = "$home/Library/Fonts/"
+firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
+cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
+set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+
 
 ## this example looks at 2 Au nanorods in water
 ## contrasting head-t-t and side-b-s configurations

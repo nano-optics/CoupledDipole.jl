@@ -10,12 +10,15 @@ using DataFrames
 using DataFramesMeta
 using AlgebraOfGraphics, CairoMakie
 using ColorSchemes
-const font_folder = "/Users/baptiste/Library/Fonts/"
-
+using LaTeXStrings
+home = homedir()
+const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
 cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
+stix(weight) = joinpath(font_folder, "texgyretermes-$(weight).otf")
+# set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+set_aog_theme!(fonts=[stix("regular"), stix("regular")])
 
-set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
 
 # update_theme!(                  # Tweaks the current theme
 #     fonts=[firasans("Regular"), firasans("Light")],
@@ -71,7 +74,6 @@ draw(l1, facet=(; linkyaxes=:none))
 params2 = expand_grid(a0=[10, 40], ar=[1, 1.5, 2], material=["Si"])
 silicon = pmap_df(params2, p -> model(; p...))
 
-using LaTeXStrings
 map = mapping(:wavelength, :value, col=:crosstype,
     row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar")
 l1 = data(@rsubset(silicon, :type == "average")) * map * visual(Lines)

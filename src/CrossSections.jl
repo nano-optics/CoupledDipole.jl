@@ -110,3 +110,31 @@ function scattering!(Csca, positions, ScatteringVectors, weights, kn, P)
     Csca[:] = 4π * kn^4 * transpose(weights) * Isca
     return Csca
 end
+
+"""
+oa_c_ext(kn, G0, B, diagA, shift)
+
+ Computes the OA absorption cross-section from the solution of CDA equations
+
+ PARAMETERS:
+ - kn [scalar] wavenumber in medium
+ - G 3NrxN_inc matrix
+ - W 3NrxN_inc matrix
+ - invV 3NrxN_inc matrix
+
+ RETURNS: absorption cross-section analyticall orientation-averaged
+
+ DEPENDS: Asym
+
+ FAMILY: low_level, cross_section
+
+"""
+function oa_c_ext(kn, G0, B, diagA, shift)
+
+    # cext = 2*pi*kn * trace(Asym(G0)*ctranspose(B)*Asym(diagA));
+    cext = 2π / kn^2 * tr(shift * Asym(G0) * B' * Asym(diagA'))
+    return cext
+end
+
+# anti-Hermitian part of a matrix
+Asym(A) = (A - A') / 2im
