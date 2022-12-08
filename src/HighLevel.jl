@@ -108,16 +108,13 @@ function spectrum_dispersion(
             Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
         end
 
-        # update the rotated blocks
-        # Remark: if we cared about memory more than speed
-        # we'd compute rotation matrices on the fly
-        # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
-        # but instead we've prestored them, since wavelength-independent
-        AlphaBlocks =
-            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # when R was passive
+        # AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # now R is active 
+        AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
         # Interaction matrix (F = I - G0 alpha_eff)
-        propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
+        interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
 
         # update the incident field
         # Remark: similarly, pre-computed rotations
@@ -283,12 +280,12 @@ function spectrum_oa(
             Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
         end
 
-        # update the rotated blocks
-        # alpha_blocks!(AlphaBlocks, Alpha, cl.angles)
-        AlphaBlocks =
-            map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # when R was passive
+        # AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # now R is active 
+        AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
-        propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
+        interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
 
         # incident_field!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)
         incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)

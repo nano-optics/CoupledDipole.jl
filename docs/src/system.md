@@ -3,7 +3,7 @@
 
 
 ```@docs
-propagator_freespace_labframe!
+interaction_matrix_labframe!
 ```
 
 ```@docs

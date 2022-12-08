@@ -30,8 +30,9 @@ R2p ≈ R1 # false
 R2p ≈ inv(R1)
 R2p ≈ transpose(R1)
 R2p ≈ R1'
+# , such as an electric field
 
-# rotation acting on a vector, such as an electric field
+# rotation acting on a vector
 
 E1 = SVector(1.0, 0.0, 0.0)
 E2 = 1 / sqrt(2) .* SVector(0.0 + 1im, 1.0, 0.0)
@@ -50,14 +51,41 @@ RotZYZ(π / 2, 0.0, 0.0) * Ez ≈ Ez
 RotZYZ(0.0, π / 2, 0.0) * Ex ≈ -Ez
 RotZYZ(0.0, π / 2, 0.0) * Ey ≈ Ey
 RotZYZ(0.0, π / 2, 0.0) * Ez ≈ Ex
-RotZYZ(π / 2, π / 4, π / 2) * Ex ≈ Ey
-RotZYZ(π / 2, π / 4, π / 2) * Ey ≈ Ey
-RotZYZ(π / 2, π / 4, π / 2) * Ez ≈ Ey
+# now combine 3 rotations
+RotZYZ(π / 2, π / 2, π / 4) * Ex ≈ 1 / √2 .* (-Ex - Ez) # Ex -> Ey -> -Ez -> 1/√2 (-Ex-Ez)
+RotZYZ(π / 2, π / 2, π / 4) * Ey ≈ 1 / √2 .* (-Ex + Ez)
+RotZYZ(π / 2, π / 2, π / 4) * Ez ≈ Ey
+
+# sounds reasonable, now how do we apply these?
+
+# in spectrum_dispersion
+# ParticleRotations = map(RotMatrix, cl.rotations)
+# IncidenceRotations = map(RotMatrix, Incidence) 
+# ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
+
+# incident_field!
+# rotating the electric field 
+# Rm = IncidenceRotations[jj]
+# Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
+# E1_r = Rm * Evec1 # active rotation
+# k_hat = kn * Rm[:, 3] # Rm applied to kx=(0,0,1) gives third column, then scaled by scalar kn
+
+# spectrum_dispersion, spectrum_oa
+# rotating the polarisability tensor from its particle frame to the lab frame
+# if R is passive:
+# AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+# if R is active:
+# AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+
+# clusters
+# rotations is the active rotation to rotate the particle from the lab frame into its actual orientation
 
 
 q = QuatRotation(r)
 e = RotXYZ(0, 1, 2)
 aa = AngleAxis(r)
+
+
 
 test_clust([r, q, e, aa])
 

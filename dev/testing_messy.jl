@@ -88,7 +88,7 @@ AlphaBlocks = [@SMatrix randn(Complex{Float64}, 3, 3) for ii = 1:N_dip]
 
 
 A = Matrix{Complex{Float64}}(I, 3 * N_dip, 3 * N_dip)
-propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
+interaction_matrix_labframe!(A, kn, R, AlphaBlocks)
 
 
 # Evec = SVector{3, Complex{Float64}}([0.1; 0.1; 0.0])

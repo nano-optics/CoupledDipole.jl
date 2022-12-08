@@ -54,7 +54,7 @@ AlphaBlocks = map((R, A) -> R' * diagm(A) * R, ParticleRotations, Alpha)
 ## propagator
 
 F = Matrix{Complex{Float64}}(I, 3 * N_dip, 3 * N_dip)
-propagator_freespace_labframe!(F, kn, cl.positions, AlphaBlocks)
+interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
 
 ## incidence
 

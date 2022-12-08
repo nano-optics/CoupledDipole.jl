@@ -130,8 +130,8 @@ function cluster_helix(N, a, b, c, R, Λ, δ, δ_0=0, handedness="left",
     ψ = 0.0 # don't care for axisymmetric particles
 
     positions = SVector.(x, y, z)
-    # rotations = QuatRotation.(RotZYZ.(φ, θ, ψ))
-    rotations = QuatRotation.(inv.(RotZYZ.(φ, θ, ψ)))
+    # rotations = QuatRotation.(inv.(RotZYZ.(φ, θ, ψ)))
+    rotations = QuatRotation.(RotZYZ.(φ, θ, ψ))
 
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
 end
@@ -247,7 +247,8 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
 
     quaternions = [QuatRotation(RotZYZ(r[1], r[2], r[3])) for r in rotations]
 
-    Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
+    # Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
+    Cluster(positions, quaternions, sizes, [material for _ ∈ 1:N], type)
 
 end
 

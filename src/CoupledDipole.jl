@@ -27,7 +27,7 @@ include("Visual.jl")
 
 
 # CoupledDipole
-export propagator_freespace_labframe!
+export interaction_matrix_labframe!
 export incident_field!
 export polarisation!
 export iterate_field!
@@ -56,7 +56,6 @@ export alpha_rh6g
 export alpha_embed
 export alpha_scale
 export alpha_kuwata
-export alpha_blocks!
 export alpha_particles
 export depolarisation_spheroid
 export depolarisation_ellipsoid
@@ -90,7 +89,7 @@ export scattered_field
 ## core functions
 
 """
-    propagator_freespace_labframe!(A,
+    interaction_matrix_labframe!(A,
         kn, R::Vector{SVector{3}},
         AlphaBlocks::Vector{SMatrix{3,3}})
 
@@ -102,7 +101,7 @@ Interaction matrix
 - `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
 
 """
-function propagator_freespace_labframe!(A, kn, R, AlphaBlocks)
+function interaction_matrix_labframe!(A, kn, R, AlphaBlocks)
 
     N_dip = length(R)
 
