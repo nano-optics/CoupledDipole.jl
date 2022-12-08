@@ -80,11 +80,23 @@ RotZYZ(π / 2, π / 2, π / 4) * Ez ≈ Ey
 # rotating the polarisability tensor from its particle frame to the lab frame
 # if R is passive:
 # AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
-# if R is active:
+# if R was active:
 # AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
 # clusters
-# rotations is the active rotation to rotate the particle from the lab frame into its actual orientation
+# rotations expresses the orientation of the particle 
+# in the lab frame, and is the inverse of the active rotation to rotate the particle
+# because we want to express the passive rotation associated with the frame transformation
+
+# example, in cluster_single:
+# rotations = [inv(QuatRotation(Rotations.RotZYZ(α, β, γ)))]
+
+## testing with a single particle
+# cf single_rod.jl
+
+
+
+
 
 
 q = QuatRotation(r)

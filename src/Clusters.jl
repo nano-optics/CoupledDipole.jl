@@ -273,7 +273,7 @@ function cluster_ball(N, a, R; material="AuCM", type="point")
     N = length(positions) # should be similar to N requested
     @info "$N points generated for that ball"
     sizes = [SVector(a, a, a) for _ ∈ 1:N] # identical particles
-    rotations = [inv(QuatRotation(1, 0, 0, 0.0)) for _ ∈ 1:N]
+    rotations = [inv(QuatRotation(1, 0, 0, 0.0)) for _ ∈ 1:N] # no rotations, spheres anyway...
 
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
 
