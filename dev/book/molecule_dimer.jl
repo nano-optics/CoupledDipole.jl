@@ -43,7 +43,7 @@ function model(; d=100, orientation="head-to-tail")
     cl = Cluster(positions, rotations, sizes, materials, "point")
 
     Incidence = [RotZ(0.0)] ## incidence: along z (no rotation)
-    res = spectrum_dispersion(cl, mat, Incidence)
+    res = spectrum_dispersion(cl, mat, Incidence, N_sca=180)
     d = dispersion_df(res, mat.wavelengths)
 end
 
@@ -53,9 +53,10 @@ params = expand_grid(d=td, orientation=("head-to-tail", "side-by-side"))
 
 all = pmap_df(params, p -> model(; p...))
 
+
 ## reference molecule
 cl0 = cluster_single(0, 1, 0, 0, 0, 0, "Rhodamine", "point")
-s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))])
+s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))], N_sca=180)
 single = dispersion_df(s, mat.wavelengths)
 
 
