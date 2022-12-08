@@ -58,6 +58,9 @@ RotZYZ(π / 2, π / 2, π / 4) * Ez ≈ Ey
 
 # sounds reasonable, now how do we apply these?
 
+# for incident and scattered directions, we want to actively rotate vectors in the common lab frame
+# so we use directly active rotations 
+
 # in spectrum_dispersion
 # ParticleRotations = map(RotMatrix, cl.rotations)
 # IncidenceRotations = map(RotMatrix, Incidence) 
@@ -69,6 +72,9 @@ RotZYZ(π / 2, π / 2, π / 4) * Ez ≈ Ey
 # Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
 # E1_r = Rm * Evec1 # active rotation
 # k_hat = kn * Rm[:, 3] # Rm applied to kx=(0,0,1) gives third column, then scaled by scalar kn
+
+# for particles, however, we want to transform between local frame and lab frame
+# so a passive transformation is used (describing the same object in two different coordinate systems)
 
 # spectrum_dispersion, spectrum_oa
 # rotating the polarisability tensor from its particle frame to the lab frame

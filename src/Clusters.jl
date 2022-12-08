@@ -49,7 +49,8 @@ function cluster_single(a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="pa
     sizes = [SVector(a, b, c)]
     positions = [SVector(0.0, 0.0, 0.0)]
     # input parameters are Euler angles
-    rotations = [QuatRotation(Rotations.RotZYZ(α, β, γ))]
+    # inverse as passive rotation needed
+    rotations = [inv(QuatRotation(Rotations.RotZYZ(α, β, γ)))]
     Cluster(positions, rotations, sizes, [material], type)
 end
 
@@ -79,7 +80,7 @@ function cluster_dimer(d, a, b, c, ϕ=0.0, α_1=0.0, α_2=0.0, material="Au", ty
     q3 = QuatRotation(cos(ϕ / 2), zero(eltype(α_1)), sin(ϕ / 2), zero(eltype(α_1))) # rotation ϕ about y
     # rotate particle 1 by q1 only (stays in yz plane)
     # rotate particle 2 by q2, then q3 but in original frame so order swapped
-    rotations = [q1, q3 * q2]
+    rotations = inv.([q1, q3 * q2]) # inverse as passive rotation needed
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:2], type)
 end
 
@@ -130,8 +131,9 @@ function cluster_helix(N, a, b, c, R, Λ, δ, δ_0=0, handedness="left",
     ψ = 0.0 # don't care for axisymmetric particles
 
     positions = SVector.(x, y, z)
-    # rotations = QuatRotation.(inv.(RotZYZ.(φ, θ, ψ)))
-    rotations = QuatRotation.(RotZYZ.(φ, θ, ψ))
+    # rotations = QuatRotation.(RotZYZ.(φ, θ, ψ))
+    # inverse as passive rotation needed
+    rotations = QuatRotation.(inv.(RotZYZ.(φ, θ, ψ)))
 
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
 end
@@ -159,7 +161,7 @@ cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
 function cluster_line(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="particle")
 
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
-    rotations = [QuatRotation(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
+    rotations = [inv(QuatRotation(RotZYZ(α, β, γ))) for _ ∈ 1:N] # identical particles
 
     positions = SVector.(-(N - 1)*Λ/2:Λ:(N-1)*Λ/2, zero(eltype(Λ)), zero(eltype(Λ)))
 
@@ -192,7 +194,7 @@ function cluster_array(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", ty
     N = N′^2 # actual number,  may have fewer than original N particles
 
     sizes = [SVector(a, b, c) for _ ∈ 1:N] # identical particles
-    rotations = [QuatRotation(RotZYZ(α, β, γ)) for _ ∈ 1:N] # identical particles
+    rotations = [inv(QuatRotation(RotZYZ(α, β, γ))) for _ ∈ 1:N] # identical particles
 
     x = -(N′ - 1)*Λ/2:Λ:(N′-1)*Λ/2
     positions = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
@@ -245,9 +247,8 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
 
     end
 
-    quaternions = [QuatRotation(RotZYZ(r[1], r[2], r[3])) for r in rotations]
+    quaternions = [inv(QuatRotation(RotZYZ(r[1], r[2], r[3]))) for r in rotations]
 
-    # Cluster(positions, inv.(quaternions), sizes, [material for _ ∈ 1:N], type)
     Cluster(positions, quaternions, sizes, [material for _ ∈ 1:N], type)
 
 end
@@ -272,7 +273,7 @@ function cluster_ball(N, a, R; material="AuCM", type="point")
     N = length(positions) # should be similar to N requested
     @info "$N points generated for that ball"
     sizes = [SVector(a, a, a) for _ ∈ 1:N] # identical particles
-    rotations = [QuatRotation(1, 0, 0, 0.0) for _ ∈ 1:N]
+    rotations = [inv(QuatRotation(1, 0, 0, 0.0)) for _ ∈ 1:N]
 
     Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
 

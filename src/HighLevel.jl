@@ -108,10 +108,10 @@ function spectrum_dispersion(
             Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
         end
 
-        # when R was passive
-        # AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
-        # now R is active 
-        AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+        #  R is passive
+        AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # when R is active 
+        # AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
         # Interaction matrix (F = I - G0 alpha_eff)
         interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
@@ -280,10 +280,10 @@ function spectrum_oa(
             Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
         end
 
-        # when R was passive
-        # AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
-        # now R is active 
-        AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
+        #  R is passive
+        AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+        # when R is active 
+        # AlphaBlocks = map((R, A) -> R * (diagm(A) * R'), ParticleRotations, Alpha)
 
         interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
 
