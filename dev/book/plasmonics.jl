@@ -57,7 +57,7 @@ map = mapping(:wavelength, :value, col=:crosstype,
     row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar",
     linestyle=:material)
 l1 = data(@rsubset(gold, :type == "average")) * map * visual(Lines)
-draw(l1, facet=(; linkyaxes=:none))
+draw(l1, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
 
 # params = expand_grid(a0=[10, 20, 30, 40], ar=[1, 1.5, 2], material=["Ag"])
 
@@ -67,7 +67,7 @@ draw(l1, facet=(; linkyaxes=:none))
 #     row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar",
 #     linestyle=:material)
 # l1 = data(@rsubset(silver, :type == "average")) * map * visual(Lines)
-# draw(l1, facet=(; linkyaxes=:none))
+# draw(l1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
 
 ## non metal
 params2 = expand_grid(a0=[10, 40], ar=[1, 1.5, 2], material=["Si"])
