@@ -5,21 +5,19 @@ using CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature
-using DataFrames
 using DataFramesMeta
-using AlgebraOfGraphics
-using Makie
+using DataFrames
 using Rotations
-using ColorSchemes
 using LaTeXStrings
+using AlgebraOfGraphics, Makie, CairoMakie
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
 cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
-stix(weight) = joinpath(font_folder, "texgyretermes-$(weight).otf")
 # set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
-set_aog_theme!(fonts=[stix("regular"), stix("regular")])
 
+gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
+set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 ## this example looks at a helical strand of Au nanorods in water
 ## contrasting angular dispersion of CD against OA
@@ -74,7 +72,7 @@ dat2 = data(d2)
 lay1 = dat1 * mapping(:wavelength, :value, row=:type) * visual(Lines, linestyle=:dash)
 lay2 = dat2 * mapping(:wavelength, :value, color=:angle => nonnumeric, col=:axis,
              row=:type) * visual(Lines)
-draw(lay1 + lay2, facet=(; linkyaxes=:none),
+draw(lay1 + lay2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
       palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 
 

@@ -5,19 +5,19 @@ using CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature
-using DataFrames
 using DataFramesMeta
-using AlgebraOfGraphics
-using Makie
+using DataFrames
 using Rotations
-using ColorSchemes
 using LaTeXStrings
+using AlgebraOfGraphics, Makie, CairoMakie
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
 cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
-set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+# set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
 
+gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
+set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 ## this example looks at a square array of Au nanorods in glass
 ## normal incidence, diffractive pitch
@@ -50,7 +50,7 @@ m1 = dat1 * mapping(:wavelength, :value, col=:polarisation)
 m2 = dat2 * mapping(:wavelength, :value, col=:polarisation)
 layer1 = m1 * visual(Lines, linestyle=:dash)
 layer2 = m2 * visual(Lines)
-fg = draw(layer1 + layer2, facet=(; linkyaxes=:none),
+fg = draw(layer1 + layer2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
     palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 
 fg

@@ -2,23 +2,22 @@
 push!(LOAD_PATH, expanduser("~/Documents/nano-optics/CoupledDipole.jl/"))
 using Revise
 using CoupledDipole
-using Rotations
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature
-using DataFrames
 using DataFramesMeta
-using AlgebraOfGraphics, CairoMakie
-using ColorSchemes
+using DataFrames
+using Rotations
 using LaTeXStrings
+using AlgebraOfGraphics, Makie, CairoMakie
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
 cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
-stix(weight) = joinpath(font_folder, "texgyretermes-$(weight).otf")
 # set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
-set_aog_theme!(fonts=[stix("regular"), stix("regular")])
 
+gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
+set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 # update_theme!(                  # Tweaks the current theme
 #     fonts=[firasans("Regular"), firasans("Light")],
@@ -77,5 +76,5 @@ silicon = pmap_df(params2, p -> model(; p...))
 map = mapping(:wavelength, :value, col=:crosstype,
     row=:a0 => nonnumeric => "a0", color=:ar => nonnumeric => "ar")
 l1 = data(@rsubset(silicon, :type == "average")) * map * visual(Lines)
-draw(l1, facet=(; linkyaxes=:none), axis=(; ylabel=L"\sigma/nm^2"))
+draw(l1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
 

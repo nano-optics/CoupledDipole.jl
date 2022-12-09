@@ -5,16 +5,19 @@ using CoupledDipole
 using LinearAlgebra
 using StaticArrays
 using FastGaussQuadrature
+using DataFramesMeta
 using DataFrames
 using Rotations
-using DataFramesMeta
-using ColorSchemes
 using LaTeXStrings
+using AlgebraOfGraphics, Makie, CairoMakie
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
 cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
-set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+# set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+
+gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
+set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 
 ## this example looks at 2 uniaxial molecules in water
@@ -66,7 +69,7 @@ m1 = d1 * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation,
 m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
-fg = draw(layer1 + layer2, facet=(; linkyaxes=:none),
+fg = draw(layer1 + layer2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
     palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 
 fg

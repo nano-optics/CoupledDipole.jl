@@ -9,11 +9,15 @@ using DataFramesMeta
 using DataFrames
 using Rotations
 using LaTeXStrings
+using AlgebraOfGraphics, Makie, CairoMakie
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
 cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
-set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+# set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+
+gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
+set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 
 ## this example looks at 2 Au nanorods in water
@@ -46,7 +50,7 @@ map1 = mapping(:wavelength, :value, row=:type, col=:crosstype)
 m1 = map1 * (data(d1) * visual(Lines) +
              data(d2) * visual(Lines, linestyle=:dash) +
              data(d0) * visual(Lines, linestyle=:dot))
-fg = draw(m1, facet=(; linkyaxes=:none))
+fg = draw(m1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
 
 fg
 

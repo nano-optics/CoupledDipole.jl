@@ -1,4 +1,3 @@
-
 # include("../src/CoupledDipole.jl")
 push!(LOAD_PATH, expanduser("~/Documents/nano-optics/CoupledDipole.jl/"))
 using Revise
@@ -9,6 +8,16 @@ using FastGaussQuadrature
 using DataFramesMeta
 using DataFrames
 using Rotations
+using LaTeXStrings
+using AlgebraOfGraphics, Makie, CairoMakie
+home = homedir()
+const font_folder = "$home/Library/Fonts/"
+firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
+cmu(weight) = joinpath(font_folder, "cmun$(weight).ttf")
+# set_aog_theme!(fonts=[cmu("rm"), cmu("rm")])
+
+gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
+set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 ## this example illustrates rotations
 # as implemented in Rotations.jl
