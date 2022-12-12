@@ -7,11 +7,12 @@ scattered_field(λ, probes, positions, dipoles)
 - `dipoles`: 3Ndipx2Ninc matrix of self-consistent dipole moments
 
 """
-function scattered_field(kn, Rdip, Rpro, P)
+function scattered_field(k, Rdip, Rpro, P)
 
     N_dip = length(Rdip)
     N_pro = length(Rpro)
     N_inc = size(P, 2)
+    Z₀ = 376.730313668 # free-space impedance
 
     # Esca = zeros(eltype(P), (3N_pro, N_inc))
     # actually easier to work with array of vectors
@@ -19,46 +20,42 @@ function scattered_field(kn, Rdip, Rpro, P)
     Bsca = [@SVector(zeros(eltype(P), (3))) for _ ∈ 1:N_inc*N_pro]
 
     # for loop over N_probe locations
-    for jj = 1:N_pro
-        # when Esca was a matrix
-        # ind_jj = 3jj-2:3jj
-        # where to store the fields in Esca
-        ind2_jj = N_inc*(jj-1)+1:N_inc*jj
-        Etmp = zeros(eltype(P), (3, N_inc)) # store contribution at current probe location for all directions
+    for i = 1:N_pro
+        # store contribution at current probe location for all directions
+        Etmp = zeros(eltype(P), (3, N_inc))
         Btmp = zeros(eltype(P), (3, N_inc))
-        # for loop over N_dip dipoles
-        for kk = 1:N_dip
-            ind_kk = 3kk-2:3kk
 
+        for j = 1:N_dip
+            jj = 3j-2:3j
             # source to probe
-            rk_to_rj = Rpro[jj] - Rdip[kk]
-            rjk = norm(rk_to_rj, 2)
-            rjkhat = rk_to_rj / rjk
-            rjkrjk = rjkhat * transpose(rjkhat)
+            rⱼ_to_rᵢ = Rpro[i] - Rdip[j]
+            rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
+            n = rⱼ_to_rᵢ / rᵢⱼ
+            nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
+            nx = SMatrix{3,3}(0, n[3], n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
 
-            Ge_jk =
-                exp(im * kn * rjk) / rjk * (
-                    kn * kn * (rjkrjk - I) +
-                    (im * kn * rjk - 1.0) / (rjk * rjk) * (3 * rjkrjk - I)
+            expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
+
+            # EE 
+            Aᵢⱼ =
+                expikror * (
+                    k^2 * (nxn - I) +
+                    (im * k * rᵢⱼ - 1) / (rᵢⱼ^2) * (3 * nxn - I)
                 )
-            Gm_jk =
-                exp(im * kn * rjk) / rjk * (
-                    kn * kn * (rjkrjk - I) +
-                    (im * kn * rjk - 1.0) / (rjk * rjk) * (3 * rjkrjk - I)
-                )
-            # Esca[ind_jj, :] += Gjk * P[ind_kk, :]
-            # now a list
-            Etmp += Ge_jk * P[ind_kk, :]
-            Btmp += Gm_jk * P[ind_kk, :]
+
+            # EM 
+            Bᵢⱼ = expikror * (nx - I) * (k^2 + im * k / rᵢⱼ)
+
+            # contribution from j-th source dipole, for all incidences
+            Etmp += Aᵢⱼ * P[jj, :]
+            Btmp += Bᵢⱼ * P[jj, :]
 
         end
-        # store scattered electric field 3-vector at probe location for each incidence
-        for i ∈ 1:N_inc
-            Esca[N_inc*(jj-1)+i] = Etmp[:, i]
-            Bsca[N_inc*(jj-1)+i] = Btmp[:, i]
+        # store scattered field 3-vector at probe location for each incidence
+        for l ∈ 1:N_inc
+            Esca[N_inc*(i-1)+l] = Etmp[:, l]
+            Bsca[N_inc*(i-1)+l] = Z₀ .* Btmp[:, l]
         end
-        # Esca[ind2_jj] = [Etmp[:, l] for l in 1:N_inc]
-        # Bsca[ind2_jj] = [Btmp[:, l] for l in 1:N_inc]
 
     end
 
