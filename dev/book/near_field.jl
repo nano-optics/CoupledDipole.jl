@@ -70,8 +70,14 @@ probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
 probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
 N_pro = length(probes)
 
+# when it was a matrix
+# Esca = scattered_field(kn, cl.positions, probes, P)
+# Isca = sum(reshape(abs2.(Esca), (3, N_pro * 2N_inc)), dims=1)
+# plot(collect(x), log10.(Isca[1:length(x)]))
+
+
 Esca = scattered_field(kn, cl.positions, probes, P)
 
-Isca = sum(reshape(abs2.(Esca), (3, N_pro * 2N_inc)), dims=1)
+Isca = [sum(abs2.(E)) for E in Esca]
 
-plot(collect(x), log10.(Isca[1:length(x)]))
+plot(collect(x), log10.(Isca[1:2:length(Esca)]))
