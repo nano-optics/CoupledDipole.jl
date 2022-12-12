@@ -56,15 +56,69 @@ fg
 
 ## loop
 
-params = expand_grid(radius=range(10, 50, step=10), gap=range(5, 20, step=5))
+params = expand_grid(radius=range(10.0, 50, step=10), gap=range(5.0, 20, step=5))
 all = pmap_df(params, p -> model(p...))
 
-d1 = data(@rsubset(all, :type == "average"))
+using Arrow
+terms_d = Arrow.Table("./dev/book/terms_data.arrow") |> DataFrame
+# terms_d[:,:crosstype] .= a 
+terms_d[:,:cross] = replace.(terms_d[:,:crosstype], "Abs" => "absorption", "Sca" => "scattering", "Ext" => "extinction")
 
-m1 = d1 * mapping(:wavelength, :value, color=:gap => nonnumeric => "gap /nm", col=:crosstype, row=:radius => nonnumeric)
+
+d1 = data(@rsubset(all, :type == "average",:crosstype == "extinction"))
+d2 = data(@rsubset(terms_d, :dipole == "1",:cross == "extinction"))
+d3 = data(@rsubset(terms_d, :dipole == "Inf",:cross == "extinction"))
+
+# m1 = d1 * mapping(:wavelength, :value, color=:gap => nonnumeric => "gap /nm", col=:crosstype, row=:radius => nonnumeric)
+
+# m2 = d2 * mapping(:wavelength, :average => x -> x ./ 4, color=:gap => nonnumeric => "gap /nm", 
+# col=:cross, row=:radius => nonnumeric)
+
+m1 = d1 * mapping(:wavelength, :value, col=:gap => nonnumeric => "gap /nm", row=:radius => nonnumeric)
+
+m2 = d2 * mapping(:wavelength, :average => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
+row=:radius => nonnumeric)
+
+m3 = d3 * mapping(:wavelength, :average => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
+row=:radius => nonnumeric)
+
+
 
 layer1 = m1 * visual(Lines)
-# layer2 = m2 * visual(Lines, linestyle=:dash)
-draw(layer1, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
+layer2 = m2 * visual(Lines, linestyle=:dash)
+layer3 = m3 * visual(Lines, linestyle=:dot)
+fg=draw(layer1 + layer2 + layer3, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
     palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+
+
+
+save("figure.pdf", fg, px_per_unit=3)
+
+## look at dichroism
+
+
+d1 = data(@rsubset(all, :type == "dichroism",:crosstype == "extinction"))
+d2 = data(@rsubset(terms_d, :dipole == "1",:cross == "extinction"))
+d3 = data(@rsubset(terms_d, :dipole == "Inf",:cross == "extinction"))
+
+
+m1 = d1 * mapping(:wavelength, :value, col=:gap => nonnumeric => "gap /nm", row=:radius => nonnumeric)
+
+m2 = d2 * mapping(:wavelength, :average => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
+row=:radius => nonnumeric)
+
+m3 = d3 * mapping(:wavelength, :average => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
+row=:radius => nonnumeric)
+
+
+
+layer1 = m1 * visual(Lines)
+layer2 = m2 * visual(Lines, linestyle=:dash)
+layer3 = m3 * visual(Lines, linestyle=:dot)
+fg=draw(layer1 + layer2 + layer3, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
+    palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+
+
+
+save("figure2.pdf", fg, px_per_unit=3)
 
