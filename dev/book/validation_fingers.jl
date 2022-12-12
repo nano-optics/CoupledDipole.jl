@@ -21,38 +21,37 @@ gill(weight) = joinpath(font_folder, "GillSansNova-$(weight).otf")
 set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 
-## this example looks at 1 Au nanorod in water
-## checking the orientation properties
-# reference rod is along x
-# other case is along z but rotated by pi/4, pi/2,
-# with incidence along z rotated by 45deg
+## this example considers the fingers crossed configuration at different scales
+## to test the limits of the coupled-dipole approximation
+
 
 ## materials
 wavelengths = collect(450:2:750.0)
 media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 mat = Material(wavelengths, media)
 
-## cluster geometry
+## dimer geometry
+# cluster_dimer(d, a, b, c, ϕ=0.0, α_1=0.0, α_2=0.0, material="Au", type="particle")
 
-α = π / 4
-β = π / 2
-γ = 0.0
-cl0 = cluster_single(35.0, 20.0, 20.0)
-cl1 = cluster_single(20.0, 20.0, 35.0, α, β, γ)
+cl0 = cluster_single(20.0, 20.0, 35.0)
+cl1 = cluster_dimer(100.0, 20.0, 20.0, 35.0, π / 4)
+cl2 = cluster_dimer(100.0, 20.0, 20.0, 35.0, -π / 4)
 
-Incidence = [RotZ(0.0)] ## incidence: along z (no rotation)
-res0 = spectrum_dispersion(cl0, mat, Incidence)
-d0 = dispersion_df(res0, mat.wavelengths)
+oa0 = spectrum_oa(cl0, mat)
+oa1 = spectrum_oa(cl1, mat)
+oa2 = spectrum_oa(cl2, mat)
 
-Incidence = [RotZ(π / 4)] ## incidence: along z, E at 45deg
-res1 = spectrum_dispersion(cl1, mat, Incidence)
-d1 = dispersion_df(res1, mat.wavelengths)
+d0 = oa_df(oa0, mat.wavelengths)
+d1 = oa_df(oa1, mat.wavelengths)
+d2 = oa_df(oa2, mat.wavelengths)
 
-map1 = mapping(:wavelength, :value, row=:polarisation, col=:crosstype)
+map1 = mapping(:wavelength, :value, row=:type, col=:crosstype)
+
 m1 = map1 * (data(d1) * visual(Lines) +
-             data(d0) * visual(Lines, linestyle=:dash, color=:red))
+             data(d2) * visual(Lines, linestyle=:dash) +
+             data(d0) * visual(Lines, linestyle=:dot))
 fg = draw(m1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
 
 fg
 
-save("figure.pdf", fg, px_per_unit=3)
+# save("figure.pdf", fg, px_per_unit=3)

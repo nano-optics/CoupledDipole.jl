@@ -35,6 +35,7 @@ export iterate_field!
 export Cluster
 export cluster_single
 export cluster_dimer
+export cluster_quadrimer
 export cluster_helix
 export cluster_line
 export cluster_array

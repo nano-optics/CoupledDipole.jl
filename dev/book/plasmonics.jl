@@ -9,7 +9,8 @@ using DataFramesMeta
 using DataFrames
 using Rotations
 using LaTeXStrings
-using AlgebraOfGraphics, Makie, CairoMakie
+using AlgebraOfGraphics, Makie, CairoMakie, ColorSchemes
+
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")

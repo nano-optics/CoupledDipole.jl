@@ -9,7 +9,7 @@ using DataFramesMeta
 using DataFrames
 using Rotations
 using LaTeXStrings
-using AlgebraOfGraphics, Makie, CairoMakie
+using AlgebraOfGraphics, Makie, CairoMakie, ColorSchemes
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
@@ -80,7 +80,7 @@ m1 = d1 * mapping(:wavelength, :value, color=:d => nonnumeric, col=:orientation,
 m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
-draw(layer1 + layer2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
+draw(layer1 + layer2, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
     palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 # https://docs.juliaplots.org/latest/generated/colorschemes/
 # cgrad(ColorSchemes.viridis.colors, 12, categorical=true)

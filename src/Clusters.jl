@@ -85,6 +85,48 @@ function cluster_dimer(d, a, b, c, ϕ=0.0, α_1=0.0, α_2=0.0, material="Au", ty
 end
 
 
+"""
+   cluster_quadrimer(r, d, material="Au", type="particle")
+
+Particle cluster consisting of 4 identical spheres in a chiral geometry
+- `r`: sphere radius
+- `d`: gap between spheres
+- `material`: String referencing the material of every particle
+- `type`: String, "point" dipole or "particle"
+
+# Examples
+
+```
+cluster_quadrimer(80, 10)
+```
+
+"""
+function cluster_quadrimer(r, d, material="Au", type="particle")
+    sizes = [SVector(r, r, r) for _ ∈ 1:4] # identical particles
+    p1 = SVector(0.0, 0.0, 0.0)
+    p2 = SVector(2r + d, 0.0, 0.0)
+    p3 = SVector(0.0, 2r + d, 0.0)
+    p4 = SVector(0.0, 2r + d, 2r + d)
+    positions = [p1, p2, p3, p4]
+    q = QuatRotation(1.0, 0.0, 0.0, 0.0)
+    rotations = [q, q, q, q] # useless since spheres
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:4], type)
+end
+
+# function [cl] = (r, s, d, theta)
+
+#     cl.angles = zeros(3, 4)
+#     cl.sizes = r * ones(3, 4)
+#     p1 = [0; 0; 0]
+#     p2 = [s; 0; 0]
+#     p3 = [0; 0; d]
+#     p4 = [s * cos(theta); s * sin(theta); d]
+
+#     cl.positions = [p1 p2 p3 p4]
+
+# end
+
+
 
 """
     cluster_helix(N, a, b, c, R, Λ, δ = π/4, δ_0 = 0, handedness="left",

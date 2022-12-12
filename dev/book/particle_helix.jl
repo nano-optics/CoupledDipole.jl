@@ -9,7 +9,8 @@ using DataFramesMeta
 using DataFrames
 using Rotations
 using LaTeXStrings
-using AlgebraOfGraphics, Makie, CairoMakie
+using AlgebraOfGraphics, Makie, CairoMakie, ColorSchemes
+
 home = homedir()
 const font_folder = "$home/Library/Fonts/"
 firasans(weight) = joinpath(font_folder, "FiraSans-$(weight).ttf")
@@ -70,9 +71,9 @@ d2 = stack(tmp, [:dichroism, :average], variable_name=:type)
 dat1 = data(@rsubset(d1, :crosstype == "extinction"))
 dat2 = data(d2)
 lay1 = dat1 * mapping(:wavelength, :value, row=:type) * visual(Lines, linestyle=:dash)
-lay2 = dat2 * mapping(:wavelength, :value, color=:angle => nonnumeric, col=:axis,
+lay2 = dat2 * mapping(:wavelength, :value, color=:angle => nonnumeric => "angle /º", col=:axis,
              row=:type) * visual(Lines)
-draw(lay1 + lay2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
+fg = draw(lay1 + lay2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
       palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 
 
