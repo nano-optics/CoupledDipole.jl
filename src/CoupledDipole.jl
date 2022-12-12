@@ -96,42 +96,46 @@ export scattered_field
 
 Interaction matrix
 
-- `A`: `3N_dip x 3N_dip` interaction matrix
-- `kn`: wavenumber in incident medium
+- `F`: `3N_dip x 3N_dip` interaction matrix
+- `k`: wavenumber in incident medium
 - `R`: `N_dip`-vector of 3-Svectors of particle positions
 - `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
 
 """
-function interaction_matrix_labframe!(A, kn, R, AlphaBlocks)
+function interaction_matrix_labframe!(F, k, R, AlphaBlocks)
 
     N_dip = length(R)
 
-    # Note: might want to try BlockArray.jl
-    # Construct a BlockArray from blocks
-    # mortar((A,B),(C,D))
-    # would simply indexing, at the expense of another dep
+    # nested loop over dipole pairs
+    for i = 1:N_dip
+        ii = 3i-2:3i
 
-    # nested for loop over N_dip dipoles
-    for jj = 1:N_dip
-        ind_jj = 3jj-2:3jj
+        for j = i+1:N_dip
+            jj = 3j-2:3j
 
-        for kk = (jj+1):N_dip
-            ind_kk = 3kk-2:3kk
+            rⱼ_to_rᵢ = R[i] - R[j]
+            rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
+            n = rⱼ_to_rᵢ / rᵢⱼ
+            nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
+            nx = SMatrix{3,3}(0, n[3], n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
 
-            rk_to_rj = R[jj] - R[kk]
-            rjk = norm(rk_to_rj, 2)
-            rjkhat = rk_to_rj / rjk
-            rjkrjk = rjkhat * transpose(rjkhat)
+            expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
 
-            Ajk =
-                exp(im * kn * rjk) / rjk * (
-                    kn * kn * (rjkrjk - I) +
-                    (im * kn * rjk - 1.0) / (rjk * rjk) * (3 * rjkrjk - I)
+            # EE and MM coupling tensor
+            Aᵢⱼ =
+                expikror * (
+                    k^2 * (nxn - I) +
+                    (im * k * rᵢⱼ - 1) / (rᵢⱼ^2) * (3 * nxn - I)
                 )
 
+            αᵢ = AlphaBlocks[i]
+            αⱼ = AlphaBlocks[j]
+            Aᵗᵢⱼ = transpose(Aᵢⱼ)
+
             # assign blocks
-            A[ind_jj, ind_kk] = Ajk * AlphaBlocks[kk]
-            A[ind_kk, ind_jj] = transpose(Ajk) * AlphaBlocks[jj]
+            F[ii, jj] = Aᵢⱼ * αⱼ
+            F[jj, ii] = Aᵗᵢⱼ * αᵢ
+
             # use views to avoid copies (?)
             # Av1 = @view A[ind_jj, ind_kk]
             # Av2 = @view A[ind_kk, ind_jj]
@@ -141,8 +145,10 @@ function interaction_matrix_labframe!(A, kn, R, AlphaBlocks)
         end
     end
 
-    return A
+    return F
 end
+
+
 
 
 
