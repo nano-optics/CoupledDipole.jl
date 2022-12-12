@@ -19,7 +19,7 @@ cluster_helix
 ```
 
 ```@docs
-cluster_line
+cluster_chain
 ```
 
 ```@docs

@@ -37,7 +37,7 @@ export cluster_single
 export cluster_dimer
 export cluster_quadrimer
 export cluster_helix
-export cluster_line
+export cluster_chain
 export cluster_array
 export cluster_shell
 # CrossSections

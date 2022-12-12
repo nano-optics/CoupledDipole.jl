@@ -183,7 +183,7 @@ end
 
 
 """
-    cluster_line(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
+    cluster_chain(N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle")
 
 Line of N identical particles in the x direction
 - `N`: number of particles (approximate if not exact square)
@@ -196,11 +196,11 @@ Line of N identical particles in the x direction
 # Examples
 
 ```
-cluster_line(3, 500, 20, 20, 30, 0, 0, 0)
+cluster_chain(3, 500, 20, 20, 30, 0, 0, 0)
 ```
 
 """
-function cluster_line(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="particle")
+function cluster_chain(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="particle")
 
     sizes = [SVector(a, b, c) for ii in 1:N] # identical particles
     rotations = [inv(QuatRotation(RotZYZ(α, β, γ))) for _ ∈ 1:N] # identical particles
