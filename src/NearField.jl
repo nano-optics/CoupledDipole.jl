@@ -24,7 +24,7 @@ function scattered_field(kn, Rdip, Rpro, P)
             ind_kk = 3kk-2:3kk
 
             # source to probe
-            rk_to_rj = R[jj] - R[kk]
+            rk_to_rj = Rpro[jj] - Rdip[kk]
             rjk = norm(rk_to_rj, 2)
             rjkhat = rk_to_rj / rjk
             rjkrjk = rjkhat * transpose(rjkhat)
