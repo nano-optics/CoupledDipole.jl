@@ -70,16 +70,17 @@ probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
 probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
 N_pro = length(probes)
 
-E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence)
-
 
 # when it was a matrix
 # Esca = scattered_field(kn, cl.positions, probes, P)
 # Isca = sum(reshape(abs2.(Esca), (3, N_pro * 2N_inc)), dims=1)
 # plot(collect(x), log10.(Isca[1:length(x)]))
 
+# incident field at probe locations
+EinProbes = Array{T2}(undef, (3N_pro, 2N_inc))
+incident_field!(EinProbes, Ejones, kn, probes, IncidenceRotations)
 
-Esca, Bsca = scattered_field(kn, cl.positions, probes, P)
+Esca, Bsca, Etot, Btot = local_field(kn, cl.positions, probes, P, EinProbes)
 
 Isca = [sum(abs2.(E)) for E in Esca]
 Hsca = [sum(abs2.(B)) for B in Bsca]

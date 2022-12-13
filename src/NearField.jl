@@ -4,23 +4,27 @@ scattered_field(λ, probes, positions, dipoles)
 - `λ`: wavelength
 - `probes`: SVector of spatial positions where the field is to be evaluated
 - `positions`: SVector of dipole positions
-- `dipoles`: 3Ndipx2Ninc matrix of self-consistent dipole moments
+- `P`: 3Ndipx2Ninc matrix of self-consistent dipole moments
 
 """
-function scattered_field(k, Rdip, Rpro, P)
+function local_field(k, Rdip, Rpro, P, EinProbes)
 
     N_dip = length(Rdip)
     N_pro = length(Rpro)
     N_inc = size(P, 2)
     Z₀ = 376.730313668 # free-space impedance
+    Y₀ = 1 / Z₀
 
     # Esca = zeros(eltype(P), (3N_pro, N_inc))
     # actually easier to work with array of vectors
     Esca = [@SVector(zeros(eltype(P), 3)) for _ ∈ 1:N_inc*N_pro]
-    Bsca = [@SVector(zeros(eltype(P), 3)) for _ ∈ 1:N_inc*N_pro]
+    Bsca = similar(Esca)
+    Etot = similar(Esca)
+    Btot = similar(Esca)
 
     # for loop over N_probe locations
     for i = 1:N_pro
+        ii = 3i-2:3i
         # store contribution at current probe location for all directions
         Etmp = zeros(eltype(P), (3, N_inc))
         Btmp = zeros(eltype(P), (3, N_inc))
@@ -52,14 +56,17 @@ function scattered_field(k, Rdip, Rpro, P)
 
         end
         # store scattered field 3-vector at probe location for each incidence
+        # adding Ein is a bit awkward as it's stored in a 3NxNinc matrix like P
         for l ∈ 1:N_inc
             Esca[N_inc*(i-1)+l] = Etmp[:, l]
-            Bsca[N_inc*(i-1)+l] = Z₀ .* Btmp[:, l]
+            Bsca[N_inc*(i-1)+l] = Z₀ * Btmp[:, l]
+            Etot[N_inc*(i-1)+l] = Etmp[:, l] + EinProbes[ii, l]
+            Btot[N_inc*(i-1)+l] = Btmp[:, l] + Y₀ * EinProbes[ii, l]
         end
 
     end
 
-    return Esca, Bsca
+    return Esca, Bsca, Etot, Btot
 end
 
 
@@ -135,7 +142,7 @@ function map_nf(probes,
 
     # now the near-field part 
 
-    Esca, Bsca = scattered_field(k, cl.positions, probes, P)
+    Esca, Bsca, Etot, Btot = local_field(k, cl.positions, probes, EinProbes)
     out_dims = (2 * length(Incidence), length(probes))
     E² = reshape([sum(abs2.(E)) for E in Esca], out_dims)
     B² = reshape([sum(abs2.(B)) for B in Bsca], out_dims)
