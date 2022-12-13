@@ -90,16 +90,12 @@ plot(collect(x), log10.(Hsca[1:2:length(Bsca)]))
 # high level
 
 x = -200.0:2.0:200
-probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
+y = -100.0:2.0:100
+probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence)
 
-positions.E1 = E²[:, 2]
+mapping([positions.x] => "x", [positions.y] => "y", [log10.(E²[:, 1])] => "z") * visual(Heatmap) |> draw
 
-data(positions) * mapping([x] => "x", [y] => "y", [z] => "E1") * visual(Heatmap) |> draw
+mapping([positions.x] => "x", [positions.y] => "y", [log10.(E²[:, 2])] => "z") * visual(Heatmap) |> draw
 
-a = DataFrame([collect(1:10), collect(1:10), rand(10, 10)], [:x, :y, :z])
-
-x = positions.x
-y = positions.y
-z = log10.(E²[:, 2])
-mapping([x] => "x", [y] => "y", [z] => "z") * visual(Heatmap) |> draw
+mapping([positions.x] => "x", [positions.y] => "y", [𝒞[:, 2]] => "z") * visual(Heatmap) |> draw

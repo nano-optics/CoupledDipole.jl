@@ -142,8 +142,11 @@ function map_nf(probes,
     𝒞 = reshape(map((E, B) -> imag(E ⋅ B), Esca, Bsca), out_dims)
     # for convenience, return the positions as a dataframe
     positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
+    # for i in eachindex(cl.positions)
+    #     mask = map(probe -> norm(probe - cl.positions[i]) <= cl.sizes[i][1]^2, probes)
+    # end
 
-    return transpose(E²), transpose(B²), transpose(𝒞), positions
+    return transpose(E²), transpose(B²), transpose(𝒞), positions #, mask
 
 end
 
