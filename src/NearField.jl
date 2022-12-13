@@ -16,8 +16,8 @@ function scattered_field(k, Rdip, Rpro, P)
 
     # Esca = zeros(eltype(P), (3N_pro, N_inc))
     # actually easier to work with array of vectors
-    Esca = [@SVector(zeros(eltype(P), (3))) for _ ∈ 1:N_inc*N_pro]
-    Bsca = [@SVector(zeros(eltype(P), (3))) for _ ∈ 1:N_inc*N_pro]
+    Esca = [@SVector(zeros(eltype(P), 3)) for _ ∈ 1:N_inc*N_pro]
+    Bsca = [@SVector(zeros(eltype(P), 3)) for _ ∈ 1:N_inc*N_pro]
 
     # for loop over N_probe locations
     for i = 1:N_pro
@@ -65,6 +65,9 @@ end
 
 
 
+# x = -200.0:2.0:200
+# probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
+# probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
 function map_nf(probes,
     cl::Cluster,
     mat::Material,
@@ -72,54 +75,75 @@ function map_nf(probes,
     polarisation="linear",
     prescription="kuwata")
 
+    N_pro = length(probes)
+    N_dip = length(cl.positions)
+    N_inc = length(Incidence)
+
     ## low level stuff
     proto_r = cl.positions[1][1] # position type
-    proto_a = cl.rotations[1][1] # angle type
+    proto_a = RotMatrix(cl.rotations[1])[1, 1] # angle type
     proto_α = 0.1 + 0.1im # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
     T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
     T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
-    N_dip = length(cl.positions)
-    N_lam = length(mat.wavelengths)
-    N_inc = length(Incidence)
     F = Matrix{T2}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
     Ein = Array{T2}(undef, (3N_dip, 2N_inc))
     E = similar(Ein)
     P = similar(Ein)
 
-    Ejones = [SVector(1.0 + 0im, 0.0), SVector(0.0, 1.0 + 0im)]
+    # incident field
+    if polarisation == "linear"
+        Ejones = [
+            SVector(1.0 + 0im, 0.0), # Jones vector, first polar
+            SVector(0.0, 1.0 + 0im), # Jones vector, second polar
+        ]
+    elseif polarisation == "circular"
+        Ejones = 1.0 / √2.0 .* [
+            SVector(1im, 1.0), # Jones vector, first polar ↺
+            SVector(1.0, 1im), # Jones vector, second polar ↻
+        ]
+    end
 
-    ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
-    IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
+    #   solve the system for the polarisation
+    ParticleRotations = map(RotMatrix, cl.rotations)
+    IncidenceRotations = map(RotMatrix, Incidence)
     λ = mat.wavelengths[1]
+
+    if length(mat.wavelengths) > 1
+        @warn "this function expects a single wavelength; using $λ"
+    end
+
     n_medium = mat.media["medium"](λ)
-    kn = n_medium * 2π / λ
-    Epsilon = map(m -> mat.media[m](λ), cl.materials)
-    Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ)
+    k = n_medium * 2π / λ
+    if cl.type == "point"
+        Alpha = map(
+            (m, s) ->
+                alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+            cl.materials,
+            cl.sizes,
+        )
+
+    elseif cl.type == "particle"
+        Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+        Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+    end
     AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
-    interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
-    incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
+    interaction_matrix_labframe!(F, k, cl.positions, AlphaBlocks)
+    incident_field!(Ein, Ejones, k, cl.positions, IncidenceRotations)
     E = F \ Ein
     polarisation!(P, E, AlphaBlocks)
 
-    x = -200.0:2.0:200
-    probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
-    probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
-    N_pro = length(probes)
+    # now the near-field part 
 
-    # when it was a matrix
-    # Esca = scattered_field(kn, cl.positions, probes, P)
-    # Isca = sum(reshape(abs2.(Esca), (3, N_pro * 2N_inc)), dims=1)
-    # plot(collect(x), log10.(Isca[1:length(x)]))
+    Esca, Bsca = scattered_field(k, cl.positions, probes, P)
+    out_dims = (2 * length(Incidence), length(probes))
+    E² = reshape([sum(abs2.(E)) for E in Esca], out_dims)
+    B² = reshape([sum(abs2.(B)) for B in Bsca], out_dims)
+    𝒞 = reshape(map((E, B) -> imag(E ⋅ B), Esca, Bsca), out_dims)
+    # for convenience, return the positions as a dataframe
+    positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
 
-
-    Esca, Bsca = scattered_field(kn, cl.positions, probes, P)
-
-    E² = [sum(abs2.(E)) for E in Esca]
-    B² = [sum(abs2.(B)) for B in Bsca]
-    𝒞 = map((E, B) -> imag(E ⋅ B), Esca, Bsca)
-
-    return E², B², 𝒞
+    return transpose(E²), transpose(B²), transpose(𝒞), positions
 
 end
 

@@ -70,6 +70,9 @@ probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
 probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
 N_pro = length(probes)
 
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence)
+
+
 # when it was a matrix
 # Esca = scattered_field(kn, cl.positions, probes, P)
 # Isca = sum(reshape(abs2.(Esca), (3, N_pro * 2N_inc)), dims=1)
@@ -83,3 +86,20 @@ Hsca = [sum(abs2.(B)) for B in Bsca]
 
 plot(collect(x), log10.(Isca[1:2:length(Esca)]))
 plot(collect(x), log10.(Hsca[1:2:length(Bsca)]))
+
+# high level
+
+x = -200.0:2.0:200
+probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence)
+
+positions.E1 = E²[:, 2]
+
+data(positions) * mapping([x] => "x", [y] => "y", [z] => "E1") * visual(Heatmap) |> draw
+
+a = DataFrame([collect(1:10), collect(1:10), rand(10, 10)], [:x, :y, :z])
+
+x = positions.x
+y = positions.y
+z = log10.(E²[:, 2])
+mapping([x] => "x", [y] => "y", [z] => "z") * visual(Heatmap) |> draw

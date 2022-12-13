@@ -104,10 +104,10 @@ d3 = data(@rsubset(terms_d, :dipole == "Inf",:cross == "extinction"))
 
 m1 = d1 * mapping(:wavelength, :value, col=:gap => nonnumeric => "gap /nm", row=:radius => nonnumeric)
 
-m2 = d2 * mapping(:wavelength, :average => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
+m2 = d2 * mapping(:wavelength, :dichroism => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
 row=:radius => nonnumeric)
 
-m3 = d3 * mapping(:wavelength, :average => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
+m3 = d3 * mapping(:wavelength, :dichroism => x -> x ./ 4, col=:gap => nonnumeric => "gap /nm", 
 row=:radius => nonnumeric)
 
 
@@ -115,7 +115,7 @@ row=:radius => nonnumeric)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
 layer3 = m3 * visual(Lines, linestyle=:dot)
-fg=draw(layer1 + layer2 + layer3, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
+fg=draw(layer1 + layer2 + layer3, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
     palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
 
 

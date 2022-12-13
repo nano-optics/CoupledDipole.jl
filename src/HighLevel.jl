@@ -10,7 +10,7 @@ Simulating far-field cross-sections for multiple wavelengths and directions of i
 - `cl`: cluster of particles
 - `mat`: dielectric functions
 - `Incidence`: N_inc vector of quaternions describing incidence directions
-- `polarisations`: incident field consists of 2 orthogonal "linear" or "circular" polarisations
+- `polarisation`: incident field consists of 2 orthogonal "linear" or "circular" polarisations
 - `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
 - `prescription`: polarisability prescription for particles
 - `method`: direct or iterative solver
@@ -51,12 +51,12 @@ function spectrum_dispersion(
     P = similar(Ein)
 
     # incident field
-    if polarisations == "linear"
+    if polarisation == "linear"
         Ejones = [
             SVector(1.0 + 0im, 0.0), # Jones vector, first polar
             SVector(0.0, 1.0 + 0im), # Jones vector, second polar
         ]
-    elseif polarisations == "circular"
+    elseif polarisation == "circular"
         Ejones = 1.0 / √2.0 .* [
             SVector(1im, 1.0), # Jones vector, first polar ↺
             SVector(1.0, 1im), # Jones vector, second polar ↻

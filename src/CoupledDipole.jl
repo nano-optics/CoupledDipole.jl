@@ -86,6 +86,7 @@ export visualise_makie
 export visualise_threejs
 # NearField
 export scattered_field
+export map_nf
 
 ## core functions
 
