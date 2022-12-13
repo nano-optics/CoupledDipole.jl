@@ -43,8 +43,8 @@ function local_field(k, Rdip, Rpro, P, EinProbes)
             # EE 
             Aᵢⱼ =
                 expikror * (
-                    k^2 * (nxn - I) +
-                    (im * k * rᵢⱼ - 1) / (rᵢⱼ^2) * (3 * nxn - I)
+                    k^2 * (I - nxn) -
+                    (1 - im * k * rᵢⱼ) / (rᵢⱼ^2) * (I - 3 * nxn)
                 )
 
             # EM 

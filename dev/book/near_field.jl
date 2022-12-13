@@ -51,10 +51,10 @@ E = similar(Ein)
 P = similar(Ein)
 
 Ejones = [SVector(1.0 + 0im, 0.0), SVector(0.0, 1.0 + 0im)]
-Ejones = 1.0 / √2.0 .* [
-    SVector(1im, 1.0), # Jones vector, first polar ↺
-    SVector(1.0, 1im), # Jones vector, second polar ↻
-]
+# Ejones = 1.0 / √2.0 .* [
+#     SVector(1im, 1.0), # Jones vector, first polar ↺
+#     SVector(1.0, 1im), # Jones vector, second polar ↻
+# ]
 
 ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
 IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
@@ -69,8 +69,8 @@ incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 E = F \ Ein
 polarisation!(P, E, AlphaBlocks)
 
-x = -200.0:2.0:200
-probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
+x = -300.0:2.0:300
+# probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
 probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
 N_pro = length(probes)
 
@@ -93,10 +93,54 @@ Itot = [sum(abs2.(E)) for E in Etot]
 Htot = [sum(abs2.(B)) for B in Btot]
 
 
-plot(collect(x), log10.(Isca[1:2:length(Esca)]))
-plot(collect(x), log10.(Hsca[1:2:length(Bsca)]))
+# plot(collect(x), log10.(Isca[1:2:length(Esca)]))
+# plot(collect(x), log10.(Hsca[1:2:length(Bsca)]))
+# plot(collect(x), log10.([1:2:length(Etot)]))
 
-plot(collect(x), log10.(Itot[1:2:length(Etot)]))
+
+using HDF5
+fid = h5open("./dev/book/map.h5", "r")
+g = fid["Near-Field"]
+map_E = read(g, "map_E")
+map_B = read(g, "map_B")
+map_C = read(g, "normalised_ldoc")
+
+slice = map_E[:, 3] .≈ 0.0
+
+a = map_E[slice, 2]
+b = map_E[slice, 3]
+c = map_E[slice, 9]
+
+plot(a, log10.(map_E[slice, 8]))
+lines!(a, log10.(map_E[slice, 8]))
+
+df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 8]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=collect(x), y=log10.(Itot[2:2:length(Esca)]))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+draw(layer * xy + layer2 * xy2)
+
+df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 9]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=collect(x), y=log10.(Itot[2:2:length(Esca)]))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+draw(layer * xy + layer2 * xy2)
+
+
+
+
+m1 = map1 * (data(d1) * visual(Lines) +
+             data(d2) * visual(Lines, linestyle=:dash) +
+             data(d0) * visual(Lines, linestyle=:dot))
+fg = draw(m1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
+
+
+# "lambda" "x"      "y"      "z"      "scatID" "volID"  "E2avg"  "E2X"    "E2Y" 
+
 
 # high level
 
@@ -113,3 +157,9 @@ mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!mask, 1])] => "z
 mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!mask, 2])] => "z") * visual(Heatmap) |> draw
 
 mapping([filtered.x] => "x", [filtered.y] => "y", [𝒞[.!mask, 2]] => "z") * visual(Heatmap) |> draw
+
+a = map_E[:, 2]
+b = map_E[:, 3]
+c = map_E[:, 9]
+
+mapping([a] => "x", [b] => "y", [c] => "z") * visual(Heatmap) |> draw
