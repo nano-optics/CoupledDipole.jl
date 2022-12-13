@@ -51,6 +51,10 @@ E = similar(Ein)
 P = similar(Ein)
 
 Ejones = [SVector(1.0 + 0im, 0.0), SVector(0.0, 1.0 + 0im)]
+Ejones = 1.0 / √2.0 .* [
+    SVector(1im, 1.0), # Jones vector, first polar ↺
+    SVector(1.0, 1im), # Jones vector, second polar ↻
+]
 
 ParticleRotations = map(RotMatrix, cl.rotations) # now (active) Rotation objects
 IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
@@ -99,7 +103,8 @@ plot(collect(x), log10.(Itot[1:2:length(Etot)]))
 x = -200.0:2.0:200
 y = -100.0:2.0:100
 probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
-E², B², 𝒞, positions, mask = map_nf(probes, cl, mat, Incidence)
+Incidence = [RotX(π / 2)]
+E², B², 𝒞, positions, mask = map_nf(probes, cl, mat, Incidence, polarisation="circular")
 
 filtered = positions[.!mask, :]
 
