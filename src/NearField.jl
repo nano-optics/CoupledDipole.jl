@@ -152,7 +152,7 @@ function map_nf(probes,
     𝒞 = reshape(map((E, B) -> imag(E ⋅ B), Etot, Btot), out_dims)
     # for convenience, return the positions as a dataframe
     positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
-    test_inside(point) = reduce(|, map((dip, rad) -> norm(point - dip) <= rad[1], cl.positions, cl.sizes))
+    test_inside(point) = reduce(|, map((dip, rad) -> norm(point - dip) <= max(rad...), cl.positions, cl.sizes))
     mask = test_inside.(probes)
 
     return transpose(E²), transpose(B²), transpose(𝒞), positions, mask
