@@ -28,10 +28,10 @@ function spectrum_dispersion(
 
     # what is the type of arrays to initialise?
     proto_r = cl.positions[1][1] # position type
-    proto_a = cl.rotations[1][1] # angle type
-    proto_α = 0.1 + 0.1im # dummy complex polarisability
+    # CHECK: would picking the first element of quaternion be a sensible idea
+    proto_a = RotMatrix(cl.rotations[1])[1, 1] # angle type
+    proto_α = proto_r * (1.0 + 1.0im) # dummy complex polarisability
     proto_k = 2π / mat.wavelengths[1]
-    # CHECK: is picking the first element of quaternion a sensible idea
     T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
     # note: cross-sections are typeof(imag(P*E)), which boils down to T1, hopefully
     T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α

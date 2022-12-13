@@ -150,7 +150,17 @@ end
 
 
 
+function interaction_matrix_labframe(k, R, AlphaBlocks)
+    N_dip = length(R)
+    # what is the type of arrays to initialise?
+    proto_r = R[1][1] # position type
+    proto_α = AlphaBlocks[1][1, 1] # complex polarisability
+    T = typeof(1im * k * proto_r + proto_α) # blocks are ~ exp(ikr) or R * α
 
+    F = Matrix{T}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
+    interaction_matrix_labframe!(F, k, R, AlphaBlocks)
+    return F
+end
 
 """
     incident_field!(Ein,
