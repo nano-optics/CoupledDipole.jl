@@ -21,7 +21,7 @@ function spectrum_dispersion(
     mat::Material,
     Incidence;
     N_sca::Int=36,
-    polarisations="linear",
+    polarisation="linear",
     prescription="kuwata",
     method="direct"
 )
@@ -57,9 +57,9 @@ function spectrum_dispersion(
             SVector(0.0, 1.0 + 0im), # Jones vector, second polar
         ]
     elseif polarisations == "circular"
-        Ejones = 1.0 / sqrt(2.0) .* [
-            SVector(1im, 1.0), # Jones vector, first polar
-            SVector(1.0, 1im), # Jones vector, second polar
+        Ejones = 1.0 / √2.0 .* [
+            SVector(1im, 1.0), # Jones vector, first polar ↺
+            SVector(1.0, 1im), # Jones vector, second polar ↻
         ]
     end
 
@@ -217,9 +217,9 @@ function spectrum_oa(
     # block_array[Block(1, 1)]
 
     # incident field
-    Ejones = 1.0 / sqrt(2.0) .* [
-        SVector(1im, 1.0), # Jones vector, first polar
-        SVector(1.0, 1im), # Jones vector, second polar
+    Ejones = 1.0 / √2.0 .* [
+        SVector(1im, 1.0), # Jones vector, first polar ↺
+        SVector(1.0, 1im), # Jones vector, second polar ↻
     ]
 
     # store all rotation matrices

@@ -76,8 +76,10 @@ N_pro = length(probes)
 # plot(collect(x), log10.(Isca[1:length(x)]))
 
 
-Esca = scattered_field(kn, cl.positions, probes, P)
+Esca, Bsca = scattered_field(kn, cl.positions, probes, P)
 
 Isca = [sum(abs2.(E)) for E in Esca]
+Hsca = [sum(abs2.(B)) for B in Bsca]
 
 plot(collect(x), log10.(Isca[1:2:length(Esca)]))
+plot(collect(x), log10.(Hsca[1:2:length(Bsca)]))

@@ -39,8 +39,8 @@ cl0 = cluster_single(15.0 / 2, 15.0 / 2, 15.0)
 angles = range(0, π / 2, 7)
 Incidence = QuatRotation.([RotX.(angles); RotY.(angles); RotZ.(angles)])
 
-disp0 = spectrum_dispersion(cl0, mat, Incidence, polarisations="circular")
-disp1 = spectrum_dispersion(cl1, mat, Incidence, polarisations="circular")
+disp0 = spectrum_dispersion(cl0, mat, Incidence, polarisation="circular")
+disp1 = spectrum_dispersion(cl1, mat, Incidence, polarisation="circular")
 
 disp0 = dispersion_df(disp0, mat.wavelengths, format="wide")
 disp1 = dispersion_df(disp1, mat.wavelengths, format="wide")
