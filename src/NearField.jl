@@ -141,19 +141,21 @@ function map_nf(probes,
     polarisation!(P, E, AlphaBlocks)
 
     # now the near-field part 
+    # incident field at probe locations
+    EinProbes = Array{T2}(undef, (3N_pro, 2N_inc))
+    incident_field!(EinProbes, Ejones, k, probes, IncidenceRotations)
 
-    Esca, Bsca, Etot, Btot = local_field(k, cl.positions, probes, EinProbes)
+    Esca, Bsca, Etot, Btot = local_field(k, cl.positions, probes, P, EinProbes)
     out_dims = (2 * length(Incidence), length(probes))
-    E² = reshape([sum(abs2.(E)) for E in Esca], out_dims)
-    B² = reshape([sum(abs2.(B)) for B in Bsca], out_dims)
-    𝒞 = reshape(map((E, B) -> imag(E ⋅ B), Esca, Bsca), out_dims)
+    E² = reshape([sum(abs2.(E)) for E in Etot], out_dims)
+    B² = reshape([sum(abs2.(B)) for B in Btot], out_dims)
+    𝒞 = reshape(map((E, B) -> imag(E ⋅ B), Etot, Btot), out_dims)
     # for convenience, return the positions as a dataframe
     positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
-    # for i in eachindex(cl.positions)
-    #     mask = map(probe -> norm(probe - cl.positions[i]) <= cl.sizes[i][1]^2, probes)
-    # end
+    test_inside(point) = reduce(|, map((dip, rad) -> norm(point - dip) <= rad[1], cl.positions, cl.sizes))
+    mask = test_inside.(probes)
 
-    return transpose(E²), transpose(B²), transpose(𝒞), positions #, mask
+    return transpose(E²), transpose(B²), transpose(𝒞), positions, mask
 
 end
 

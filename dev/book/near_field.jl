@@ -85,18 +85,26 @@ Esca, Bsca, Etot, Btot = local_field(kn, cl.positions, probes, P, EinProbes)
 Isca = [sum(abs2.(E)) for E in Esca]
 Hsca = [sum(abs2.(B)) for B in Bsca]
 
+Itot = [sum(abs2.(E)) for E in Etot]
+Htot = [sum(abs2.(B)) for B in Btot]
+
+
 plot(collect(x), log10.(Isca[1:2:length(Esca)]))
 plot(collect(x), log10.(Hsca[1:2:length(Bsca)]))
+
+plot(collect(x), log10.(Itot[1:2:length(Etot)]))
 
 # high level
 
 x = -200.0:2.0:200
 y = -100.0:2.0:100
 probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
-E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence)
+E², B², 𝒞, positions, mask = map_nf(probes, cl, mat, Incidence)
 
-mapping([positions.x] => "x", [positions.y] => "y", [log10.(E²[:, 1])] => "z") * visual(Heatmap) |> draw
+filtered = positions[.!mask, :]
 
-mapping([positions.x] => "x", [positions.y] => "y", [log10.(E²[:, 2])] => "z") * visual(Heatmap) |> draw
+mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!mask, 1])] => "z") * visual(Heatmap) |> draw
 
-mapping([positions.x] => "x", [positions.y] => "y", [𝒞[:, 2]] => "z") * visual(Heatmap) |> draw
+mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!mask, 2])] => "z") * visual(Heatmap) |> draw
+
+mapping([filtered.x] => "x", [filtered.y] => "y", [𝒞[.!mask, 2]] => "z") * visual(Heatmap) |> draw
