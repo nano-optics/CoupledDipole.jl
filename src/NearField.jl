@@ -1,95 +1,28 @@
-"""
-scattered_field(λ, probes, positions, dipoles)
 
-- `λ`: wavelength
-- `probes`: SVector of spatial positions where the field is to be evaluated
+"""
+scattered_field(probe, k, positions, sizes, rotations, P)
+
+- `probe`: SVector, point where the scattered EM field is to be evaluated
+- `k`: wavenumber
 - `positions`: SVector of dipole positions
+- `sizes`: SVector of dipole sizes
+- `rotations`: SVector of particle rotation matrices
 - `P`: 3Ndipx2Ninc matrix of self-consistent dipole moments
 
 """
-function local_field(k, Rdip, Rpro, P, EinProbes)
+function scattered_field(probe, k, positions, sizes, rotations, P)
 
-    N_dip = length(Rdip)
-    N_pro = length(Rpro)
-    N_inc = size(P, 2)
     Z₀ = 376.730313668 # free-space impedance
-    Y₀ = 1 / Z₀
+    Y₀ = 1 / 376.730313668 # H = Y₀ E
+    c₀ = 299792458 # m/s
 
-    # Esca = zeros(eltype(P), (3N_pro, N_inc))
-    # actually easier to work with array of vectors
-    Esca = [@SVector(zeros(eltype(P), 3)) for _ ∈ 1:N_inc*N_pro]
-    Bsca = similar(Esca)
-    Etot = similar(Esca)
-    Btot = similar(Esca)
-
-    # for loop over N_probe locations
-    for i = 1:N_pro
-        ii = 3i-2:3i
-        # store contribution at current probe location for all directions
-        Etmp = zeros(eltype(P), (3, N_inc))
-        Btmp = zeros(eltype(P), (3, N_inc))
-
-        for j = 1:N_dip
-            jj = 3j-2:3j
-            # source to probe
-            rⱼ_to_rᵢ = Rpro[i] - Rdip[j]
-            rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
-            n = rⱼ_to_rᵢ / rᵢⱼ
-            nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
-            nx = SMatrix{3,3}(0, n[3], n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
-
-            expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
-
-            # EE 
-            Aᵢⱼ =
-                expikror * (
-                    k^2 * (I - nxn) -
-                    (1 - im * k * rᵢⱼ) / (rᵢⱼ^2) * (I - 3 * nxn)
-                )
-
-            # EM 
-            Bᵢⱼ = expikror * (nx - I) * (k^2 + im * k / rᵢⱼ)
-
-            # contribution from j-th source dipole, for all incidences
-            Etmp += Aᵢⱼ * P[jj, :]
-            Btmp += Bᵢⱼ * P[jj, :]
-
-        end
-        # store scattered field 3-vector at probe location for each incidence
-        # adding Ein is a bit awkward as it's stored in a 3NxNinc matrix like P
-        for l ∈ 1:N_inc
-            Esca[N_inc*(i-1)+l] = Etmp[:, l]
-            Bsca[N_inc*(i-1)+l] = Z₀ * Btmp[:, l]
-            Etot[N_inc*(i-1)+l] = Etmp[:, l] + EinProbes[ii, l]
-            Btot[N_inc*(i-1)+l] = Btmp[:, l] + Y₀ * EinProbes[ii, l]
-        end
-
-    end
-
-    return Esca, Bsca, Etot, Btot
-end
-
-ellipsoid(origin, size) = (origin[1] / size[1])^2 + (origin[2] / size[2])^2 + (origin[3] / size[3])^2
-
-function is_inside(probe, positions, sizes, rotations)
-    tests = map((p, s, r) -> ellipsoid(r' * (probe - p), s) <= 1, positions, sizes, rotations)
-    return reduce(|, tests)
-end
-
-
-# internal_field(p, V, χ) = 1 / χ * p / V
-
-function scattered_field(probe, k, Rdip, sizes, rotations, P)
-
-    N_dip = length(Rdip)
+    N_dip = length(positions)
     N_inc = size(P, 2)
-    Z₀ = 376.730313668 # free-space impedance
-    Y₀ = 1 / Z₀
 
     Esca = zeros(eltype(P), (3, N_inc))
     Bsca = zeros(eltype(P), (3, N_inc))
 
-    inside = is_inside(probe, Rdip, sizes, rotations)
+    inside = is_inside(probe, positions, sizes, rotations)
     # if inside
     #     Esca = internal_field(P[jj, :], prod(sizes[j]), χ)
     # else
@@ -98,7 +31,7 @@ function scattered_field(probe, k, Rdip, sizes, rotations, P)
             jj = 3j-2:3j
 
             # source to probe
-            rⱼ_to_rᵢ = probe - Rdip[j]
+            rⱼ_to_rᵢ = probe - positions[j]
             rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
             n = rⱼ_to_rᵢ / rᵢⱼ
             nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
@@ -126,6 +59,15 @@ function scattered_field(probe, k, Rdip, sizes, rotations, P)
 end
 
 
+"""
+incident_field(Ejones, k, probe, IncidenceRotations)
+
+- `probe`: SVector, point where the scattered EM field is to be evaluated
+- `k`: wavenumber
+- `Ejones`: 2-Svectors defining 2 orthogonal Jones polarisations
+- `IncidenceRotations`: `N_inc`-vector of rotation 3-Smatrices
+
+"""
 function incident_field(Ejones, k, probe, IncidenceRotations)
     T = typeof(Ejones[1][1] * k * probe[1] * IncidenceRotations[1][1, 1])
 
@@ -148,9 +90,26 @@ function incident_field(Ejones, k, probe, IncidenceRotations)
     return Ein
 end
 
+"""
+map_nf(probes,
+    cl::Cluster,
+    mat::Material,
+    Incidence;
+    polarisation="linear",
+    prescription="kuwata")
+
+- `probes`: array of SVectors, points where the scattered EM field is to be evaluated
+- `cl`: cluster of particles
+- `mat`: dielectric functions
+- `Incidence`: N_inc vector of quaternions describing incidence directions
+- `polarisation`: incident field consists of 2 orthogonal "linear" or "circular" polarisations
+- `prescription`: polarisability prescription for particles
+
+# example
 # x = -200.0:2.0:200
 # probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
 # probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
+"""
 function map_nf(probes,
     cl::Cluster,
     mat::Material,
@@ -159,7 +118,9 @@ function map_nf(probes,
     prescription="kuwata")
 
     Z₀ = 376.730313668 # free-space impedance
-    Y₀ = 1 / Z₀
+    Y₀ = 1 / 376.730313668 # H = Y₀ E
+    c₀ = 299792458 # m/s
+
     N_pro = length(probes)
     N_dip = length(cl.positions)
     N_inc = length(Incidence)
@@ -251,3 +212,12 @@ function map_nf(probes,
 
 end
 
+
+ellipsoid(origin, size) = (origin[1] / size[1])^2 + (origin[2] / size[2])^2 + (origin[3] / size[3])^2
+
+function is_inside(probe, positions, sizes, ParticleRotations)
+    tests = map((p, s, r) -> ellipsoid(r' * (probe - p), s) <= 1, positions, sizes, ParticleRotations)
+    return reduce(|, tests)
+end
+
+internal_field(p, V, χ) = 1 / χ * p / V

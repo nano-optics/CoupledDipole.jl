@@ -124,7 +124,17 @@ layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 draw(layer * xy + layer2 * xy2)
 
-is_inside(SVector(0, 0, 0), cl.positions, cl.sizes, ParticleRotations)
+Z₀ = 376.730313668 # free-space impedance
+Y₀ = 1 / 376.730313668 # H = Y₀ E
+c₀ = 299792458 # m/s
+
+df = (; x=map_B[slice, 2], y=log10.(map_B[slice, 8]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=collect(x), y=log10.(Htot[1:2:length(Esca)] / c₀ / Z₀))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+draw(layer * xy + layer2 * xy2)
 
 
 Esca2, Bsca2, inside = scattered_field(probes[1], kn, cl.positions, cl.sizes, ParticleRotations, P)
@@ -174,6 +184,6 @@ cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "Au")
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="circular")
 
 d = positions[.!positions.inside, :]
-d.z .= E²[.!positions.inside, 1]
+d.z .= 𝒞[.!positions.inside, 1]
 
 draw(data(d) * mapping(:x, :y, :z) * visual(Heatmap), axis=(; xlabel="x /nm", ylabel="y /nm", aspect=DataAspect()))
