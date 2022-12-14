@@ -96,7 +96,7 @@ xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 draw(layer * xy + layer2 * xy2)
-draw(layer2 * xy2)
+# draw(layer2 * xy2)
 
 
 
