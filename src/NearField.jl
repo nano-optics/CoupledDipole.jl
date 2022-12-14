@@ -158,6 +158,8 @@ function map_nf(probes,
     polarisation="linear",
     prescription="kuwata")
 
+    Z₀ = 376.730313668 # free-space impedance
+    Y₀ = 1 / Z₀
     N_pro = length(probes)
     N_dip = length(cl.positions)
     N_inc = length(Incidence)
@@ -217,21 +219,35 @@ function map_nf(probes,
     polarisation!(P, E, AlphaBlocks)
 
     # now the near-field part 
-    # incident field at probe locations
-    EinProbes = Array{T2}(undef, (3N_pro, 2N_inc))
-    incident_field!(EinProbes, Ejones, k, probes, IncidenceRotations)
 
-    Esca, Bsca, Etot, Btot = local_field(k, cl.positions, probes, P, EinProbes)
-    out_dims = (2 * length(Incidence), length(probes))
-    E² = reshape([sum(abs2.(E)) for E in Etot], out_dims)
-    B² = reshape([sum(abs2.(B)) for B in Btot], out_dims)
-    𝒞 = reshape(map((E, B) -> imag(E ⋅ B), Etot, Btot), out_dims)
+    T3 = typeof(proto_r)
+    Esca = [@SMatrix(zeros(T2, 3, 2N_inc)) for _ ∈ 1:N_pro]
+    Einc = similar(Esca)
+    Bsca = similar(Esca)
+    Etot = similar(Esca)
+    Btot = similar(Esca)
+    E² = Matrix{T3}(undef, N_pro, 2N_inc)
+    B² = similar(E²)
+    𝒞 = similar(E²)
+    inside = Vector{Bool}(undef, N_pro)
+    for i in eachindex(probes)
+
+        Einc[i] = incident_field(Ejones, k, probes[i], IncidenceRotations)
+        Esca[i], Bsca[i], inside[i] = scattered_field(probes[i], k, cl.positions, cl.sizes, ParticleRotations, P)
+        Etot[i] = Einc[i] + Esca[i]
+        Btot[i] = Y₀ * Einc[i] + Bsca[i]
+        # scalar summaries, but for each incidence
+        E²[i, :] = sum(abs2.(Etot[i]), dims=1)
+        B²[i, :] = sum(abs2.(Btot[i]), dims=1)
+        𝒞[i, :] = imag.(sum(conj.(Etot[i]) .* Btot[i], dims=1))
+
+    end
+
     # for convenience, return the positions as a dataframe
     positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
-    test_inside(point) = reduce(|, map((dip, rad) -> norm(point - dip) <= max(rad...), cl.positions, cl.sizes))
-    mask = test_inside.(probes)
+    positions.inside .= inside
 
-    return transpose(E²), transpose(B²), transpose(𝒞), positions, mask
+    return E², B², 𝒞, positions
 
 end
 

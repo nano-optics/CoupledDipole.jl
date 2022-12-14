@@ -104,15 +104,9 @@ g = fid["Near-Field"]
 map_E = read(g, "map_E")
 map_B = read(g, "map_B")
 map_C = read(g, "normalised_ldoc")
+# "lambda" "x"      "y"      "z"      "scatID" "volID"  "E2avg"  "E2X"    "E2Y" 
 
 slice = map_E[:, 3] .≈ 0.0
-
-a = map_E[slice, 2]
-b = map_E[slice, 3]
-c = map_E[slice, 9]
-
-plot(a, log10.(map_E[slice, 8]))
-lines!(a, log10.(map_E[slice, 8]))
 
 df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 8]))
 xy = data(df) * mapping(:x, :y)
@@ -133,33 +127,61 @@ draw(layer * xy + layer2 * xy2)
 is_inside(SVector(0, 0, 0), cl.positions, cl.sizes, ParticleRotations)
 
 
-m1 = map1 * (data(d1) * visual(Lines) +
-             data(d2) * visual(Lines, linestyle=:dash) +
-             data(d0) * visual(Lines, linestyle=:dot))
-fg = draw(m1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
-
-
-# "lambda" "x"      "y"      "z"      "scatID" "volID"  "E2avg"  "E2X"    "E2Y" 
-
+Esca2, Bsca2, inside = scattered_field(probes[1], kn, cl.positions, cl.sizes, ParticleRotations, P)
+Esca[1:2]
+Esca2
 
 # high level
+
+
+# now the near-field part 
+# incident field at probe locations
+Z₀ = 376.730313668 # free-space impedance
+Y₀ = 1 / Z₀
+T1 = eltype(P)
+T2 = eltype(cl.positions[1])
+Esca = [@SMatrix(zeros(T1, 3, 2N_inc)) for _ ∈ 1:N_pro]
+Einc = similar(Esca)
+Bsca = similar(Esca)
+Etot = similar(Esca)
+Btot = similar(Esca)
+E² = Matrix{T2}(undef, N_pro, 2N_inc)
+B² = similar(E²)
+𝒞 = similar(E²)
+inside = similar(E²)
+for i in eachindex(probes)
+
+    Einc[i] = incident_field(Ejones, k, probes[i], IncidenceRotations)
+    Esca[i], Bsca[i], inside[i] = scattered_field(probes[i], kn, cl.positions, cl.sizes, ParticleRotations, P)
+    Etot[i] = Einc[i] + Esca[i]
+    Btot[i] = Y₀ * Einc[i] + Bsca[i]
+    # scalar summaries
+    E²[i, :] = sum(abs2.(Etot[i]), dims=1)
+    B²[i, :] = sum(abs2.(Btot[i]), dims=1)
+    𝒞[i, :] = imag.(sum(conj.(Etot[i]) .* Btot[i], dims=1))
+
+end
+
 
 x = -200.0:2.0:200
 y = -100.0:2.0:100
 probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
 Incidence = [RotX(π / 2)]
-E², B², 𝒞, positions, mask = map_nf(probes, cl, mat, Incidence, polarisation="circular")
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear")
 
-filtered = positions[.!mask, :]
+filtered = positions[.!positions.inside, :]
 
-mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!mask, 1])] => "z") * visual(Heatmap) |> draw
+mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!positions.inside, 1])] => "z") * visual(Heatmap) |> draw
 
-mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!mask, 2])] => "z") * visual(Heatmap) |> draw
+mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!positions.inside, 2])] => "z") * visual(Heatmap) |> draw
 
-mapping([filtered.x] => "x", [filtered.y] => "y", [𝒞[.!mask, 2]] => "z") * visual(Heatmap) |> draw
+lay = mapping([filtered.x] => "x", [filtered.y] => "y", [𝒞[.!positions.inside, 2]] => "z") * visual(Heatmap)
+
+draw(lay, axis=(; xlabel="wavelength /nm", aspect=DataAspect()))
 
 a = map_E[:, 2]
 b = map_E[:, 3]
 c = map_E[:, 9]
 
-mapping([a] => "x", [b] => "y", [c] => "z") * visual(Heatmap) |> draw
+lay = mapping([a] => "x", [b] => "y", [c] => "z") * visual(Heatmap)
+draw(lay, aspect=DataAspect())
