@@ -130,7 +130,7 @@ layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 draw(layer * xy + layer2 * xy2)
 
-
+is_inside(SVector(0, 0, 0), cl.positions, cl.sizes, ParticleRotations)
 
 
 m1 = map1 * (data(d1) * visual(Lines) +

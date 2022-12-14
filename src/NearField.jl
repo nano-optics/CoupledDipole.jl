@@ -69,50 +69,84 @@ function local_field(k, Rdip, Rpro, P, EinProbes)
     return Esca, Bsca, Etot, Btot
 end
 
+ellipsoid(origin, size) = (origin[1] / size[1])^2 + (origin[2] / size[2])^2 + (origin[3] / size[3])^2
+
+function is_inside(probe, positions, sizes, rotations)
+    tests = map((p, s, r) -> ellipsoid(r * probe - p, s) <= 1, positions, sizes, rotations)
+    return reduce(|, tests)
+end
 
 
-function scattered_field(k, Rdip, probe, P)
+# internal_field(p, V, χ) = 1 / χ * p / V
+
+function scattered_field(probe, k, Rdip, sizes, rotations, P)
 
     N_dip = length(Rdip)
     N_inc = size(P, 2)
     Z₀ = 376.730313668 # free-space impedance
     Y₀ = 1 / Z₀
 
-    # store contribution at current probe location for all directions
     Esca = zeros(eltype(P), (3, N_inc))
     Bsca = zeros(eltype(P), (3, N_inc))
 
-    for j = 1:N_dip
-        jj = 3j-2:3j
-        # source to probe
-        rⱼ_to_rᵢ = probe - Rdip[j]
-        rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
-        n = rⱼ_to_rᵢ / rᵢⱼ
-        nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
-        nx = SMatrix{3,3}(0, n[3], n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
+    inside = is_inside(probe, Rdip, sizes, rotations)
+    # if inside
+    #     Esca = internal_field(P[jj, :], prod(sizes[j]), χ)
+    # else
+    if !inside # we're outside particles
+        for j = 1:N_dip
+            jj = 3j-2:3j
 
-        expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
+            # source to probe
+            rⱼ_to_rᵢ = probe - Rdip[j]
+            rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
+            n = rⱼ_to_rᵢ / rᵢⱼ
+            nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
+            nx = SMatrix{3,3}(0, n[3], n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
 
-        # EE 
-        Aᵢⱼ =
-            expikror * (
-                k^2 * (I - nxn) -
-                (1 - im * k * rᵢⱼ) / (rᵢⱼ^2) * (I - 3 * nxn)
-            )
+            expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
 
-        # EM 
-        Bᵢⱼ = expikror * (nx - I) * (k^2 + im * k / rᵢⱼ)
+            # EE 
+            Aᵢⱼ =
+                expikror * (
+                    k^2 * (I - nxn) -
+                    (1 - im * k * rᵢⱼ) / (rᵢⱼ^2) * (I - 3 * nxn)
+                )
 
-        # contribution from j-th source dipole, for all incidences
-        Esca += Aᵢⱼ * P[jj, :]
-        Bsca += Bᵢⱼ * P[jj, :]
+            # EM 
+            Bᵢⱼ = expikror * (nx - I) * (k^2 + im * k / rᵢⱼ)
 
+            # contribution from j-th source dipole, for all incidences
+            Esca += Aᵢⱼ * P[jj, :]
+            Bsca += Bᵢⱼ * P[jj, :]
+
+        end
     end
-
-    return Esca, Bsca
+    return Esca, Bsca, inside
 end
 
 
+function incident_field(Ejones, k, probe, IncidenceRotations)
+    T = typeof(Ejones[1][1] * k * probe[1] * IncidenceRotations[1][1, 1])
+
+    N_inc = length(IncidenceRotations)
+    Ein = Array{T}(undef, (3, 2N_inc))
+
+    Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
+    Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
+
+    for jj in eachindex(IncidenceRotations)
+        Rm = IncidenceRotations[jj]
+        k_hat = k * Rm[:, 3] # Rm * [0;0;1] == 3rd column
+        E1_r = Rm * Evec1
+        E2_r = Rm * Evec2
+        kR = dot(k_hat, probe)
+        Ein[:, jj] = E1_r * exp(im * kR)
+        Ein[:, jj+N_inc] = E2_r * exp(im * kR)
+    end
+
+    return Ein
+end
 
 # x = -200.0:2.0:200
 # probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]

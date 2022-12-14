@@ -87,6 +87,10 @@ export visualise_threejs
 # NearField
 export local_field
 export map_nf
+export scattered_field
+export incident_field
+export is_inside
+export ellipsoid
 
 ## core functions
 
@@ -209,14 +213,6 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
 end
 
 
-function incident_field(Ejones, kn, R, IncidenceRotations)
-    T = typeof(Ejones[1][1] * kn * R[1][1] * IncidenceRotations[1][1, 1])
-    N_dip = length(R)
-    N_inc = length(IncidenceRotations)
-    Ein = Array{T}(undef, (3N_dip, 2N_inc))
-    incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
-    return Ein
-end
 
 """
     polarisation!(P, E, AlphaBlocks)
