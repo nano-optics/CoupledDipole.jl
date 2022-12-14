@@ -99,7 +99,7 @@ Htot = [sum(abs2.(B)) for B in Btot]
 
 
 using HDF5
-fid = h5open("./dev/book/map.h5", "r")
+fid = h5open("./dev/book/map_Lmax1.h5", "r")
 g = fid["Near-Field"]
 map_E = read(g, "map_E")
 map_B = read(g, "map_B")
@@ -116,7 +116,7 @@ lines!(a, log10.(map_E[slice, 8]))
 
 df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 8]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=collect(x), y=log10.(Itot[2:2:length(Esca)]))
+df2 = (; x=collect(x), y=log10.(Itot[1:2:length(Esca)]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
