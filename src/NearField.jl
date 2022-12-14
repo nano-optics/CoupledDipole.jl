@@ -72,7 +72,7 @@ end
 ellipsoid(origin, size) = (origin[1] / size[1])^2 + (origin[2] / size[2])^2 + (origin[3] / size[3])^2
 
 function is_inside(probe, positions, sizes, rotations)
-    tests = map((p, s, r) -> ellipsoid(r * probe - p, s) <= 1, positions, sizes, rotations)
+    tests = map((p, s, r) -> ellipsoid(r' * (probe - p), s) <= 1, positions, sizes, rotations)
     return reduce(|, tests)
 end
 

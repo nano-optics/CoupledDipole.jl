@@ -167,6 +167,10 @@ x = -200.0:2.0:200
 y = -100.0:2.0:100
 probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
 Incidence = [RotX(π / 2)]
+
+cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "Au")
+cl = cluster_chain(5, 80, 15, 30, 30, π / 10, 0, 0, "Au")
+
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear")
 
 filtered = positions[.!positions.inside, :]
@@ -175,13 +179,6 @@ mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!positions.inside
 
 mapping([filtered.x] => "x", [filtered.y] => "y", [log10.(E²[.!positions.inside, 2])] => "z") * visual(Heatmap) |> draw
 
-lay = mapping([filtered.x] => "x", [filtered.y] => "y", [𝒞[.!positions.inside, 2]] => "z") * visual(Heatmap)
+lay = mapping([filtered.x] => "x", [filtered.y] => "y", [E²[.!positions.inside, 1]] => "z") * visual(Heatmap)
 
-draw(lay, axis=(; xlabel="wavelength /nm", aspect=DataAspect()))
-
-a = map_E[:, 2]
-b = map_E[:, 3]
-c = map_E[:, 9]
-
-lay = mapping([a] => "x", [b] => "y", [c] => "z") * visual(Heatmap)
-draw(lay, aspect=DataAspect())
+draw(lay, axis=(; xlabel="x /nm", ylabel="y /nm", aspect=DataAspect()))
