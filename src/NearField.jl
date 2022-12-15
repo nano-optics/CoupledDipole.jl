@@ -1,4 +1,6 @@
 
+internal_field(p, V, εᵣ) = 4π * εᵣ / (εᵣ - 1.33^2) * p / V
+
 """
 scattered_field(probe, k, n, positions, sizes, rotations, P)
 
@@ -9,10 +11,11 @@ scattered_field(probe, k, n, positions, sizes, rotations, P)
 - `sizes`: SVector of dipole sizes
 - `rotations`: SVector of particle rotation matrices
 - `P`: 3Ndipx2Ninc matrix of self-consistent dipole moments
+- `Epsilon`: list of dielectric function inside each particle (for internal fields)
 - `evaluate_inside`: logical, whether to compute the (unphysical) scattered field inside particles
 
 """
-function scattered_field(probe, k, n_medium, positions, sizes, rotations, P; evaluate_inside=true)
+function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Epsilon=missing; evaluate_inside=true)
 
     Z₀ = 376.730313668 # free-space impedance
     Y₀ = 1 / 376.730313668 # H = Y₀ E
@@ -25,10 +28,17 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P; eva
     Esca = zeros(eltype(P), (3, N_inc))
     Bsca = zeros(eltype(P), (3, N_inc))
 
-    inside = is_inside(probe, positions, sizes, rotations)
-    # if inside
-    #     Esca = internal_field(P[jj, :], prod(sizes[j]), χ)
-    # else
+    inside, id = is_inside(probe, positions, sizes, rotations)
+
+    if inside & !evaluate_inside # use the dipole moment to approximate Einside
+        j = id[]
+        jj = 3j-2:3j
+        pmod = sum(abs2.(P[jj, :]), dims=1)
+        # @info "inside particle $j, $pmod"
+        εᵣ = Epsilon[j]
+        Esca = internal_field(P[jj, :], 4π / 3 * prod(sizes[j]), εᵣ)
+    end
+
     if !inside | evaluate_inside # we're outside particles
         for j = 1:N_dip
             jj = 3j-2:3j
@@ -86,7 +96,7 @@ function incident_field(Ejones, k, n_medium, probe, IncidenceRotations)
 
     Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
     Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
-    # B=(k x E)
+    # B⃗ = k⃗ × E⃗
     # Bx = - Ey   
     # By = Ex
     # Bz = 0 
@@ -110,6 +120,9 @@ function incident_field(Ejones, k, n_medium, probe, IncidenceRotations)
 
     return Ein, Bin
 end
+
+
+
 
 """
 map_nf(probes,
@@ -219,7 +232,7 @@ function map_nf(probes,
     for i in eachindex(probes)
 
         Einc[i], Binc[i] = incident_field(Ejones, k, n_medium, probes[i], IncidenceRotations)
-        Esca[i], Bsca[i], inside[i] = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P;
+        Esca[i], Bsca[i], inside[i] = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P, Epsilon;
             evaluate_inside=evaluate_inside)
         Etot[i] = Einc[i] + Esca[i]
         Btot[i] = Binc[i] + Bsca[i]
@@ -246,7 +259,8 @@ ellipsoid(origin, size) = (origin[1] / size[1])^2 + (origin[2] / size[2])^2 + (o
 
 function is_inside(probe, positions, sizes, ParticleRotations)
     tests = map((p, s, r) -> ellipsoid(r' * (probe - p), s) <= 1, positions, sizes, ParticleRotations)
-    return reduce(|, tests)
+    overall = reduce(|, tests)
+    id = findall(tests)
+    return overall, id
 end
 
-internal_field(p, V, χ) = 1 / χ * p / V
