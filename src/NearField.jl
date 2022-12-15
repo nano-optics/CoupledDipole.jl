@@ -222,7 +222,7 @@ function map_nf(probes,
             evaluate_inside=evaluate_inside)
         Etot[i] = Einc[i] + Esca[i]
         Btot[i] = Binc[i] + Bsca[i]
-
+        # @info Esca[i], Bsca[i], conj.(Etot[i]) .* Btot[i]
         # scalar summaries, but for each incidence
         E²[i, :] = sum(abs2.(Etot[i]), dims=1)
         B²[i, :] = sum(abs2.(Btot[i]), dims=1)

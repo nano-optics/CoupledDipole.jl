@@ -34,7 +34,7 @@ map_C = read(g, "normalised_ldoc")
 slice = map_E[:, 3] .≈ 0.0
 # "lambda" "x"      "y"      "z"      "scatID" "volID"  "E2avg"  "E2X"    "E2Y" 
 
-df = (; x=map_E[slice, 2], y=log10.(map_B[slice, 9]))
+df = (; x=map_E[slice, 2], y=log10.(map_B[slice, 8]))
 xy = data(df) * mapping(:x, :y)
 layer = visual(Lines)
 draw(layer * xy)
@@ -57,17 +57,17 @@ E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="lin
 
 
 slice2 = .!positions.inside
-df = (; x=map_E[slice2, 2], y=log10.(map_E[slice2, 8]))
+df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 8]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=log10.(E²[:, 1]))
+df2 = (; x=positions.x, y=log10.(E²[:, 2]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 draw(layer * xy + layer2 * xy2)
 
-df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 9]))
+df = (; x=map_E[slice2, 2], y=log10.(map_E[slice2, 9]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=log10.(E²[:, 2]))
+df2 = (; x=positions.x, y=log10.(E²[:, 1]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
@@ -77,15 +77,10 @@ Z₀ = 376.730313668 # free-space impedance
 Y₀ = 1 / 376.730313668 # H = Y₀ E
 c₀ = 299792458 # m/s
 
-n = SVector(1, 2, 3)
-SMatrix{3,3}(0, n[3], -n[2], -n[3], 0, n[1], n[1], -n[1], 0)
-
-E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
-
 slice2 = .!positions.inside
 df = (; x=map_B[slice2, 2], y=log10.(c₀^2 * map_B[slice2, 8]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=log10.(c₀^2 * B²[:, 1]))
+df2 = (; x=positions.x, y=log10.(c₀^2 * B²[:, 2]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
@@ -94,13 +89,35 @@ draw(layer * xy + layer2 * xy2)
 
 df = (; x=map_B[slice2, 2], y=(c₀^2 * map_B[slice2, 9]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=(c₀^2 * B²[:, 2]))
+df2 = (; x=positions.x, y=(c₀^2 * B²[:, 1]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
 # draw(layer2 * xy2)
 
+# probes2 = probes[1:2]
+# E², B², 𝒞, positions = map_nf(probes2, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
+
+
+# E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
+
+df = (; x=map_C[slice2, 2], y=(map_C[slice2, 6]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=positions.x, y=(𝒞[:, 1]))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
+
+
+df = (; x=map_C[slice2, 2], y=(map_C[slice2, 7]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=positions.x, y=(𝒞[:, 2]))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
 
 
 # high level
