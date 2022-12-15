@@ -26,7 +26,9 @@ set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 ## to compare with TERMS results
 
 using HDF5
-fid = h5open("./dev/book/map_Lmax1.h5", "r")
+# fid = h5open("./dev/book/map_Lmax1.h5", "r")
+fid = h5open("/Users/baptiste/Documents/github/book-cda/code/terms/map_Lmax1.h5", "r")
+
 g = fid["Near-Field"]
 map_E = read(g, "map_E")
 map_B = read(g, "map_B")
@@ -53,7 +55,7 @@ probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
 cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "Au")
 # cl = cluster_chain(5, 80, 15, 30, 30, π / 10, 0, 0, "Au")
 
-E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="circular"; evaluate_inside=false)
 
 
 slice2 = .!positions.inside
@@ -96,11 +98,35 @@ layer2 = visual(Lines, linestyle=:dash, color=:red)
 fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
 # draw(layer2 * xy2)
 
-# probes2 = probes[1:2]
-# E², B², 𝒞, positions = map_nf(probes2, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
+probes2 = probes[[1]]
+
+Einc, Binc, Esca, Bsca, Etot, Btot, positions = map_nf(probes2, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false, return_fields=true)
+Etot[1]
+Einc[1]
+Esca[1]
+Binc[1]
+Bsca[1]
+Btot[1]
 
 
-# E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
+# Etot
+# 9.50215901807303531E-01  1.18776253408519855E-01 
+# -7.80625564189563192E-18 -2.94902990916057206E-17  
+# 1.22044526811645668E-03  1.68799142884323752E-04 
+# vs 
+# 0.945584+0.121082im       0.0+0.0im
+# 0.0+0.0im       0.950494-0.0221498im
+# 0.0+0.0im            0.0+0.0im
+# Esca
+# -4.97840981926966630E-02  1.18776253408519855E-01 
+# -7.80625564189563192E-18 -2.94902990916057206E-17  
+# 1.22044526811645668E-03  1.68799142884323752E-04
+# vs
+# -0.0544159+0.121082im         0.0+0.0im
+# 0.0+0.0im       -0.0495062-0.0221498im
+# 0.0+0.0im              0.0+0.0im
+
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="circular"; evaluate_inside=false)
 
 df = (; x=map_C[slice2, 2], y=(map_C[slice2, 6]))
 xy = data(df) * mapping(:x, :y)

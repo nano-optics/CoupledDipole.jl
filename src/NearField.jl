@@ -138,7 +138,8 @@ function map_nf(probes,
     Incidence;
     polarisation="linear",
     prescription="kuwata",
-    evaluate_inside=true)
+    evaluate_inside=true,
+    return_fields=false)
 
     Z₀ = 376.730313668 # free-space impedance
     Y₀ = 1 / 376.730313668 # H = Y₀ E
@@ -222,7 +223,7 @@ function map_nf(probes,
             evaluate_inside=evaluate_inside)
         Etot[i] = Einc[i] + Esca[i]
         Btot[i] = Binc[i] + Bsca[i]
-        # @info Esca[i], Bsca[i], conj.(Etot[i]) .* Btot[i]
+        # @info Esca[i], Einc[i]
         # scalar summaries, but for each incidence
         E²[i, :] = sum(abs2.(Etot[i]), dims=1)
         B²[i, :] = sum(abs2.(Btot[i]), dims=1)
@@ -233,7 +234,9 @@ function map_nf(probes,
     # for convenience, return the positions as a dataframe
     positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
     positions.inside .= inside
-
+    if return_fields
+        return Einc, Binc, Esca, Bsca, Etot, Btot, positions
+    end
     return E², B², 𝒞, positions
 
 end
