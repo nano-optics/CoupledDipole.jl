@@ -174,7 +174,33 @@ g = fid["Near-Field"]
 map_E = read(g, "map_E")
 map_B = read(g, "map_B")
 map_C = read(g, "normalised_ldoc")
-slice = map_E[:, 3] .≈ 0.0
 
 d2 = DataFrame(map_C[:, [2, 3, 6, 7]], [:x, :y, :C1, :C2])
 draw(data(d2) * mapping(:x, :y, :C1) * visual(Heatmap), axis=(; xlabel="x /nm", ylabel="y /nm", aspect=DataAspect()))
+
+
+# slice through
+
+
+slice = map_E[:, 3] .≈ 1.0
+
+probes = SVector.(Iterators.product(x, 1.0, zero(eltype(x))))[:]
+
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
+
+df = (; x=map_C[slice, 2], y=(map_C[slice, 6]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=positions.x, y=(𝒞[:, 2]))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
+
+
+df = (; x=map_C[slice, 2], y=(map_C[slice, 7]))
+xy = data(df) * mapping(:x, :y)
+df2 = (; x=positions.x, y=(𝒞[:, 1]))
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))

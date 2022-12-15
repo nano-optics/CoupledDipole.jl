@@ -227,7 +227,7 @@ function map_nf(probes,
         # scalar summaries, but for each incidence
         E²[i, :] = sum(abs2.(Etot[i]), dims=1)
         B²[i, :] = sum(abs2.(Btot[i]), dims=1)
-        𝒞[i, :] = c₀ * imag.(sum(conj.(Etot[i]) .* Btot[i], dims=1))
+        𝒞[i, :] = c₀ / n_medium * imag.(sum(conj.(Etot[i]) .* Btot[i], dims=1))
 
     end
 
