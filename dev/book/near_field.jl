@@ -155,14 +155,26 @@ fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
 x = -300.0:1.0:300
 y = -100.0:1.0:100
 probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
-Incidence = [RotX(0 * π / 2)]
+Incidence = [RotX(0)]
 
-cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "Au")
+cl = cluster_chain(5, 80, 10, 10, 10, 0, 0, 0, "Au")
 # cl = cluster_chain(5, 80, 15, 30, 30, π / 10, 0, 0, "Au")
 
-E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="circular")
+E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear")
 
 d = positions[.!positions.inside, :]
 d.z .= 𝒞[.!positions.inside, 1]
+d.z .= 𝒞[.!positions.inside, 2]
 
 draw(data(d) * mapping(:x, :y, :z) * visual(Heatmap), axis=(; xlabel="x /nm", ylabel="y /nm", aspect=DataAspect()))
+
+
+fid = h5open("/Users/baptiste/Documents/github/book-cda/code/terms/map_2d.h5", "r")
+g = fid["Near-Field"]
+map_E = read(g, "map_E")
+map_B = read(g, "map_B")
+map_C = read(g, "normalised_ldoc")
+slice = map_E[:, 3] .≈ 0.0
+
+d2 = DataFrame(map_C[:, [2, 3, 6, 7]], [:x, :y, :C1, :C2])
+draw(data(d2) * mapping(:x, :y, :C1) * visual(Heatmap), axis=(; xlabel="x /nm", ylabel="y /nm", aspect=DataAspect()))
