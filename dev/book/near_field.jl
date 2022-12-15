@@ -34,7 +34,7 @@ map_C = read(g, "normalised_ldoc")
 slice = map_E[:, 3] .≈ 0.0
 # "lambda" "x"      "y"      "z"      "scatID" "volID"  "E2avg"  "E2X"    "E2Y" 
 
-df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 8]))
+df = (; x=map_E[slice, 2], y=log10.(map_B[slice, 9]))
 xy = data(df) * mapping(:x, :y)
 layer = visual(Lines)
 draw(layer * xy)
@@ -81,9 +81,9 @@ SMatrix{3,3}(0, n[3], -n[2], -n[3], 0, n[1], n[1], -n[1], 0)
 
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
 
-df = (; x=map_B[slice, 2], y=log10.(map_B[slice, 9]))
+df = (; x=map_B[slice, 2], y=log10.(c₀^2 * map_B[slice, 8]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=log10.(B²[:, 2]))
+df2 = (; x=positions.x, y=log10.(c₀^2 * B²[:, 2]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
