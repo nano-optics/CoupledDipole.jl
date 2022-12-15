@@ -50,8 +50,6 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P; eva
                 )
 
             # EM 
-            # Bᵢⱼ = expikror * (nx - I) * (k^2 - im * k / rᵢⱼ)
-            # Bᵢⱼ = expikror * (I - nx) * (k^2 + im * k / rᵢⱼ)
             Bᵢⱼ = expikror * (nx) * (k^2 + im * k / rᵢⱼ)
 
             # contribution from j-th source dipole, for all incidences
@@ -61,7 +59,7 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P; eva
         end
     end
     # B = Z ε₀ε Gm P̄ 
-    scale = Z₀ * ε₀ * n_medium^2
+    scale = Z₀ * ε₀ * n_medium
     return Esca, scale * Bsca, inside
 end
 
@@ -88,10 +86,12 @@ function incident_field(Ejones, k, n_medium, probe, IncidenceRotations)
 
     Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
     Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
-    # plane wave B rotates by -π/2 about k, i.e. z in the Jones frame
-    Rot90 = RotZ(-π / 2)
-    Bvec1 = Rot90 * Evec1
-    Bvec2 = Rot90 * Evec2
+    # B=(k x E)
+    # Bx = - Ey   
+    # By = Ex
+    # Bz = 0 
+    Bvec1 = SVector(-Ejones[1][2], Ejones[1][1], 0)
+    Bvec2 = SVector(-Ejones[2][2], Ejones[2][1], 0)
 
     for jj in eachindex(IncidenceRotations)
         Rm = IncidenceRotations[jj]
@@ -221,7 +221,7 @@ function map_nf(probes,
         Esca[i], Bsca[i], inside[i] = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P;
             evaluate_inside=evaluate_inside)
         Etot[i] = Einc[i] + Esca[i]
-        Btot[i] = Binc[i] + Bsca[i] #Yᵣ=n_medium 
+        Btot[i] = Binc[i] + Bsca[i]
 
         # scalar summaries, but for each incidence
         E²[i, :] = sum(abs2.(Etot[i]), dims=1)

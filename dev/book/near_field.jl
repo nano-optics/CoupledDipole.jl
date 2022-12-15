@@ -56,7 +56,8 @@ cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "Au")
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
 
 
-df = (; x=map_E[slice, 2], y=log10.(map_E[slice, 8]))
+slice2 = .!positions.inside
+df = (; x=map_E[slice2, 2], y=log10.(map_E[slice2, 8]))
 xy = data(df) * mapping(:x, :y)
 df2 = (; x=positions.x, y=log10.(E²[:, 1]))
 xy2 = data(df2) * mapping(:x, :y)
@@ -81,21 +82,23 @@ SMatrix{3,3}(0, n[3], -n[2], -n[3], 0, n[1], n[1], -n[1], 0)
 
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="linear"; evaluate_inside=false)
 
-df = (; x=map_B[slice, 2], y=log10.(c₀^2 * map_B[slice, 8]))
+slice2 = .!positions.inside
+df = (; x=map_B[slice2, 2], y=log10.(c₀^2 * map_B[slice2, 8]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=log10.(c₀^2 * B²[:, 2]))
+df2 = (; x=positions.x, y=log10.(c₀^2 * B²[:, 1]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 draw(layer * xy + layer2 * xy2)
 
-df = (; x=map_B[slice, 2], y=log10.(map_B[slice, 8]))
+
+df = (; x=map_B[slice2, 2], y=(c₀^2 * map_B[slice2, 9]))
 xy = data(df) * mapping(:x, :y)
-df2 = (; x=positions.x, y=log10.(B²[:, 1]))
+df2 = (; x=positions.x, y=(c₀^2 * B²[:, 2]))
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
-draw(layer * xy + layer2 * xy2)
+fg = draw(layer * xy + layer2 * xy2, axis=(; xlabel="x /nm"))
 # draw(layer2 * xy2)
 
 
