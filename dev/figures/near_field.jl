@@ -27,12 +27,13 @@ set_aog_theme!(fonts=[gill("Book"), gill("Light")])
 
 using HDF5
 # fid = h5open("./dev/book/map_Lmax1.h5", "r")
-fid = h5open("/Users/baptiste/Documents/github/book-cda/code/terms/map_Lmax1.h5", "r")
+fid = h5open("$home/Documents/github/book-cda/code/terms/map_Lmax1.h5", "r")
 
 g = fid["Near-Field"]
 map_E = read(g, "map_E")
 map_B = read(g, "map_B")
 map_C = read(g, "normalised_ldoc")
+HDF5.h5_close()
 slice = map_E[:, 3] .≈ 0.0
 # "lambda" "x"      "y"      "z"      "scatID" "volID"  "E2avg"  "E2X"    "E2Y" 
 
@@ -57,16 +58,27 @@ cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "Au")
 E², B², 𝒞, positions = map_nf(probes, cl, mat, Incidence, polarisation="circular"; evaluate_inside=false)
 
 E²[positions.inside, 1]
-df = (; x=positions.x[.!positions.inside], y=E²[.!positions.inside, 2])
-df = (; x=map_E[positions.inside, 2], y=log10.(map_E[positions.inside, 8]))
-df2 = (; x=positions.x[positions.inside], y=E²[positions.inside, 2])
+df2 = (; x=positions.x, y=log10.(E²[:, 2]))
+df = (; x=map_E[:, 2], y=log10.(map_E[:, 9]))
+# df2 = (; x=positions.x[positions.inside], y=E²[positions.inside, 2])
 xy = data(df) * mapping(:x, :y)
 xy2 = data(df2) * mapping(:x, :y)
 layer = visual(Lines)
 layer2 = visual(Lines, linestyle=:dash, color=:red)
 draw(layer * xy + layer2 * xy2)
 
-draw(layer2 * xy2)
+
+df2 = (; x=positions.x, y=log10.(E²[:, 1]))
+df = (; x=map_E[:, 2], y=log10.(map_E[:, 8]))
+# df2 = (; x=positions.x[positions.inside], y=E²[positions.inside, 2])
+xy = data(df) * mapping(:x, :y)
+xy2 = data(df2) * mapping(:x, :y)
+layer = visual(Lines)
+layer2 = visual(Lines, linestyle=:dash, color=:red)
+draw(layer * xy + layer2 * xy2)
+
+
+# draw(layer2 * xy2)
 
 
 slice2 = .!positions.inside

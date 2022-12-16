@@ -1,5 +1,5 @@
 
-internal_field(p, V, εᵣ) = 4π * εᵣ / (εᵣ - 1.33^2) * p / V
+internal_field(p, V, εₘ, εᵣ) = 4π * εₘ / (εᵣ - 1.0) * p / V
 
 """
 scattered_field(probe, k, n, positions, sizes, rotations, P)
@@ -36,7 +36,7 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Eps
         pmod = sum(abs2.(P[jj, :]), dims=1)
         # @info "inside particle $j, $pmod"
         εᵣ = Epsilon[j]
-        Esca = internal_field(P[jj, :], 4π / 3 * prod(sizes[j]), εᵣ)
+        Esca = internal_field(P[jj, :], 4π / 3 * prod(sizes[j]), n_medium^2, εᵣ)
     end
 
     if !inside | evaluate_inside # we're outside particles
@@ -234,7 +234,7 @@ function map_nf(probes,
         Einc[i], Binc[i] = incident_field(Ejones, k, n_medium, probes[i], IncidenceRotations)
         Esca[i], Bsca[i], inside[i], id = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P, Epsilon;
             evaluate_inside=evaluate_inside)
-        if inside[id] # internal field deduced from P is the total field
+        if inside[i] # internal field deduced from P is the total field
             Etot[i] = Esca[i]
         else
             Etot[i] = Einc[i] + Esca[i]
