@@ -22,7 +22,7 @@ data <- map_df(circles, `$`, 'attribs') |>
   select(cx,cy,r,fill,id) |>
   mutate(across(c(cx,cy,r), as.numeric)) |>
   mutate(x = 5*cx, y=5*(max(cy)-cy)) |>
-  mutate(radius = ifelse(fill=='#D60080',r/2,r)) |>
+  mutate(radius = ifelse(fill=='#D60080',10,15)) |>
   mutate(material = ifelse(fill=='#D60080',"Ag","Au"))
 
 library(ggforce)
@@ -40,16 +40,18 @@ MultipoleCutoff 2
 MultipoleSelections 1
 EE1:1_EM2:1_ME2:1_MM2:1  blocks
 Wavelength 633
+OutputFormat HDF5 map_FIELD
 ScattererCentredCrossSections
 SpacePoints  {xmin} {xmax}  {Nx}    {ymin} {ymax}   {Ny}    0   0   0
 Incidence  0.0 0.0 0.0 {pol}
 Scatterers  {N}"
+
 pol <- 1
 xmin <- min(data$x) - 10
 ymin <- min(data$y) - 10
 xmax <- max(data$x) + 10
 ymax <- max(data$y) + 10
-Nx <- 100; Ny <- 50
+Nx <- 300; Ny <- 100
 N <- nrow(data)
 cat(glue(tpl),"\n", file = 'input_field', append=FALSE)
 cat(glue_data(data, "{material}_S1 {x} {y} 0.0 {radius}"),sep= "\n", file = 'input_field', append=TRUE)
@@ -68,12 +70,12 @@ ggplot() +
   theme_void()+
   theme(legend.position = 'none', legend.direction = 'horizontal')
 
-d <- h5read('map.h5', "Near-Field")
+d <- h5read('map_FIELD.h5', "Near-Field")
 map <- data.frame(d$map_E)
 names(map) <- c('lambda', 'x', 'y', 'z', 'scatID', 'volID',  'E2avg', 'E2X', 'E2Y')
 glimpse(map)
 
-geometry <- get_geometry('input_nf')
+geometry <- get_geometry('input_FIELD')
 
 library(tidyr)
 m <- pivot_longer(map, c(E2X,E2Y))
