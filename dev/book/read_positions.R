@@ -22,7 +22,7 @@ data <- map_df(circles, `$`, 'attribs') |>
   select(cx,cy,r,fill,id) |>
   mutate(across(c(cx,cy,r), as.numeric)) |>
   mutate(x = 5*cx, y=5*(max(cy)-cy)) |>
-  mutate(radius = ifelse(fill=='#D60080',10,15)) |>
+  mutate(radius = ifelse(fill=='#D60080',r*2,r*3)) |>
   mutate(material = ifelse(fill=='#D60080',"Ag","Au"))
 
 library(ggforce)
