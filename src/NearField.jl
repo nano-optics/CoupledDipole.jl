@@ -70,7 +70,7 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Eps
     end
     # B = Z ε₀ε Gm P̄ 
     scale = Z₀ * ε₀ * n_medium
-    return Esca, scale * Bsca, inside
+    return Esca, scale * Bsca, inside, id
 end
 
 
@@ -232,11 +232,15 @@ function map_nf(probes,
     for i in eachindex(probes)
 
         Einc[i], Binc[i] = incident_field(Ejones, k, n_medium, probes[i], IncidenceRotations)
-        Esca[i], Bsca[i], inside[i] = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P, Epsilon;
+        Esca[i], Bsca[i], inside[i], id = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P, Epsilon;
             evaluate_inside=evaluate_inside)
-        Etot[i] = Einc[i] + Esca[i]
+        if inside[id] # internal field deduced from P is the total field
+            Etot[i] = Esca[i]
+        else
+            Etot[i] = Einc[i] + Esca[i]
+        end
         Btot[i] = Binc[i] + Bsca[i]
-        # @info Esca[i], Einc[i]
+
         # scalar summaries, but for each incidence
         E²[i, :] = sum(abs2.(Etot[i]), dims=1)
         B²[i, :] = sum(abs2.(Btot[i]), dims=1)

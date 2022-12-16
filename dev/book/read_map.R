@@ -5,12 +5,12 @@ library(ggforce)
 library(rhdf5)
 theme_set(theme_grey())
 
-d <- h5read('map.h5', "Near-Field")
+d <- h5read('map_FIELD.h5', "Near-Field")
 map <- data.frame(d$map_E)
-names(map) <- c('lambda', 'x', 'y', 'z', 'scatID', 'volID',  'E2avg', 'E2X', 'E2Y')
+names(map) <- c('lambda', 'x', 'y', 'z', 'scatID', 'volID',  'E2avg', 'E2X')
 glimpse(map)
 
-geometry <- get_geometry('input_nf')
+geometry <- get_geometry('input_FIELD')
 
 library(tidyr)
 m <- pivot_longer(map, c(E2X,E2Y))
