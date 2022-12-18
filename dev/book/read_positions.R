@@ -56,7 +56,7 @@ Nx <- 800; Ny <- 200
 N <- nrow(data)
 cat(glue(tpl),"\n", file = 'input_field', append=FALSE)
 cat(glue_data(data, "{material}_S1 {x} {y} 0.0 {radius}"),sep= "\n", file = 'input_field', append=TRUE)
-cat(glue_data(data, "{material}_S1 {x} {y} 0.0 {radius}"),sep= "\n", file = 'data_field', append=FALSE)
+cat(glue_data(data, "{material} {x} {y} 0.0 {radius}"),sep= "\n", file = 'data_field', append=FALSE)
 
 library(terms)
 ge <- get_geometry(input = 'input_field')
