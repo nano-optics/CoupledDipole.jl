@@ -138,8 +138,8 @@ function interaction_matrix_labframe!(F, k, R, AlphaBlocks)
             Aᵗᵢⱼ = transpose(Aᵢⱼ)
 
             # assign blocks
-            F[ii, jj] = Aᵢⱼ * αⱼ
-            F[jj, ii] = Aᵗᵢⱼ * αᵢ
+            @views  F[ii, jj] = Aᵢⱼ * αⱼ
+            @views F[jj, ii] = Aᵗᵢⱼ * αᵢ
 
             # use views to avoid copies (?)
             # Av1 = @view A[ind_jj, ind_kk]
@@ -205,8 +205,8 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
             # fill!(Ev1, E1_r * exp(im * kR))
             # fill!(Ev2, E2_r * exp(im * kR))
 
-            Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
-            Ein[kk*3-2:kk*3, jj+N_inc] = E2_r * exp(im * kR)
+            @views Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
+            @views Ein[kk*3-2:kk*3, jj+N_inc] = E2_r * exp(im * kR)
         end
     end
     return Ein
@@ -234,7 +234,7 @@ function polarisation!(P, E, AlphaBlocks)
         # Ev = @view E[ind, :]
         # fill!(Pv, AlphaBlocks[ii] * Ev)
 
-        P[ind, :] = AlphaBlocks[ii] * E[ind, :] # all incidence angles at once
+        @views P[ind, :] = AlphaBlocks[ii] * E[ind, :] # all incidence angles at once
     end
 
     return P
