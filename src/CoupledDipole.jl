@@ -28,8 +28,11 @@ include("Visual.jl")
 
 # CoupledDipole
 export interaction_matrix_labframe!
+export interaction_matrix_labframe
 export incident_field!
+export incident_field
 export polarisation!
+export polarisation
 export iterate_field!
 # Clusters
 export Cluster
@@ -138,7 +141,7 @@ function interaction_matrix_labframe!(F, k, R, AlphaBlocks)
             Aᵗᵢⱼ = transpose(Aᵢⱼ)
 
             # assign blocks
-            @views  F[ii, jj] = Aᵢⱼ * αⱼ
+            @views F[ii, jj] = Aᵢⱼ * αⱼ
             @views F[jj, ii] = Aᵗᵢⱼ * αᵢ
 
             # use views to avoid copies (?)
@@ -197,7 +200,8 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
         E1_r = Rm * Evec1
         E2_r = Rm * Evec2
         for kk = 1:N_dip
-            kR = dot(k_hat, R[kk]) # everything real
+
+            expikr = exp(im * dot(k_hat, R[kk]))
 
             # use views to avoid copies (?)
             # Ev1 = @view Ein[kk*3-2:kk*3, jj]
@@ -205,14 +209,28 @@ function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
             # fill!(Ev1, E1_r * exp(im * kR))
             # fill!(Ev2, E2_r * exp(im * kR))
 
-            @views Ein[kk*3-2:kk*3, jj] = E1_r * exp(im * kR)
-            @views Ein[kk*3-2:kk*3, jj+N_inc] = E2_r * exp(im * kR)
+            @views Ein[kk*3-2:kk*3, jj] = E1_r * expikr
+            @views Ein[kk*3-2:kk*3, jj+N_inc] = E2_r * expikr
         end
     end
     return Ein
 end
 
+function incident_field(Ejones, kn, R, IncidenceRotations)
 
+    N_dip = length(R)
+    N_inc = length(IncidenceRotations)
+
+    # what is the type of arrays to initialise?
+    proto_r = R[1][1] # position type
+    proto_E = Ejones[1][1] # E type
+    proto_a = RotMatrix(IncidenceRotations[1])[1, 1] # angle type
+    T = typeof(im * kn * proto_a * proto_E * proto_r) # Einc ~ Ejones . exp(ikr) 
+
+    Ein = Array{T}(undef, (3N_dip, 2N_inc))
+    incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
+    return Ein
+end
 
 """
     polarisation!(P, E, AlphaBlocks)
@@ -227,19 +245,22 @@ Self-consistent dipole moments from the electric field, P = αE
 function polarisation!(P, E, AlphaBlocks)
 
     # loop over N_dip particles
-    for ii in eachindex(AlphaBlocks)
-        ind = 3ii-2:3ii
-        # use views to avoid copies (?)
-        # Pv = @view P[ind, :]
-        # Ev = @view E[ind, :]
-        # fill!(Pv, AlphaBlocks[ii] * Ev)
+    for i in eachindex(AlphaBlocks)
+        ii = 3i-2:3i
 
-        @views P[ind, :] = AlphaBlocks[ii] * E[ind, :] # all incidence angles at once
+        @views P[ii, :] = AlphaBlocks[i] * E[ii, :] # all incidence angles at once
     end
 
     return P
 end
 
+function polarisation(E, AlphaBlocks)
+
+    P = similar(E)
+    polarisation!(P, E, AlphaBlocks)
+
+    return P
+end
 
 
 """

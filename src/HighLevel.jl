@@ -69,13 +69,13 @@ function spectrum_dispersion(
     # IncidenceRotations = map(euler_active, Incidence) # old Euler, no longer needed
     IncidenceRotations = map(RotMatrix, Incidence) # now given as quaternions
     ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
-    # NOTE: we only need the third column to rotate kz, should specialise
+    # TODO we only need the third column to rotate kz, should specialise
 
     ## loop over wavelengths
 
     # use type T for containers, inferred from positions
     # this is to be compatible with autodiff when optimising cluster geometry
-    cext = Array{T1}(undef, (N_lam, 2 * N_inc))
+    cext = Array{T1}(undef, (N_lam, 2N_inc))
     cabs = similar(cext)
     csca = similar(cext)
     tmpcext = Vector{T1}(undef, 2N_inc)
@@ -329,9 +329,6 @@ function spectrum_oa(
         dabs[ii] = dot(tmpcabs, weights2)
         dsca[ii] = dot(tmpcsca, weights2)
     end
-
-    # csca = cext - cabs
-    # dsca = dext - dabs
 
     (
         average=CrossSections(

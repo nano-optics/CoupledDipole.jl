@@ -60,7 +60,7 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Eps
                 )
 
             # EM 
-            Bᵢⱼ = expikror * (nx) * (k^2 + im * k / rᵢⱼ)
+            Bᵢⱼ = expikror * nx * (k^2 + im * k / rᵢⱼ)
 
             # contribution from j-th source dipole, for all incidences
             Esca += Aᵢⱼ * P[jj, :]
