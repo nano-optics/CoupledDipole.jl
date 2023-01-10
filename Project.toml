@@ -1,7 +1,7 @@
+authors = ["baptiste"]
 name = "CoupledDipole"
 uuid = "24bcd77a-7611-40bf-902e-63663ab6a659"
-authors = ["baptiste"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
