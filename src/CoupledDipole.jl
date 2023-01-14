@@ -129,12 +129,18 @@ function interaction_matrix_labframe!(F, k, R, AlphaBlocks)
 
             expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
 
-            # EE and MM coupling tensor
-            Aᵢⱼ =
-                expikror * (
-                    k^2 * (nxn - I) +
-                    (im * k * rᵢⱼ - 1) / (rᵢⱼ^2) * (3 * nxn - I)
-                )
+            # # EE and MM coupling tensor
+            # Aᵢⱼ =
+            #     expikror * (
+            #         k^2 * (nxn - I) +
+            #         (im * k * rᵢⱼ - 1) / (rᵢⱼ^2) * (3 * nxn - I)
+            #     )
+            kr = k * rᵢⱼ
+            k2expikror = k^2 * exp(im * kr) / rᵢⱼ
+
+            Aᵢⱼ = k2expikror * (
+                (nxn - I) + (im / kr - 1 / kr^2) * (3 * nxn - I)
+            )
 
             αᵢ = AlphaBlocks[i]
             αⱼ = AlphaBlocks[j]
