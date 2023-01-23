@@ -74,7 +74,7 @@ Ejones = [SVector{2}(1.0, 0.0), SVector{2}(0.0, 1.0)]
 Incidence = [@SVector randn(Float64, 3) for ii = 1:Ni]
 IncidenceRotations = map(CoupledDipole.euler_active, Incidence)
 Ein = Array{Complex{Float64}}(undef, (3 * N_dip, 2Ni))
-incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
+incident_field_pw!(Ein, Ejones, kn, R, IncidenceRotations)
 E = similar(Ein)
 P = similar(Ein)
 polarisation!(P, E, AlphaBlocks)

@@ -20,6 +20,7 @@ include("Clusters.jl")
 include("Mie.jl")
 include("Materials.jl")
 include("CrossSections.jl")
+include("IncidentField.jl")
 include("NearField.jl")
 include("HighLevel.jl")
 include("PostProcessing.jl")
@@ -29,11 +30,14 @@ include("Visual.jl")
 # CoupledDipole
 export interaction_matrix_labframe!
 export interaction_matrix_labframe
-export incident_field!
-export incident_field
 export polarisation!
 export polarisation
 export iterate_field!
+# IncidentField
+export incident_field_pw!
+export incident_field_pw
+export incident_field_probe
+export incident_field_dip!
 # Clusters
 export Cluster
 export cluster_single
@@ -70,6 +74,8 @@ export mie_ff
 # HighLevel
 export spectrum_dispersion
 export spectrum_oa
+export map_nf
+export scattering_pattern
 # PostProcessing
 export dispersion_df
 export oa_df
@@ -84,16 +90,15 @@ export euler_unitvector
 export axis_angle
 export RotZYZ
 export spheroid_ar
+export is_inside
+export ellipsoid
 # Visual
 export visualise_makie
 export visualise_threejs
-# NearField
+# ScatteredField
 export local_field
-export map_nf
 export scattered_field
-export incident_field
-export is_inside
-export ellipsoid
+export far_field
 
 ## core functions
 
@@ -176,67 +181,6 @@ function interaction_matrix_labframe(k, R, AlphaBlocks)
     return F
 end
 
-"""
-    incident_field!(Ein,
-        Ejones,
-        kn, R::Vector{SVector{3}},
-        IncidenceRotations)
-
-Incident field at particle positions
-
-- `Ein`: `3N_dip x N_inc` matrix, right-hand side of coupled-dipole system
-- `Ejones`: tuple of 2 2-Svectors defining 2 orthogonal Jones polarisations
-- `kn`: wavenumber in incident medium
-- `R`: `N_dip`-vector of 3-Svectors of particle positions
-- `IncidenceRotations`: `N_inc`-vector of rotation 3-Smatrices
-
-"""
-function incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
-
-    N_inc = length(IncidenceRotations)
-    N_dip = length(R)
-
-    Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector
-    Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
-
-    for jj in eachindex(IncidenceRotations)
-        Rm = IncidenceRotations[jj]
-        # Rm * [0;0;1] == 3rd column
-        k_hat = kn * Rm[:, 3]
-        E1_r = Rm * Evec1
-        E2_r = Rm * Evec2
-        for kk = 1:N_dip
-
-            expikr = exp(im * dot(k_hat, R[kk]))
-
-            # use views to avoid copies (?)
-            # Ev1 = @view Ein[kk*3-2:kk*3, jj]
-            # Ev2 = @view Ein[kk*3-2:kk*3, jj+N_inc]
-            # fill!(Ev1, E1_r * exp(im * kR))
-            # fill!(Ev2, E2_r * exp(im * kR))
-
-            @views Ein[kk*3-2:kk*3, jj] = E1_r * expikr
-            @views Ein[kk*3-2:kk*3, jj+N_inc] = E2_r * expikr
-        end
-    end
-    return Ein
-end
-
-function incident_field(Ejones, kn, R, IncidenceRotations)
-
-    N_dip = length(R)
-    N_inc = length(IncidenceRotations)
-
-    # what is the type of arrays to initialise?
-    proto_r = R[1][1] # position type
-    proto_E = Ejones[1][1] # E type
-    proto_a = RotMatrix(IncidenceRotations[1])[1, 1] # angle type
-    T = typeof(im * kn * proto_a * proto_E * proto_r) # Einc ~ Ejones . exp(ikr) 
-
-    Ein = Array{T}(undef, (3N_dip, 2N_inc))
-    incident_field!(Ein, Ejones, kn, R, IncidenceRotations)
-    return Ein
-end
 
 """
     polarisation!(P, E, AlphaBlocks)

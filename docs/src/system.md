@@ -7,7 +7,7 @@ interaction_matrix_labframe!
 ```
 
 ```@docs
-incident_field!
+incident_field_pw!
 ```
 
 ```@docs

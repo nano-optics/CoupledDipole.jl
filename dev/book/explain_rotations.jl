@@ -75,7 +75,7 @@ RotZYZ(π / 2, π / 2, π / 4) * Ez ≈ Ey
 # IncidenceRotations = map(RotMatrix, Incidence) 
 # ScatteringVectors = map(euler_unitvector, quad_sca.nodes)
 
-# incident_field!
+# incident_field_pw!
 # rotating the electric field 
 # Rm = IncidenceRotations[jj]
 # Evec1 = SVector(Ejones[1][1], Ejones[1][2], 0) # 3-vector

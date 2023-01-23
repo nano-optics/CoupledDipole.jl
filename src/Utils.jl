@@ -122,3 +122,13 @@ function spheroid_ar(a₀, χ)
 
     return a, c
 end
+
+
+ellipsoid(origin, size) = (origin[1] / size[1])^2 + (origin[2] / size[2])^2 + (origin[3] / size[3])^2
+
+function is_inside(probe, positions, sizes, ParticleRotations)
+    tests = map((p, s, r) -> ellipsoid(r' * (probe - p), s) <= 1, positions, sizes, ParticleRotations)
+    overall = reduce(|, tests)
+    id = findall(tests)
+    return overall, id
+end

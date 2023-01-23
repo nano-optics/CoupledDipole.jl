@@ -70,7 +70,7 @@ Evec2 = SVector(Ejones[2][1], Ejones[2][2], 0) # 3-vector
 IncidenceRotations[2] * Evec1
 
 Ein = Array{Complex{Float64}}(undef, (3 * N_dip, 2N_inc))
-incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
+incident_field_pw!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
 E = similar(Ein)
 E = F \ Ein

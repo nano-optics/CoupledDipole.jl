@@ -118,9 +118,9 @@ function spectrum_dispersion(
 
         # update the incident field
         # Remark: similarly, pre-computed rotations
-        # incident_field!(Ein, Ejones, kn, cl.positions, Incidence)
+        # incident_field_pw!(Ein, Ejones, kn, cl.positions, Incidence)
         # but instead we've prestored them, since wavelength-independent
-        incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
+        incident_field_pw!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
 
         # solve
@@ -287,8 +287,8 @@ function spectrum_oa(
 
         interaction_matrix_labframe!(F, kn, cl.positions, AlphaBlocks)
 
-        # incident_field!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)
-        incident_field!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
+        # incident_field_pw!(Ein, Ejones, kn, cl.positions, quad_inc.nodes)
+        incident_field_pw!(Ein, Ejones, kn, cl.positions, IncidenceRotations)
 
         # solve
 
@@ -343,5 +343,244 @@ function spectrum_oa(
         ),
     )
 
+
+end
+
+
+
+"""
+map_nf(probes,
+    cl::Cluster,
+    mat::Material,
+    Incidence;
+    polarisation="linear",
+    prescription="kuwata")
+
+- `probes`: array of SVectors, points where the scattered EM field is to be evaluated
+- `cl`: cluster of particles
+- `mat`: dielectric functions
+- `Incidence`: N_inc vector of quaternions describing incidence directions
+- `polarisation`: incident field consists of 2 orthogonal "linear" or "circular" polarisations
+- `prescription`: polarisability prescription for particles
+- `evaluate_inside`: logical, whether to compute the (unphysical) scattered field inside particles
+
+# example
+# x = -200.0:2.0:200
+# probes = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
+# probes = SVector.(Iterators.product(x, zero(eltype(x)), zero(eltype(x))))[:]
+"""
+function map_nf(probes,
+    cl::Cluster,
+    mat::Material,
+    Incidence;
+    polarisation="linear",
+    prescription="kuwata",
+    evaluate_inside=true,
+    return_fields=false)
+
+    Z₀ = 376.730313668 # free-space impedance
+    Y₀ = 1 / 376.730313668 # H = Y₀ E
+    c₀ = 299792458 # m/s
+
+    N_pro = length(probes)
+    N_dip = length(cl.positions)
+    N_inc = length(Incidence)
+
+    ## low level stuff
+    proto_r = cl.positions[1][1] # position type
+    proto_a = RotMatrix(cl.rotations[1])[1, 1] # angle type
+    proto_α = 0.1 + 0.1im # dummy complex polarisability
+    proto_k = 2π / mat.wavelengths[1]
+    T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
+    T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
+    F = Matrix{T2}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
+    Ein = Array{T2}(undef, (3N_dip, 2N_inc))
+    E = similar(Ein)
+    P = similar(Ein)
+
+    # incident field
+    if polarisation == "linear"
+        Ejones = [
+            SVector(1.0 + 0im, 0.0), # Jones vector, first polar
+            SVector(0.0, 1.0 + 0im), # Jones vector, second polar
+        ]
+    elseif polarisation == "circular"
+        Ejones = 1.0 / √2.0 .* [
+            SVector(1im, 1.0), # Jones vector, first polar ↺
+            SVector(1.0, 1im), # Jones vector, second polar ↻
+        ]
+    end
+
+    #   solve the system for the polarisation
+    ParticleRotations = map(RotMatrix, cl.rotations)
+    IncidenceRotations = map(RotMatrix, Incidence)
+    λ = mat.wavelengths[1]
+
+    if length(mat.wavelengths) > 1
+        @warn "this function expects a single wavelength; using $λ"
+    end
+
+    n_medium = mat.media["medium"](λ)
+    k = n_medium * 2π / λ
+    if cl.type == "point"
+        Alpha = map(
+            (m, s) ->
+                alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+            cl.materials,
+            cl.sizes,
+        )
+
+    elseif cl.type == "particle"
+        Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+        Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+    end
+    AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+    interaction_matrix_labframe!(F, k, cl.positions, AlphaBlocks)
+    incident_field_pw!(Ein, Ejones, k, cl.positions, IncidenceRotations)
+    E = F \ Ein
+    polarisation!(P, E, AlphaBlocks)
+
+    # now the near-field part 
+
+    T3 = typeof(proto_r)
+    Esca = [@SMatrix(zeros(T2, 3, 2N_inc)) for _ ∈ 1:N_pro]
+    Einc = similar(Esca)
+    Binc = similar(Esca)
+    Bsca = similar(Esca)
+    Etot = similar(Esca)
+    Btot = similar(Esca)
+    E² = Matrix{T3}(undef, N_pro, 2N_inc)
+    B² = similar(E²)
+    𝒞 = similar(E²)
+    inside = Vector{Bool}(undef, N_pro)
+    for i in eachindex(probes)
+        # TODO refactor to use same incident field function as PW, varargout E,B
+        Einc[i], Binc[i] = incident_field_probe(Ejones, k, n_medium, probes[i], IncidenceRotations)
+        Esca[i], Bsca[i], inside[i], id = scattered_field(probes[i], k, n_medium, cl.positions, cl.sizes, ParticleRotations, P, Epsilon;
+            evaluate_inside=evaluate_inside)
+        if inside[i] # internal field deduced from P is the total field
+            Etot[i] = Esca[i]
+        else
+            Etot[i] = Einc[i] + Esca[i]
+        end
+        Btot[i] = Binc[i] + Bsca[i]
+
+        # scalar summaries, but for each incidence
+        E²[i, :] = sum(abs2.(Etot[i]), dims=1)
+        B²[i, :] = sum(abs2.(Btot[i]), dims=1)
+        𝒞[i, :] = c₀ / n_medium * imag.(sum(conj.(Etot[i]) .* Btot[i], dims=1))
+
+    end
+
+    # for convenience, return the positions as a dataframe
+    positions = DataFrame(reduce(vcat, transpose.(probes)), [:x, :y, :z])
+    positions.inside .= inside
+    if return_fields
+        return Einc, Binc, Esca, Bsca, Etot, Btot, positions
+    end
+    return E², B², 𝒞, positions
+
+end
+
+
+
+"""
+scattering_pattern(probes,
+    cl::Cluster,
+    mat::Material,
+    source;
+    polarisation="linear",
+    prescription="kuwata")
+
+- `directions`: array of SVectors, directions where the scattered EM field is to be evaluated
+- `cl`: cluster of particles
+- `mat`: dielectric functions
+- `source`: SVector of dipole source position
+- `prescription`: polarisability prescription for particles
+
+# example
+# φ = range(0,2π,36)
+# θ = range(0,π,18)
+# directions = SVector.(Iterators.product(φ, θ, 0.0))[:]
+"""
+function scattering_pattern(directions,
+    cl::Cluster,
+    mat::Material,
+    source;
+    prescription="kuwata")
+
+    Z₀ = 376.730313668 # free-space impedance
+    Y₀ = 1 / 376.730313668 # H = Y₀ E
+    c₀ = 299792458 # m/s
+
+    N_dir = length(directions)
+    N_dip = length(cl.positions)
+
+
+    ## low level stuff
+    proto_r = cl.positions[1][1] # position type
+    proto_a = RotMatrix(cl.rotations[1])[1, 1] # angle type
+    proto_α = 0.1 + 0.1im # dummy complex polarisability
+    proto_k = 2π / mat.wavelengths[1]
+    T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
+    T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
+    F = Matrix{T2}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
+    Ein = Array{T2}(undef, (3N_dip, 3)) # 3 orthogonal dipoles considered
+    E = similar(Ein)
+    P = similar(Ein)
+
+
+    #   solve the system for the polarisation
+    ParticleRotations = map(RotMatrix, cl.rotations)
+    λ = mat.wavelengths[1]
+
+    if length(mat.wavelengths) > 1
+        @warn "this function expects a single wavelength; using $λ"
+    end
+
+    n_medium = mat.media["medium"](λ)
+    k = n_medium * 2π / λ
+    if cl.type == "point"
+        Alpha = map(
+            (m, s) ->
+                alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+            cl.materials,
+            cl.sizes,
+        )
+
+    elseif cl.type == "particle"
+        Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+        Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+    end
+    AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+    interaction_matrix_labframe!(F, k, cl.positions, AlphaBlocks)
+
+    # incident field from dipole sources
+    incident_field_dip!(Ein, source, k, cl.positions)
+
+    E = F \ Ein
+    polarisation!(P, E, AlphaBlocks)
+
+    # now the scattered field pattern
+
+    T3 = typeof(proto_r)
+    E² = Matrix{T3}(undef, N_dir, 3)
+    p₁ = SVector(1.0, 0.0, 0.0) # x
+    p₂ = SVector(0.0, 1.0, 0.0) # y
+    p₃ = SVector(0.0, 0.0, 1.0) # z
+    Psources = hcat(p₁, p₂, p₃)
+    dipoles = vcat(Psources, P)
+    positions = copy(cl.positions)
+    insert!(positions, 1, source)
+    for i in eachindex(directions)
+
+        Esca = far_field(directions[i], k, positions, dipoles)
+
+        # scalar summaries, but for each emission direction
+        E²[i, :] = sum(abs2.(Esca), dims=1)
+
+    end
+
+    return E²
 
 end
