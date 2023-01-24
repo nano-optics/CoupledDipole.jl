@@ -16,9 +16,10 @@ using AlgebraOfGraphics, Makie, CairoMakie, ColorSchemes
 
 ## materials
 wavelengths = [633.0]
+# wavelengths = [833.0]
 media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
 
-media = Dict([("dummy", x -> 1.33^2), ("medium", x -> 1.33)])
+media = Dict([("Au", epsilon_Au), ("dummy", x -> 1.33^2), ("medium", x -> 1.33)])
 mat = Material(wavelengths, media)
 
 ## line cut
@@ -29,8 +30,9 @@ x = -300.0:1.0:300
 directions = SVector.(Iterators.product(φ, θ, 0.0))[:]
 
 directions = SVector.(Iterators.product(0.0, θ, 0.0))[:]
-cl = cluster_chain(5, 80, 30, 30, 30, 0, 0, 0, "dummy")
-source = SVector(0, 10.0, 0.0) # not at origin...
+cl = cluster_dimer(100, 30, 30, 30, 0, 0, 0, "Au")
+# cl = cluster_dimer(80, 30, 30, 30, 0, 0, 0, "dummy")
+source = SVector(0, 0.0, 0.0) # not at origin...
 
 E² = scattering_pattern(directions,
     cl::Cluster,

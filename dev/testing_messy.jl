@@ -10,6 +10,29 @@ using DataFrames
 using VegaLite
 # using Gadfly
 
+
+function simulation(N)
+
+    if N > 100
+        A = rand(Complex{Float64}, (N, N))
+        Y = rand(Complex{Float64}, (N, 5))
+        # A = Matrix{Complex{Float64}}(undef, N, N)
+        # Y = Matrix{Complex{Float64}}(undef, N, 5)
+        @info "using regular Array"
+    elseif N <= 100
+        A = rand(SMatrix{N,N,Complex{Float64},N^2})
+        Y = rand(SMatrix{N,5,Complex{Float64},5N})
+        @info "using static Array"
+    end
+
+    X = A \ Y
+    return abs2.(X)
+end
+
+simulation(3)
+simulation(300)
+
+
 function lorentzian(λ, α_k, λ_k, µ_k)
     -α_k * λ_k / µ_k * (1.0 - 1.0 / (1.0 - (λ_k / λ)^2 - 1im * (λ_k^2 / (µ_k * λ))))
 end

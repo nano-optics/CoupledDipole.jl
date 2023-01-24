@@ -149,15 +149,12 @@ function incident_field_dip!(Ein, source, k, positions)
         n = rⱼ_to_rᵢ / rᵢⱼ
         nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
 
-        expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
+        kr = k * rᵢⱼ
+        k2expikror = k^2 * exp(im * kr) / rᵢⱼ
 
-        # EE 
-        Aᵢⱼ =
-            expikror * (
-                k^2 * (I - nxn) -
-                (1 - im * k * rᵢⱼ) / (rᵢⱼ^2) * (I - 3 * nxn)
-            )
-
+        Aᵢⱼ = k2expikror * (
+            (I - nxn) + (im / kr - 1 / kr^2) * (I - 3 * nxn)
+        )
         # EM magnetic field unused for now
         # nx = SMatrix{3,3}(0, n[3], -n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
         # Bᵢⱼ = expikror * nx * (k^2 + im * k / rᵢⱼ)

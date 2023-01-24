@@ -570,6 +570,7 @@ function scattering_pattern(directions,
     p₃ = SVector(0.0, 0.0, 1.0) # z
     Psources = hcat(p₁, p₂, p₃)
     dipoles = vcat(Psources, P)
+    # @info display(dipoles)
     positions = copy(cl.positions)
     insert!(positions, 1, source)
     for i in eachindex(directions)

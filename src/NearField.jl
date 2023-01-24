@@ -50,17 +50,16 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Eps
             nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
             nx = SMatrix{3,3}(0, n[3], -n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
 
-            expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
+            kr = k * rᵢⱼ
+            k2expikror = k^2 * exp(im * kr) / rᵢⱼ
 
             # EE 
-            Aᵢⱼ =
-                expikror * (
-                    k^2 * (I - nxn) -
-                    (1 - im * k * rᵢⱼ) / (rᵢⱼ^2) * (I - 3 * nxn)
-                )
+            Aᵢⱼ = k2expikror * (
+                (I - nxn) + (im / kr - 1 / kr^2) * (I - 3 * nxn)
+            )
 
-            # EM 
-            Bᵢⱼ = expikror * nx * (k^2 + im * k / rᵢⱼ)
+            # EM             
+            Bᵢⱼ = k2expikror * (1 + im / kr) * nx
 
             # contribution from j-th source dipole, for all incidences
             Esca += Aᵢⱼ * P[jj, :]
@@ -110,7 +109,7 @@ function far_field(direction, k, positions, dipoles)
         jj = (j-1)*3+1:j*3    # find current dipole
         rj = positions[j]
         nrj = dot(n, rj)
-        phase = exp(-1im * k * nrj)
+        phase = exp(1im * k * nrj)
 
         Esca += phase * G * dipoles[jj, :]
         # TODO Bsca as well
