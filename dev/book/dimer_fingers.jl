@@ -38,6 +38,8 @@ cl0 = cluster_single(20.0, 20.0, 35.0)
 cl1 = cluster_dimer(100.0, 20.0, 20.0, 35.0, π / 4)
 cl2 = cluster_dimer(100.0, 20.0, 20.0, 35.0, -π / 4)
 
+test = spectrum_oa_analytical(cl1, mat)
+
 oa0 = spectrum_oa(cl0, mat)
 oa1 = spectrum_oa(cl1, mat)
 oa2 = spectrum_oa(cl2, mat)
@@ -45,11 +47,13 @@ oa2 = spectrum_oa(cl2, mat)
 d0 = oa_df(oa0, mat.wavelengths)
 d1 = oa_df(oa1, mat.wavelengths)
 d2 = oa_df(oa2, mat.wavelengths)
+d3 = oa_df(test, mat.wavelengths)
 
 map1 = mapping(:wavelength, :value, row=:type, col=:crosstype)
 
 m1 = map1 * (data(d1) * visual(Lines) +
              data(d2) * visual(Lines, linestyle=:dash) +
+             data(d3) * visual(Lines, linestyle=:dash, color=:red) +
              data(d0) * visual(Lines, linestyle=:dot))
 fg = draw(m1, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"))
 

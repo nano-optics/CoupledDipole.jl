@@ -52,6 +52,39 @@ function absorption!(Cabs, kn, P, E)
 end
 
 
+# NOTE this seems actually redundant, as boild down to current formula
+#
+# this is the second version of CDE, where alpha is static
+# and radiation reaction is included in the coupling instead
+# we convert the results using Eqs 52 and 22 of Markel 2019
+# function absorption2!(Cabs, kn, E, P, AlphaBlocks)
+
+#     N_inc = size(P, 2)
+#     N_dip = Int(size(P, 1) / 3)
+#     Gᵢᵢ = 2im / 3 * k^3 * I # self-reaction
+#     # χ: static polarisabilities, we actually need 
+#     # local field e = χ⁻¹ p 
+#     # e = χ⁻¹α E = (I + Gα) E
+#     e = similar(E)
+#     # for i in eachindex(AlphaBlocks) # alpha not needed
+#     for i in 1:N_dip
+#         ii = 3i-2:3i
+#         # e = (I + Gᵢᵢ * AlphaBlocks[i]) * E[ii, :]
+
+#         e[ii, :] = E[ii, :] + Gᵢᵢ * P[ii, :] # local field
+#         # TODO compute per dipole absorption
+#     end
+
+#     for j in 1:N_inc       
+#         # Cabs[jj] = 4π * kn * (imag(dot(E[:, jj], P[:, jj])) -
+#         # kn^3 * 2 / 3 * real(dot(P[:, jj], P[:, jj])))
+#         Cabs[j] = 4π * kn * imag(dot(e[:, j], P[:, j]))
+#     end
+
+#     # Cabs = imag(sum(e .* conj(P), dims=1))
+#     return Cabs
+# end
+
 """
     scattering(positions::Vector{SVector{3}}, ScatteringVectors::Vector{SVector{3}}, weights::Vector{Real}, kn::Real, P::Array{Complex})
 
@@ -76,10 +109,10 @@ function scattering!(Csca, positions, ScatteringVectors, weights, kn, P)
     T = eltype(Csca)
     Isca = zeros(T, N_sca, N_inc) # temp. storage of FF intensities for all scattering directions
 
-    for ii = 1:N_sca # loop over scattering angles
+    for i = 1:N_sca # loop over scattering angles
 
         # # unit vector in the scattering direction
-        n = ScatteringVectors[ii] # rotation of Oz is the third column of Rm
+        n = ScatteringVectors[i] # rotation of Oz is the third column of Rm
 
         # far-field "propagator" [kind of]
         nn = n * transpose(n)
@@ -88,20 +121,20 @@ function scattering!(Csca, positions, ScatteringVectors, weights, kn, P)
         # temporary storage of net far-field [sum_j Esca[dipole j]]
         # for a given scattering direction
         Esca = zeros(Complex{T}, 3, N_inc)
-        for jj = 1:N_dip
+        for j = 1:N_dip
+            jj = (j-1)*3+1:j*3 # find current dipole
 
-            rj = positions[jj]
+            rj = positions[j]
             nrj = dot(n, rj)
-            indjj = (jj-1)*3+1:jj*3 # find current dipole
             phase = exp(-1im * kn * nrj)
 
-            Esca = Esca + phase * G * P[indjj, :]
+            Esca = Esca + phase * G * P[jj, :]
 
         end
 
         # Esca is now the net FF in direction ii
-        Isca[ii, :] = real(sum(Esca .* conj(Esca), dims=1)) # |Esca|^2
-
+        # Isca[ii, :] = real(sum(Esca .* conj(Esca), dims=1)) # |Esca|^2
+        Isca[i, :] = sum(abs2.(Esca), dims=1)
     end
 
     # now integrate Isca over all scattering angles
@@ -110,6 +143,9 @@ function scattering!(Csca, positions, ScatteringVectors, weights, kn, P)
     Csca[:] = 4π * kn^4 * transpose(weights) * Isca
     return Csca
 end
+
+
+
 
 """
 oa_c_ext(kn, G0, B, diagA, shift)
@@ -122,7 +158,7 @@ oa_c_ext(kn, G0, B, diagA, shift)
  - W 3NrxN_inc matrix
  - invV 3NrxN_inc matrix
 
- RETURNS: absorption cross-section analyticall orientation-averaged
+ RETURNS: absorption cross-section analytically orientation-averaged
 
  DEPENDS: Asym
 
@@ -130,10 +166,38 @@ oa_c_ext(kn, G0, B, diagA, shift)
 
 """
 function oa_c_ext(kn, G0, B, diagA, shift)
+    # TODO experimental, cleanup
 
     # cext = 2*pi*kn * trace(Asym(G0)*ctranspose(B)*Asym(diagA));
     cext = 2π / kn^2 * tr(shift * Asym(G0) * B' * Asym(diagA'))
     return cext
+end
+
+
+"""
+oa_c_abs(k, G0, invA, diagInvAlpha)
+
+ Computes the OA absorption cross-section from the solution of CDA equations
+
+ PARAMETERS:
+ - kn [scalar] wavenumber in medium
+ - G0 3Nrx3Nr matrix of free-space Green tensor at positions r_i
+ - invA 3Nrx3Nr inverse of the interaction matrix
+ - diagInvAlpha 3Nrx3Nr inverse of the block-diagonal matrix of polarisabilities
+
+ RETURNS: absorption cross-section analytically orientation-averaged
+
+ DEPENDS: Asym
+
+ FAMILY: low_level, cross_section
+
+"""
+function oa_c_abs(k, G0, invA, diagInvAlpha)
+    # TODO experimental, cleanup
+
+    # cext = 2*pi*kn * trace(Asym(G0)*ctranspose(B)*Asym(diagA));
+    cabs = 2π / k^2 * tr(invA * Asym(G0) * invA' * Asym(diagInvAlpha))
+    return cabs
 end
 
 # anti-Hermitian part of a matrix

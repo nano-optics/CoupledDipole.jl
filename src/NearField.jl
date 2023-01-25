@@ -33,7 +33,7 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Eps
     if inside & !evaluate_inside # use the dipole moment to approximate Einside
         j = id[]
         jj = 3j-2:3j
-        pmod = sum(abs2.(P[jj, :]), dims=1)
+        # pmod = sum(abs2.(P[jj, :]), dims=1)
         # @info "inside particle $j, $pmod"
         εᵣ = Epsilon[j]
         Esca = internal_field(P[jj, :], 4π / 3 * prod(sizes[j]), n_medium^2, εᵣ)
@@ -51,7 +51,7 @@ function scattered_field(probe, k, n_medium, positions, sizes, rotations, P, Eps
             nx = SMatrix{3,3}(0, n[3], -n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
 
             kr = k * rᵢⱼ
-            k2expikror = k^2 * exp(im * kr) / rᵢⱼ
+            k2expikror = k^2 * exp(im * kr) / rᵢⱼ # TODO check if minus sign
 
             # EE 
             Aᵢⱼ = k2expikror * (
@@ -109,7 +109,7 @@ function far_field(direction, k, positions, dipoles)
         jj = (j-1)*3+1:j*3    # find current dipole
         rj = positions[j]
         nrj = dot(n, rj)
-        phase = exp(1im * k * nrj)
+        phase = exp(-1im * k * nrj) # TODO check why the minus sign
 
         Esca += phase * G * dipoles[jj, :]
         # TODO Bsca as well

@@ -30,6 +30,7 @@ include("Visual.jl")
 # CoupledDipole
 export interaction_matrix_labframe!
 export interaction_matrix_labframe
+export oa_analytical
 export polarisation!
 export polarisation
 export iterate_field!
@@ -52,6 +53,7 @@ export extinction!
 export absorption!
 export scattering!
 export oa_c_ext
+export oa_c_abs
 # Materials
 export Material
 export epsilon_Ag
@@ -74,6 +76,7 @@ export mie_ff
 # HighLevel
 export spectrum_dispersion
 export spectrum_oa
+export spectrum_oa_analytical
 export map_nf
 export scattering_pattern
 # PostProcessing
@@ -179,6 +182,78 @@ function interaction_matrix_labframe(k, R, AlphaBlocks)
     F = Matrix{T}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
     interaction_matrix_labframe!(F, k, R, AlphaBlocks)
     return F
+end
+
+# anti-Hermitian part of a square matrix
+asym(A) = (A - adjoint(A)) / 2im
+
+"""
+oa_analytical(kn, cl.positions, AlphaBlocks)
+
+Interaction matrix
+
+- `k`: wavenumber in incident medium
+- `R`: `N_dip`-vector of 3-Svectors of particle positions
+- `AlphaBlocks`: `N_dip`-vector of 3x3 Smatrices (polarisability tensors in the lab frame)
+
+"""
+function oa_analytical(k, R, AlphaBlocks)
+
+    N_dip = length(R)
+    # what is the type of arrays to initialise?
+    proto_r = R[1][1] # position type
+    proto_α = AlphaBlocks[1][1, 1] # complex polarisability
+    T = typeof(1im * k * proto_r + proto_α) # blocks are ~ exp(ikr) or R * α
+
+    F = Matrix{T}(I, 3N_dip, 3N_dip) # type inferred from cl.positions
+
+    G₀ = 2im / 3 * k^3 * F
+    diagAlpha = zeros(T, (3N_dip, 3N_dip))
+    diagInvAlpha0 = zeros(T, (3N_dip, 3N_dip))
+
+    # nested loop over dipole pairs
+    for i = 1:N_dip
+        ii = 3i-2:3i
+
+        αᵢ = AlphaBlocks[i]
+
+        @views diagAlpha[ii, ii] = αᵢ
+        @views diagInvAlpha0[ii, ii] = inv(αᵢ) + 2im / 3 * k^3 * I
+
+        for j = i+1:N_dip
+            jj = 3j-2:3j
+
+            rⱼ_to_rᵢ = R[i] - R[j]
+            rᵢⱼ = norm(rⱼ_to_rᵢ, 2)
+            n = rⱼ_to_rᵢ / rᵢⱼ
+            nxn = n * transpose(n) # (n ⊗ n) p = (n⋅p) n
+            nx = SMatrix{3,3}(0, n[3], n[2], -n[3], 0, n[1], n[2], -n[1], 0) # n × p
+
+            expikror = exp(im * k * rᵢⱼ) / rᵢⱼ
+
+            kr = k * rᵢⱼ
+            k2expikror = k^2 * exp(im * kr) / rᵢⱼ
+
+            Aᵢⱼ = k2expikror * (
+                (nxn - I) + (im / kr - 1 / kr^2) * (3 * nxn - I)
+            )
+
+            αⱼ = AlphaBlocks[j]
+            Aᵗᵢⱼ = transpose(Aᵢⱼ)
+
+            # assign blocks        
+            @views G₀[ii, jj] = -Aᵢⱼ
+            @views G₀[jj, ii] = -Aᵗᵢⱼ
+            @views F[ii, jj] = Aᵢⱼ * αⱼ
+            @views F[jj, ii] = Aᵗᵢⱼ * αᵢ
+
+        end
+    end
+
+    B = diagAlpha / F
+    cabs = -2π / k^2 * real(tr(B * asym(G₀) * adjoint(B) * asym(diagInvAlpha0)))
+    cext = 2π / k^2 * real(tr(asym(G₀) * asym(B)))
+    return cabs, cext
 end
 
 

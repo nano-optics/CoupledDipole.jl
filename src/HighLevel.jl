@@ -328,7 +328,12 @@ function spectrum_oa(
         dext[ii] = dot(tmpcext, weights2)
         dabs[ii] = dot(tmpcabs, weights2)
         dsca[ii] = dot(tmpcsca, weights2)
+
+
+        # cabs2[] = oa_c_abs(k, G0, invA, diagInvAlpha)
+
     end
+
 
     (
         average=CrossSections(
@@ -347,6 +352,98 @@ function spectrum_oa(
 end
 
 
+
+"""
+     spectrum_oa(cl::Cluster, mat::Material,
+                Cubature = "gl", N_inc::Int = 36, N_sca::Int=36)
+
+Orientation-averaged far-field cross-sections for multiple wavelengths
+
+- `cl`: cluster of particles
+- `mat`: dielectric functions
+- `Cubature`: spherical cubature method
+- `N_inc`: number of incident angles for spherical cubature
+- `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
+- `prescription`: polarisability prescription for particles
+- `method`: solution of linear system (direct or iterative)
+
+"""
+function spectrum_oa_analytical(
+    cl::Cluster,
+    mat::Material;
+    prescription="kuwata",
+    method="direct"
+)
+
+    # setting up constants
+
+    # what is the type of arrays to initialise?
+    proto_r = cl.positions[1][1] # position type
+    proto_a = cl.rotations[1][1] # angle type
+    proto_α = 0.1 + 0.1im # dummy complex polarisability
+    proto_k = 2π / mat.wavelengths[1]
+    T1 = typeof(proto_k * proto_r * imag(proto_α * proto_a)) #
+    # note: cross-sections are typeof(imag(P*E)), which boils down to T1, hopefully
+    T2 = typeof(proto_k * proto_r + proto_α * proto_a) # blocks are ~ exp(ikr) or R * α
+
+    N_dip = length(cl.positions)
+    N_lam = length(mat.wavelengths)
+
+    ParticleRotations = map(RotMatrix, cl.rotations)
+
+    cext = Vector{T1}(undef, N_lam)
+    cabs = similar(cext)
+    csca = similar(cext)
+
+    for i = 1:N_lam
+        λ = mat.wavelengths[i]
+        n_medium = mat.media["medium"](λ)
+        kn = n_medium * 2π / λ
+
+        if cl.type == "point"
+
+            Alpha = map(
+                (m, s) ->
+                    alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+                cl.materials,
+                cl.sizes,
+            )
+
+        elseif cl.type == "particle"
+
+            Epsilon = map(m -> mat.media[m](λ), cl.materials)
+            Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+
+        end
+
+        AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
+
+        tmpcabs, tmpcext = oa_analytical(kn, cl.positions, AlphaBlocks)
+
+        cabs[i] = tmpcabs
+        cext[i] = tmpcext
+
+    end
+
+    csca = cext - cabs
+
+    # unimplemented
+    # miss = Vector{Union{Float64,Missing}}(missing, N_lam)
+    (
+        average=CrossSections(
+            1 / N_dip * cext,
+            1 / N_dip * cabs,
+            1 / N_dip * csca,
+        ),
+        dichroism=CrossSections( # TODO
+            0 * cext,
+            0 * cext,
+            0 * cext,
+        ),
+    )
+
+
+end
 
 """
 map_nf(probes,
