@@ -82,6 +82,7 @@ export scattering_pattern
 # PostProcessing
 export dispersion_df
 export oa_df
+export incidence_labels
 # Utils
 export expand_grid
 export pmap_df
@@ -218,6 +219,7 @@ function oa_analytical(k, R, AlphaBlocks)
         αᵢ = AlphaBlocks[i]
 
         @views diagAlpha[ii, ii] = αᵢ
+        # TODO note this won't work for uniaxial alphas
         @views diagInvAlpha0[ii, ii] = inv(αᵢ) + 2im / 3 * k^3 * I
 
         for j = i+1:N_dip

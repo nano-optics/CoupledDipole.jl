@@ -25,6 +25,35 @@ function dispersion_df(x, wavelength; format="long")
 end
 
 """
+incidence_labels(d, Incidence)
+incidence_labels(d, Incidence, labels)
+
+Merging incidence information with dataframe of dispersion spectra
+
+- `d`: long-format output from dispersion_df
+- `Incidence`: vector of Rotation objects
+- `labels`: vector of labels, to give convenient names to the rotation axes (e.g. ['x', 'y', 'z']) in addition to their cartesian coordinates
+
+"""
+function incidence_labels(d, Incidence)
+    tmp = map(x -> transpose(Rotations.params(Rotations.AngleAxis(x))), Incidence)
+    angles_axes = DataFrame(reduce(vcat, tmp), [:angle, :x, :y, :z])
+    angles_axes[!, :angle_id] = 1:nrow(angles_axes)
+    # d[!, :angle_id] = 1:nrow(d) # already present from dispersion_df
+    return DataFrames.leftjoin(d, angles_axes, on=:angle_id)
+end
+
+function incidence_labels(d, Incidence, labels)
+    tmp = map(x -> transpose(Rotations.params(Rotations.AngleAxis(x))), Incidence)
+    angles_axes = DataFrame(reduce(vcat, tmp), [:angle, :x, :y, :z])
+    angles_axes[!, :angle_id] = 1:nrow(angles_axes)
+    angles_axes[!, :axis_label] = labels
+    # d[!, :angle_id] = 1:nrow(d) # already present from dispersion_df
+    return DataFrames.leftjoin(d, angles_axes, on=:angle_id)
+end
+
+
+"""
     oa_df(x, wavelength)
 
 Long format dataframe for orientation-averaged spectra
