@@ -305,6 +305,16 @@ var particle24 = createSphere(radius, segments);
                              particle24.applyQuaternion(qm);
                              particle24.quaternion.normalize();
                              scene.add(particle24);
+var particle25 = createSphere(radius, segments);
+                             particle25.position.x = 0.0;
+                             particle25.position.y = 0.0;
+                             particle25.position.z = 0.0;
+                             particle25.scale.set(10,10,10);
+                             particle25.useQuaternion = true;
+                             var qm = new THREE.Quaternion(-0.0,-0.0,-0.0,1.0);
+                             particle25.applyQuaternion(qm);
+                             particle25.quaternion.normalize();
+                             scene.add(particle25);
 
         	scene.add( new THREE.AxesHelper( 100 ) );
         	var controls = new THREE.TrackballControls(camera);

@@ -35,12 +35,16 @@ function cluster_spokes(Narm, Nspokes, Λ, a, b, c,
 
     rotations = [inv(QuatRotation(RotZYZ(a + π / 4, 0, 0))) for a in angles for _ in R]
 
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+    # Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+    mats2 = [material for _ ∈ 1:N+1]
+    sizes2 = [sizes..., SVector(a, a, a)]
+    positions2 = [positions..., SVector(0, 0, 0.0)]
+    rotations2 = [rotations..., QuatRotation(RotZ(0.0))]
+    Cluster(positions2, rotations2, sizes2, mats2, type)
 end
 
 # cl = cluster_spokes(4, 6, 100, 10, 20, 10)
 # visualise_threejs(cl)
-
 
 ## array geometry
 # N, Λ, a, b, c, φ, θ, ψ, material = "Au", type="particle"
@@ -104,7 +108,7 @@ probes = SVector.(Iterators.product(x, y, zero(eltype(x))))[:]
 E², B², 𝒞, positions = map_nf(probes, cl2, mat, Incidence, polarisation="circular"; evaluate_inside=false)
 
 df2 = (; x=positions.x, y=positions.y, z=log10.(E²[:, 2]))
-df2 = (; x=positions.x, y=positions.y, z=(𝒞[:, 1]))
+df2 = (; x=positions.x, y=positions.y, z=(𝒞[:, 2]))
 
 layer = visual(Heatmap)
 m = mapping(:x, :y, :z)
