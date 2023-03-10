@@ -60,7 +60,7 @@ all = pmap_df(params, p -> model(; p...))
 
 ## reference molecule
 cl0 = cluster_single(0, 1, 0, 0, 0, 0, "Rhodamine", "point")
-s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))], N_sca=180)
+s = spectrum_dispersion(cl0, mat, [RotZ(0.0)], N_sca=180)
 single = dispersion_df(s, mat.wavelengths)
 
 
@@ -71,7 +71,7 @@ m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
 fg = draw(layer1 + layer2, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
-    palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+    palettes=(; color=cgrad(ColorSchemes.phase.colors, length(td) + 1, categorical=true)[1:end-1]))
 
 fg
 

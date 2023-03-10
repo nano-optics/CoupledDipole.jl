@@ -48,8 +48,8 @@ function model(; d=100, orientation="head-to-tail")
     d = dispersion_df(res, mat.wavelengths)
 end
 
-
-params = expand_grid(d=range(100, 500, step=50), orientation=("head-to-tail", "side-by-side"))
+td = range(100, 500, step=50)
+params = expand_grid(d=td, orientation=("head-to-tail", "side-by-side"))
 all = pmap_df(params, p -> model(; p...))
 
 
@@ -65,7 +65,7 @@ rotations = [QuatRotation(RotZYZ(0.0, 0.0, 0.0))]
 Cluster(positions, rotations, sizes, ["Au"], "particle")
 
 cl0 = cluster_single(20.0, 50.0, 20.0)
-s = spectrum_dispersion(cl0, mat, [QuatRotation(RotZ(0.0))])
+s = spectrum_dispersion(cl0, mat, [RotZ(0.0)])
 single = dispersion_df(s, mat.wavelengths)
 
 
@@ -81,7 +81,7 @@ m2 = d2 * mapping(:wavelength, :value, row=:crosstype)
 layer1 = m1 * visual(Lines)
 layer2 = m2 * visual(Lines, linestyle=:dash)
 draw(layer1 + layer2, facet=(; linkyaxes=:rowwise), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
-    palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+    palettes=(; color=cgrad(ColorSchemes.phase.colors, length(td) + 1, categorical=true)[1:end-1]))
 # https://docs.juliaplots.org/latest/generated/colorschemes/
 # cgrad(ColorSchemes.viridis.colors, 12, categorical=true)
 # cgrad([:purple, :green], 12, categorical=true)

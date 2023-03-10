@@ -38,7 +38,6 @@ mat = Material(wavelength, media)
 
 function model(; ρ=1, R0=2, d=0.5, medium=1.33, orientation="radial")
 
-
     R = R0 + d
     N = dye_coverage(ρ, R)
     @info "$N dipoles"

@@ -52,7 +52,7 @@ m2 = dat2 * mapping(:wavelength, :value, col=:polarisation)
 layer1 = m1 * visual(Lines, linestyle=:dash)
 layer2 = m2 * visual(Lines)
 fg = draw(layer1 + layer2, facet=(; linkyaxes=:none), axis=(; xlabel="wavelength /nm", ylabel="cross-section σ /nm²"),
-    palettes=(; color=cgrad(ColorSchemes.phase.colors, 12, categorical=true)))
+    palettes=(; color=cgrad(ColorSchemes.phase.colors, 3, categorical=true)[1:2]))
 
 fg
 
