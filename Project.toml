@@ -1,6 +1,6 @@
-authors = ["baptiste"]
 name = "CoupledDipole"
 uuid = "24bcd77a-7611-40bf-902e-63663ab6a659"
+authors = ["baptiste"]
 version = "0.1.1"
 
 [deps]
@@ -19,6 +19,7 @@ Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
+ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 Query = "1a8c2f83-1ff3-5112-b086-8aa67b057ba1"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"

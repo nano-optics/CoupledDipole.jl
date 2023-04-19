@@ -12,7 +12,7 @@ Simulating far-field cross-sections for multiple wavelengths and directions of i
 - `Incidence`: N_inc vector of quaternions describing incidence directions
 - `polarisation`: incident field consists of 2 orthogonal "linear" or "circular" polarisations
 - `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
-- `prescription`: polarisability prescription for particles
+- `prescription`: polarisability prescription for particles (kuwata, majic, or mie)
 - `method`: direct or iterative solver
 
 """
@@ -173,7 +173,7 @@ Orientation-averaged far-field cross-sections for multiple wavelengths
 - `Cubature`: spherical cubature method
 - `N_inc`: number of incident angles for spherical cubature
 - `N_sca`: number of scattering angles for spherical cubature estimate of σ_sca
-- `prescription`: polarisability prescription for particles
+- `prescription`: polarisability prescription for particles (kuwata, majic, or mie)
 - `method`: solution of linear system (direct or iterative)
 
 """

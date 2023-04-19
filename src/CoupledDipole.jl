@@ -9,8 +9,10 @@ using SpecialFunctions: besselj, besselh # for Mie
 using FastGaussQuadrature: gausslegendre
 using DataInterpolations # for tabulated epsilon and alpha
 using QuadGK # for ellipsoids, should use GL as well to reduce deps
+# convenience
 using Makie
 using DataFrames
+using ProgressMeter
 
 import Rotations: RotZYZ
 

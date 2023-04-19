@@ -40,8 +40,12 @@ Expand all combinations of named arguments
 - `join`: logical, join parameters and results
 
 """
-function pmap_df(p, f, kws...; join=true)
-    tmp = map(f, eachrow(p), kws...)
+function pmap_df(p, f, kws...; join=true, showprogress=false)
+    if showprogress
+        tmp = @showprogress map(f, eachrow(p), kws...)
+    else
+        tmp = map(f, eachrow(p), kws...)
+    end
     all = reduce(vcat, tmp, source="id")
     if !join
         return all
