@@ -268,6 +268,16 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
 
         rotations = map(x -> SVector(atan(x[2], x[1]), acos(x[3] / R), 0), positions)
 
+    elseif orientation == "iso" # make particles isotropic, orientation irrelevant
+        trace = a + b + c # whatever scalings we inputed
+        sizes = [SVector(trace / 3, trace / 3, trace / 3) for _ ∈ 1:N] # identical particles
+        rotations = [@SVector rand(3) for _ ∈ 1:N]
+
+    elseif orientation == "flatiso" # make particles plane-isotropic, orientation radial
+        trace = a + b + c # whatever scalings we inputed
+        sizes = [SVector(trace / 2, trace / 2, 0) for _ ∈ 1:N] # identical particles
+        rotations = map(x -> SVector(atan(x[2], x[1]), acos(x[3] / R), 0), positions)
+
     elseif orientation == "flat"
 
         # strategy a bit suboptimal but doesn't matter
