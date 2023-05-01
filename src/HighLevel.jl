@@ -527,6 +527,7 @@ function map_nf(probes,
     end
 
     n_medium = mat.media["medium"](λ)
+    Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
     k = n_medium * 2π / λ
 
     # if cl.type == "point"
