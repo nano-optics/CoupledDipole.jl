@@ -13,6 +13,66 @@ struct Material{T}
 end
 
 
+
+"""
+alpha_wrapper(cl, mat, λ, prescription)
+
+High-level wrapper for both types of polarisabilities
+
+# Examples
+
+```
+λ = 633.0
+media = Dict([("Au", epsilon_Au), ("medium", x -> 1.33)])
+mat = Material(λ, media)
+
+cl = cluster_chain(5, 100, 1,2,3)
+n_medium = mat.media["medium"](λ)
+
+particle_dipoles = [true, false, true, true, false]
+point_dipoles = .!particle_dipoles
+alpha_wrapper(cl, mat, λ, "kuwata")
+```
+
+"""
+function alpha_wrapper(cl, mat, λ, prescription)
+
+    N = length(cl.type)
+
+    point_dipoles = cl.type .== "point"
+    particle_dipoles = cl.type .== "particle"
+
+    if (sum(point_dipoles) + sum(particle_dipoles) != N)
+        @error "type must be point or particle"
+    end
+
+    n_medium = mat.media["medium"](λ)
+
+    # point dipoles (maybe none)
+    Alpha1 = map(
+        (m, s) ->
+            alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+        cl.materials[point_dipoles],
+        cl.sizes[point_dipoles],
+    )
+
+    # particle dipoles (maybe none)
+    Epsilon = map(m -> mat.media[m](λ), cl.materials)
+    Alpha2 = alpha_particles(Epsilon, cl.sizes[particle_dipoles], n_medium^2, λ; prescription=prescription)
+
+    # combine the two
+    # if one is empty, the intersection with Any should still be the actual type
+    T = typeintersect(eltype(Alpha1), eltype(Alpha2))
+    Alpha = Vector{T}(undef, N)
+
+    Alpha[point_dipoles] = Alpha1
+    Alpha[particle_dipoles] = Alpha2
+
+    return Alpha
+end
+
+
+
 """
     epsilon_Ag(λ::Real)
 
@@ -1023,5 +1083,4 @@ function depolarisation_spheroid(a, c)
 
     return (SVector(Lx, Lx, Lz))
 end
-
 
