@@ -87,26 +87,29 @@ function spectrum_dispersion(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type == "point"
+        # if cl.type == "point"
 
-            Alpha = map(
-                (m, s) ->
-                    alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
-                cl.materials,
-                cl.sizes,
-            )
+        #     Alpha = map(
+        #         (m, s) ->
+        #             alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+        #         cl.materials,
+        #         cl.sizes,
+        #     )
 
-        elseif cl.type == "particle"
+        # elseif cl.type == "particle"
 
-            # Alpha = map(
-            #     (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
-            #     cl.materials,
-            #     cl.sizes,
-            # )
+        #     # Alpha = map(
+        #     #     (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
+        #     #     cl.materials,
+        #     #     cl.sizes,
+        #     # )
 
-            Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
-            Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
-        end
+        #     Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+        #     Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+        # end
+
+        # wrapper to deal with both point and particle dipole types
+        Alpha = alpha_wrapper(cl, mat, λ, prescription)
 
         #  R is passive
         AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
@@ -251,34 +254,37 @@ function spectrum_oa(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type == "point"
+        # if cl.type == "point"
 
-            # old version: only one material per cluster
-            # α_name = cl.material # e.g. "alpha" to refer to mat Dict
-            # α_bare = mat.media[α_name](λ)
-            # α = alpha_embedded(α_bare, n_medium)
-            # Alpha = alpha_rescale_molecule(α, cl.sizes)
+        #     # old version: only one material per cluster
+        #     # α_name = cl.material # e.g. "alpha" to refer to mat Dict
+        #     # α_bare = mat.media[α_name](λ)
+        #     # α = alpha_embedded(α_bare, n_medium)
+        #     # Alpha = alpha_rescale_molecule(α, cl.sizes)
 
-            Alpha = map(
-                (m, s) ->
-                    alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
-                cl.materials,
-                cl.sizes,
-            )
+        #     Alpha = map(
+        #         (m, s) ->
+        #             alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+        #         cl.materials,
+        #         cl.sizes,
+        #     )
 
-        elseif cl.type == "particle"
+        # elseif cl.type == "particle"
 
-            # ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
-            # ε = mat.media[ε_name](λ)
-            # Alpha = alpha_particles(λ, ε, n_medium^2, cl.sizes)
-            # Alpha = map(
-            #     (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
-            #     cl.materials,
-            #     cl.sizes,
-            # )
-            Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
-            Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
-        end
+        #     # ε_name = cl.material # e.g. "Au" to refer to epsilon_Au in mat Dict
+        #     # ε = mat.media[ε_name](λ)
+        #     # Alpha = alpha_particles(λ, ε, n_medium^2, cl.sizes)
+        #     # Alpha = map(
+        #     #     (m, s) -> alpha_kuwata(λ, mat.media[m](λ), n_medium^2, s),
+        #     #     cl.materials,
+        #     #     cl.sizes,
+        #     # )
+        #     Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+        #     Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+        # end
+
+        # wrapper to deal with both point and particle dipole types
+        Alpha = alpha_wrapper(cl, mat, λ, prescription)
 
         #  R is passive
         AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
@@ -400,21 +406,24 @@ function spectrum_oa_analytical(
         n_medium = mat.media["medium"](λ)
         kn = n_medium * 2π / λ
 
-        if cl.type == "point"
+        # if cl.type == "point"
 
-            Alpha = map(
-                (m, s) ->
-                    alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
-                cl.materials,
-                cl.sizes,
-            )
+        #     Alpha = map(
+        #         (m, s) ->
+        #             alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+        #         cl.materials,
+        #         cl.sizes,
+        #     )
 
-        elseif cl.type == "particle"
+        # elseif cl.type == "particle"
 
-            Epsilon = map(m -> mat.media[m](λ), cl.materials)
-            Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+        #     Epsilon = map(m -> mat.media[m](λ), cl.materials)
+        #     Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
 
-        end
+        # end
+
+        # wrapper to deal with both point and particle dipole types
+        Alpha = alpha_wrapper(cl, mat, λ, prescription)
 
         AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
 
@@ -519,18 +528,24 @@ function map_nf(probes,
 
     n_medium = mat.media["medium"](λ)
     k = n_medium * 2π / λ
-    if cl.type == "point"
-        Alpha = map(
-            (m, s) ->
-                alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
-            cl.materials,
-            cl.sizes,
-        )
 
-    elseif cl.type == "particle"
-        Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
-        Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
-    end
+    # if cl.type == "point"
+    #     Alpha = map(
+    #         (m, s) ->
+    #             alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+    #         cl.materials,
+    #         cl.sizes,
+    #     )
+
+    # elseif cl.type == "particle"
+    #     Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+    #     Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+    # end
+
+
+    # wrapper to deal with both point and particle dipole types
+    Alpha = alpha_wrapper(cl, mat, λ, prescription)
+
     AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
     interaction_matrix_labframe!(F, k, cl.positions, AlphaBlocks)
     incident_field_pw!(Ein, Ejones, k, cl.positions, IncidenceRotations)
@@ -637,18 +652,23 @@ function scattering_pattern(directions,
 
     n_medium = mat.media["medium"](λ)
     k = n_medium * 2π / λ
-    if cl.type == "point"
-        Alpha = map(
-            (m, s) ->
-                alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
-            cl.materials,
-            cl.sizes,
-        )
+    # if cl.type == "point"
+    #     Alpha = map(
+    #         (m, s) ->
+    #             alpha_scale(alpha_embed(mat.media[m](λ), n_medium), s),
+    #         cl.materials,
+    #         cl.sizes,
+    #     )
 
-    elseif cl.type == "particle"
-        Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
-        Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
-    end
+    # elseif cl.type == "particle"
+    #     Epsilon = map(m -> mat.media[m](λ), cl.materials) # evaluate materials at wavelength
+    #     Alpha = alpha_particles(Epsilon, cl.sizes, n_medium^2, λ; prescription=prescription)
+    # end
+
+
+    # wrapper to deal with both point and particle dipole types
+    Alpha = alpha_wrapper(cl, mat, λ, prescription)
+
     AlphaBlocks = map((R, A) -> R' * (diagm(A) * R), ParticleRotations, Alpha)
     interaction_matrix_labframe!(F, k, cl.positions, AlphaBlocks)
 

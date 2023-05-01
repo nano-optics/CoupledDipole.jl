@@ -22,8 +22,8 @@ struct Cluster{T1,T2,T3}
     "materials::Vector{String}"
     materials::Vector{String}
 
-    "type::String"
-    type::String
+    "types::Vector{String}"
+    types::Vector{String}
 
 end
 
@@ -51,7 +51,7 @@ function cluster_single(a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", type="pa
     # input parameters are Euler angles
     # inverse as passive rotation needed
     rotations = [inv(QuatRotation(Rotations.RotZYZ(α, β, γ)))]
-    Cluster(positions, rotations, sizes, [material], type)
+    Cluster(positions, rotations, sizes, [material], [type])
 end
 
 
@@ -81,7 +81,7 @@ function cluster_dimer(d, a, b, c, ϕ=0.0, α_1=0.0, α_2=0.0, material="Au", ty
     # rotate particle 1 by q1 only (stays in yz plane)
     # rotate particle 2 by q2, then q3 but in original frame so order swapped
     rotations = inv.([q1, q3 * q2]) # inverse as passive rotation needed
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:2], type)
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:2], [type for _ ∈ 1:2])
 end
 
 
@@ -110,7 +110,7 @@ function cluster_quadrimer(r, d, material="Au", type="particle")
     positions = [p1, p2, p3, p4]
     q = QuatRotation(1.0, 0.0, 0.0, 0.0)
     rotations = [q, q, q, q] # useless since spheres
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:4], type)
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:4], [type for _ ∈ 1:4])
 end
 
 # function [cl] = (r, s, d, theta)
@@ -177,7 +177,7 @@ function cluster_helix(N, a, b, c, R, Λ, δ, δ_0=0, handedness="left",
     # inverse as passive rotation needed
     rotations = QuatRotation.(inv.(RotZYZ.(φ, θ, ψ)))
 
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], [type for _ ∈ 1:N])
 end
 
 
@@ -207,7 +207,7 @@ function cluster_chain(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", ty
 
     positions = SVector.(-(N - 1)*Λ/2:Λ:(N-1)*Λ/2, zero(eltype(Λ)), zero(eltype(Λ)))
 
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], [type for _ ∈ 1:N])
 end
 
 
@@ -241,7 +241,7 @@ function cluster_array(N, Λ, a, b, c, α=0.0, β=0.0, γ=0.0, material="Au", ty
     x = -(N′ - 1)*Λ/2:Λ:(N′-1)*Λ/2
     positions = SVector.(Iterators.product(x, x, zero(eltype(x))))[:]
 
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], [type for _ ∈ 1:N])
 end
 
 function sample_fibonacci(N)
@@ -301,7 +301,7 @@ function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine"
 
     quaternions = [inv(QuatRotation(RotZYZ(r[1], r[2], r[3]))) for r in rotations]
 
-    Cluster(positions, quaternions, sizes, [material for _ ∈ 1:N], type)
+    Cluster(positions, quaternions, sizes, [material for _ ∈ 1:N], [type for _ ∈ 1:N])
 
 end
 
@@ -327,6 +327,6 @@ function cluster_ball(N, a, R; material="AuCM", type="point")
     sizes = [SVector(a, a, a) for _ ∈ 1:N] # identical particles
     rotations = [inv(QuatRotation(1, 0, 0, 0.0)) for _ ∈ 1:N] # no rotations, spheres anyway...
 
-    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], type)
+    Cluster(positions, rotations, sizes, [material for _ ∈ 1:N], [type for _ ∈ 1:N])
 
 end

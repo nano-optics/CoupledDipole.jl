@@ -37,10 +37,10 @@ alpha_wrapper(cl, mat, λ, "kuwata")
 """
 function alpha_wrapper(cl, mat, λ, prescription)
 
-    N = length(cl.type)
+    N = length(cl.types)
 
-    point_dipoles = cl.type .== "point"
-    particle_dipoles = cl.type .== "particle"
+    point_dipoles = cl.types .== "point"
+    particle_dipoles = cl.types .== "particle"
 
     if (sum(point_dipoles) + sum(particle_dipoles) != N)
         @error "type must be point or particle"

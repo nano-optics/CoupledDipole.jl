@@ -58,6 +58,7 @@ export oa_c_ext
 export oa_c_abs
 # Materials
 export Material
+export alpha_wrapper
 export epsilon_Ag
 export epsilon_Au
 export epsilon_Si
