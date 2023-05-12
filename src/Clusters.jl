@@ -258,9 +258,113 @@ function sample_fibonacci(N)
 
 end
 
-function cluster_shell(N, a, b, c, R; orientation="radial", material="Rhodamine", type="point")
 
-    positions = R .* sample_fibonacci(N)
+function sample_random(N)
+
+    α = π * (2 * rand(N) .- 1) # uniform [-pi,pi]
+    β = acos.(2 * rand(N) .- 1) # cos-uniform [-1,1]
+
+    positions = @. SVector(cos(α) * sin(β), sin(α) * sin(β), cos(β))
+    return positions
+
+end
+
+# hard core pseudo-random
+function sample_random_hc(N, exclusion; maxiter=1e3, k=30)
+
+
+    if sqrt(4 * pi * 1^2 / N) < (pi * exclusion^2)
+        @warn "The requested number of points will not fit"
+    end
+
+    #initial sample
+    s = sample_random(N + k)
+
+    indices = trues(N + k) # all assumed good
+
+    for ii in 1:(N+k) # points to test
+        for jj in (ii+1):(N+k)
+            dist = norm(s[ii] - s[ii])
+            if (dist < exclusion)  # this ii point is bad
+                indices[ii] = false
+                break # bad point, no need to test further
+            end
+        end
+    end
+
+    todo = (sum(indices) < N)
+    # if >= than N, we're done, return N positions 
+    if !todo
+        @info "no iteration needed"
+        pick = findall(indices)
+        s = s[pick[1:N]]
+        return s
+    end
+
+    # otherwise, replace bad and try again
+    iter = 0
+    while todo
+        bad = findall(.!indices)
+        p = sum(.!indices)
+        @info "iteration $iter, $p bad points so far"
+        s[bad] = sample_random(p) # replace bad ones with new random
+
+        for i in eachindex(bad) # points to test
+            badi = bad[i]
+            indices[badi] = true # assume it is good until shown otherwise
+            for j in 1:(N+k)
+                if badi == j
+                    continue
+                end
+                dist = norm(s[badi] - s[j])
+                if dist < exclusion  # this new point is bad
+                    indices[badi] = false
+                    break # no need to test further
+                end
+            end
+        end
+        # if more than N, we're done
+        if sum(indices) >= N
+            @info "iterations successful"
+            # info "success, %i points out of %i generated", sum(indices), N)
+            pick = findall(indices)
+            s = s[pick[1:N]]
+            return s
+        end
+        if iter >= maxiter
+            @warn "max number of iterations reached"
+        end
+
+        todo = (sum(indices) < N) && (iter < maxiter)
+        iter = iter + 1
+    end
+
+    # we should not get here ideally
+    return s
+
+end
+
+
+function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci", material="Rhodamine", type="point", min_exclusion=1.0)
+
+    if position == "fibonacci"
+        positions = R .* sample_fibonacci(N)
+    elseif position == "random"
+        positions = R .* sample_random(N)
+    elseif position == "pseudo-random"
+        full_area = 4π * R^2
+        area_pp = full_area / N
+        max_radius = sqrt(area_pp / π)
+        max_exclusion = 2 * max_radius  # gives some room
+        # exclusion = max_exclusion
+        @info "max_exclusion: $max_exclusion"
+        exclusion = min(min_exclusion, max_exclusion)
+        positions = R .* sample_random_hc(N, exclusion / R)
+    else
+        @info "No position means fibonacci"
+        positions = R .* sample_fibonacci(N)
+    end
+
     N = length(positions) # might be +1
     sizes = [SVector(a, b, c) for _ ∈ 1:N] # identical particles
 
