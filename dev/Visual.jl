@@ -58,14 +58,27 @@ function visualise_makie2(cl; colour=:gold, R=1.0)
         sizes = push!(sizes, (0 .* sizes[1]) .+ R)
         rotations = cl.rotations
         rotations = push!(rotations, rotations[1])
+        cols = [colour for _ in eachindex(cl.sizes)]
+        cols = push!(cols, :gold)
 
-        meshscatter(
+        fig = Figure(; resolution=(1200, 400))
+        aspect = (1, 1, 1)
+        perspectiveness = 0.5
+        ax1 = Axis3(fig[1, 1]; aspect, perspectiveness)
+        meshscatter!(ax1,
                 Point3f.(positions),
                 markersize=Vec3f.(sizes),
                 rotations=Makie_rotation.(rotations),
                 color=colour,
         )
 
+        meshscatter!(ax1,
+                Point3f.([positions[end]]),
+                markersize=Vec3f.([sizes[end]]),
+                rotations=Makie_rotation.([rotations[end]]),
+                color=:gold
+        )
+        fig
 end
 
 # using GLMakie
@@ -85,6 +98,7 @@ cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="random")
 cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="pseudo-random", min_exclusion=3)
 # cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
 
+cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="pseudo-random", min_exclusion=3)
 visualise_makie2(cl, colour=:silver, R=30)
 
 meshscatter(Point3f0(0, 0, 0), markersize=Vec3f0(30, 30, 30), color=:red, overdraw=true)
