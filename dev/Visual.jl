@@ -98,8 +98,8 @@ cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="random")
 cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="pseudo-random", min_exclusion=3)
 # cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
 
-cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="pseudo-random", min_exclusion=3)
-visualise_makie2(cl, colour=:silver, R=30)
+cl = cluster_shell(2828, 0.2, 0.2, 0.2, 15, orientation="radial", position="pseudo-random", min_exclusion=0.7)
+visualise_makie2(cl, colour=:silver, R=14)
 
 meshscatter(Point3f0(0, 0, 0), markersize=Vec3f0(30, 30, 30), color=:red, overdraw=true)
 

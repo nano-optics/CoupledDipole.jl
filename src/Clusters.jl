@@ -269,6 +269,70 @@ function sample_random(N)
 
 end
 
+# spherical interpolation
+# https://en.wikipedia.org/wiki/Slerp
+function slerp(p0, p1, d)
+    R = norm(p0)
+    dt = d / R # angle corresponding to desired spacing
+    p0n = p0 / R
+    p1n = p1 / R
+    Omega = acos(sum(p0n * p1n))
+    t = dt / Omega
+    p = sin((1 - t) * Omega) / sin(Omega) * p0 + sin(t * Omega) / sin(Omega) * p1
+    return p
+end
+
+
+"""
+%sample_landings random positions on the unit sphere tagging dimers
+%
+% 'hard-core' process, with brute-force trial approach, may fail to find a solution
+% if too many points are sought.
+% NOTE: the function always returns N points, regardless of success in exclusion
+%
+% PARAMETERS:
+% - N number of points requested
+% - exclusion threshold distance under which particles merge as dimer
+% - dimer distance to merge as dimer
+%
+% RETURNS: a 3xN matrix of point positions on the unit sphere and a vector
+% of monomer/dimer binary index
+%
+% DEPENDS: sample_random
+%
+% FAMILY: low_level, utility, sample
+%
+% EXAMPLES:
+% s = sample_landings(4,0.3)
+% s = sample_landings(4,10)
+%
+
+"""
+function sample_landings(N, exclusion, dimer_d)
+
+    # initial sample
+    s = sample_random(N)
+    sold = s
+    indices = trues(N) # all assumed monomers
+
+    for i in 1:N # points to test
+        for j in (i+1):N
+            dist = norm(s[i] - s[j]) # note: should use spherical distance
+            if dist < exclusion  # this jj point is close to ii
+                indices[i] = false
+                indices[j] = false
+                # now shift along the great circle to fixed separation d
+                newp = slerp(s[i], s[j], dimer_d)
+                s[j] = newp
+                break
+            end
+        end
+    end
+
+    return (s=s, sold=sold, indices=indices)
+
+end
+
 # hard core pseudo-random
 function sample_random_hc(N, exclusion; maxiter=1e3, k=30)
 
@@ -345,7 +409,7 @@ function sample_random_hc(N, exclusion; maxiter=1e3, k=30)
 end
 
 
-function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci", material="Rhodamine", type="point", min_exclusion=1.0)
+function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci", material="Rhodamine", type="point", min_exclusion=1.0, dimer_d=1.5)
 
     if position == "fibonacci"
         positions = R .* sample_fibonacci(N)
@@ -360,6 +424,9 @@ function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci"
         @info "max_exclusion: $max_exclusion"
         exclusion = min(min_exclusion, max_exclusion)
         positions = R .* sample_random_hc(N, exclusion / R)
+
+    elseif position == "landings"
+        positions, initial_positions, dimer_indices = sample_landings(N, exclusion, dimer_d)
     else
         @info "No position means fibonacci"
         positions = R .* sample_fibonacci(N)
