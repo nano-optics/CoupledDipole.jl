@@ -285,51 +285,80 @@ end
 
 """
 %sample_landings random positions on the unit sphere tagging dimers
-%
-% 'hard-core' process, with brute-force trial approach, may fail to find a solution
-% if too many points are sought.
-% NOTE: the function always returns N points, regardless of success in exclusion
-%
-% PARAMETERS:
-% - N number of points requested
-% - exclusion threshold distance under which particles merge as dimer
-% - dimer distance to merge as dimer
-%
-% RETURNS: a 3xN matrix of point positions on the unit sphere and a vector
-% of monomer/dimer binary index
-%
-% DEPENDS: sample_random
-%
-% FAMILY: low_level, utility, sample
-%
-% EXAMPLES:
-% s = sample_landings(4,0.3)
-% s = sample_landings(4,10)
-%
 
+    # logic: simulate random landings
+    # then check for pairs too close
+    # move them about by slerp until no longer chocking
+    # while loop until no more collisions
+    # tag dimers as such
 """
-function sample_landings(N, exclusion, dimer_d)
+function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=30)
 
-    # initial sample
-    s = sample_random(N)
+    if sqrt(4 * pi * 1^2 / N) < (pi * exclusion^2)
+        @warn "The requested number of points will not fit"
+    end
+
+
+    #initial sample
+    s = sample_random(N + k)
     sold = s
-    indices = trues(N) # all assumed monomers
 
-    for i in 1:N # points to test
-        for j in (i+1):N
-            dist = norm(s[i] - s[j]) # note: should use spherical distance
-            if dist < exclusion  # this jj point is close to ii
+    indices = trues(N + k) # all assumed good
+    dimers = .!indices
+
+    # first pass, checking distances
+    for i in 1:(N+k) # points to test
+        for j in (i+1):(N+k)
+            dist = norm(s[i] - s[j])
+            if (dist < exclusion)  # this i point is bad
                 indices[i] = false
-                indices[j] = false
-                # now shift along the great circle to fixed separation d
-                newp = slerp(s[i], s[j], dimer_d)
-                s[j] = newp
-                break
+                break # bad point, no need to test further
             end
         end
     end
 
-    return (s=s, sold=sold, indices=indices)
+    todo = (sum(indices) < N)
+
+    # if more than N, we're done without dimers, return first N positions 
+    if !todo
+        @info "no iteration needed, zero dimers"
+        return (s=s[1:N], dimers=dimers[1:N])
+    end
+
+    # otherwise, move pairs too close to set dimer distance and try again
+    iter = 0
+    while todo
+
+        for i in 1:(N+k) # points to test
+            for j in (i+1):(N+k)
+                dist = norm(s[i] - s[j])
+                if (dist < exclusion)  # this pair of points is too close, make it a dimer
+                    dimers[i] = true
+                    dimers[j] = true
+                    # shift j along the great circle to fixed separation d
+                    newp = slerp(s[i], s[j], dimer_d)
+                    s[j] = newp
+                end
+            end
+        end
+
+        # if more than N, we're done
+        if sum(indices) >= N
+            @info "iterations successful"
+            pick = findall(indices)
+            return (s=s[pick[1:N]], dimers=dimers[pick[1:N]])
+        end
+
+        if iter >= maxiter
+            @warn "max number of iterations reached"
+        end
+
+        todo = (sum(indices) < N) && (iter < maxiter)
+        iter = iter + 1
+    end
+
+    # we should not get here ideally
+    return (s=s[1:N], dimers=dimers[1:N])
 
 end
 
@@ -408,8 +437,35 @@ function sample_random_hc(N, exclusion; maxiter=1e3, k=30)
 
 end
 
+function cluster_shell_landings(N, a, R, threshold_d=0.5, dimer_d=0.8; monomer_mat="NileBlueM", dimer_mat="NileBlueD", type="point")
 
-function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci", material="Rhodamine", type="point", min_exclusion=1.0, dimer_d=1.5)
+    # logic: simulate random landings
+    # then check for pairs too close
+    # move them about by slerp until no longer chocking
+    # while loop until no more collisions
+    # tag dimers as such
+
+    s, dimers = sample_landings(N, threshold_d, dimer_d)
+
+    positions = R .* s
+
+    N = length(positions)
+    sizes = [SVector(a, a, a) for _ ∈ 1:N] # identical spheres
+
+    # particles isotropic, orientation irrelevant
+    trace = a + a + a # whatever scalings we inputed
+    sizes = [SVector(trace / 3, trace / 3, trace / 3) for _ ∈ 1:N] # identical particles
+    rotations = [@SVector rand(3) for _ ∈ 1:N]
+
+    materials = [material for _ ∈ 1:N]
+
+    quaternions = [inv(QuatRotation(RotZYZ(r[1], r[2], r[3]))) for r in rotations]
+
+    Cluster(positions, quaternions, sizes, materials, [type for _ ∈ 1:N])
+end
+
+
+function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci", material="Rhodamine", type="point", min_exclusion=1.0)
 
     if position == "fibonacci"
         positions = R .* sample_fibonacci(N)
@@ -425,8 +481,6 @@ function cluster_shell(N, a, b, c, R; orientation="radial", position="fibonacci"
         exclusion = min(min_exclusion, max_exclusion)
         positions = R .* sample_random_hc(N, exclusion / R)
 
-    elseif position == "landings"
-        positions, initial_positions, dimer_indices = sample_landings(N, exclusion, dimer_d)
     else
         @info "No position means fibonacci"
         positions = R .* sample_fibonacci(N)
