@@ -4,6 +4,8 @@ using Revise
 using CoupledDipole
 using Rotations
 
+# using WGLMakie
+
 cl = cluster_dimer(10, 1, 2, 3, pi / 4)
 
 cl = cluster_helix(8, 20, 20, 40, 100, 300, π / 4, 0, "right")
@@ -28,43 +30,43 @@ function Makie_rotation(q)
         qrotation(Vec3f(v...), θ)
 end
 
-meshscatter(
-        Point3f.(positions),
-        markersize=Vec3f.(sizes),
-        rotations=Makie_rotation.(rotations),
-        color=colour,
-)
+# meshscatter(
+#         Point3f.(positions),
+#         markersize=Vec3f.(sizes),
+#         rotations=Makie_rotation.(rotations),
+#         color=colour,
+# )
 
 
 
-using WGLMakie
-xs = cos.(1:0.5:20)
-ys = sin.(1:0.5:20)
-zs = LinRange(0, 3, length(xs))
+# using WGLMakie
+# xs = cos.(1:0.5:20)
+# ys = sin.(1:0.5:20)
+# zs = LinRange(0, 3, length(xs))
 
 
-fig, ax, p = WGLMakie.meshscatter(xs, ys, zs, markersize=0.1, color=zs)
-WGLMakie.meshscatter!(ax, [2], [0], [0], markersize=2, color=:black)
+# fig, ax, p = WGLMakie.meshscatter(xs, ys, zs, markersize=0.1, color=zs)
+# WGLMakie.meshscatter!(ax, [2], [0], [0], markersize=2, color=:black)
 
 
 # display(p)
 
 
-function visualise_makie2(cl; colour=:gold, R=1.0)
+function visualise_makie3(cl; colour=:gold, R=1.0)
 
         positions = cl.positions
-        positions = push!(positions, 0 .* positions[1])
+        # positions = push!(positions, 0 .* positions[1])
         sizes = cl.sizes
-        sizes = push!(sizes, (0 .* sizes[1]) .+ R)
+        # sizes = push!(sizes, (0 .* sizes[1]) .+ R)
         rotations = cl.rotations
-        rotations = push!(rotations, rotations[1])
+        # rotations = push!(rotations, rotations[1])
         cols = [colour for _ in eachindex(cl.sizes)]
-        cols = push!(cols, :gold)
+        # cols = push!(cols, :gold)
 
-        fig = Figure(; resolution=(1200, 400))
+        fig = Figure(; resolution=(1200, 1200))
         aspect = (1, 1, 1)
-        perspectiveness = 0.5
-        ax1 = Axis3(fig[1, 1]; aspect, perspectiveness)
+        perspectiveness = 0.0
+        ax1 = Axis3(fig[1, 1]; aspect=:data, perspectiveness, viewmode=:fitzoom)
         meshscatter!(ax1,
                 Point3f.(positions),
                 markersize=Vec3f.(sizes),
@@ -73,8 +75,8 @@ function visualise_makie2(cl; colour=:gold, R=1.0)
         )
 
         meshscatter!(ax1,
-                Point3f.([positions[end]]),
-                markersize=Vec3f.([sizes[end]]),
+                Point3f.([0 .* positions[1]]),
+                markersize=Vec3f.([0.0 .* cl.sizes[end] .+ R]),
                 rotations=Makie_rotation.([rotations[end]]),
                 color=:gold
         )
@@ -88,6 +90,9 @@ using GLMakie
 GLMakie.activate!()
 
 
+
+
+
 # cl = cluster_array(5,100,1,2,3)
 
 cl = cluster_shell(300, 1.0, 1, 5, 30, orientation="radial")
@@ -99,7 +104,9 @@ cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="pseudo-ra
 # cl = cluster_helix(8, 20, 20, 40, 100, 300, π/4, 0, "right")
 
 cl = cluster_shell(2828, 0.2, 0.2, 0.2, 15, orientation="radial", position="pseudo-random", min_exclusion=0.7)
-visualise_makie2(cl, colour=:silver, R=14)
+# cluster_shell_landings(N, a, R, threshold_d=0.5, dimer_d=0.8; monomer_mat="NileBlueM", dimer_mat="NileBlueD", type="point")
+cl = cluster_shell_landings(100, 1, 15, 0.2, 0.4)
+visualise_makie3(cl, colour=:silver, R=14)
 
 meshscatter(Point3f0(0, 0, 0), markersize=Vec3f0(30, 30, 30), color=:red, overdraw=true)
 

@@ -353,10 +353,23 @@ function slerp(p0, p1, d)
     p1n = p1 / norm(p1)
     Omega = acos(dot(p0n, p1n))
     t = dt / Omega
-    p = sin((1 - t) * Omega) / sin(Omega) * p0 + sin(t * Omega) / sin(Omega) * p1
-    return p
+    p = sin((1 - t) * Omega) / sin(Omega) * p0n + sin(t * Omega) / sin(Omega) * p1n
+    return p / norm(p)
 end
+# R = 14
+# theta = [38, 43] .* pi / 180
+# z  = R * exp.(1im * theta)
+# p0 = SVector(real(z[1]), imag(z[1]), 0)
+# p1 = SVector(real(z[2]), imag(z[2]), 0)
+# p2  = slerp(p0, p1, 1)
+# p2
 
+s = sample_random(100)
+p0 = s[1]
+p1 = s[20]
+p2 = slerp(p0, p1, 0.1)
+p2
+norm(p2)
 
 function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=30)
 
@@ -406,9 +419,17 @@ function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=30)
                     dimers[j] = true
                     # now assume this pair is fine until proven otherwise below
                     indices[i] = true
-                    indices[i] = true
+                    indices[j] = true
                     # shift j along the great circle to fixed separation d
                     newp = slerp(s[i], s[j], dimer_d)
+                    WAT = norm(newp)
+                    # @info "norm is $WAT"
+                    # if abs(WAT - 1.0) > 0.001
+                    #     p0 = s[i]
+                    #     p1 = s[j]
+                    #     p2 = newp
+                    #     # @info "$p0, $p1, $p2"
+                    # end
                     s[j] = newp
                 end
             end
@@ -420,6 +441,7 @@ function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=30)
                 dist = norm(s[i] - s[j])
                 if (dist < threshold_d)  # this i point is bad
                     indices[i] = false
+                    indices[j] = false
                     break # bad point, no need to test further
                 end
             end
