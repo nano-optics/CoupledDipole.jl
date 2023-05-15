@@ -73,6 +73,13 @@ function visualise_makie3(cl; colour=:gold, R=1.0)
                 rotations=Makie_rotation.(rotations),
                 color=colour,
         )
+        dimers = cl.materials .== "NileBlueD"
+        meshscatter!(ax1,
+                Point3f.(positions[dimers]),
+                markersize=Vec3f.(sizes[dimers]),
+                rotations=Makie_rotation.(rotations[dimers]),
+                color=:red,
+        )
 
         meshscatter!(ax1,
                 Point3f.([0 .* positions[1]]),
@@ -105,7 +112,8 @@ cl = cluster_shell(300, 1.0, 1, 2, 30, orientation="radial", position="pseudo-ra
 
 cl = cluster_shell(2828, 0.2, 0.2, 0.2, 15, orientation="radial", position="pseudo-random", min_exclusion=0.7)
 # cluster_shell_landings(N, a, R, threshold_d=0.5, dimer_d=0.8; monomer_mat="NileBlueM", dimer_mat="NileBlueD", type="point")
-cl = cluster_shell_landings(100, 1, 15, 0.2, 0.4)
+cl = cluster_shell_landings(500, 0.4, 15, 0.8)
+
 visualise_makie3(cl, colour=:silver, R=14)
 
 meshscatter(Point3f0(0, 0, 0), markersize=Vec3f0(30, 30, 30), color=:red, overdraw=true)

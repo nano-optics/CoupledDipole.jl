@@ -363,114 +363,47 @@ end
 # p1 = SVector(real(z[2]), imag(z[2]), 0)
 # p2  = slerp(p0, p1, 1)
 # p2
+# s = sample_random(100)
+# p0 = s[1]
+# p1 = s[20]
+# p2 = slerp(p0, p1, 0.1)
+# p2
+# norm(p2)
 
-s = sample_random(100)
-p0 = s[1]
-p1 = s[20]
-p2 = slerp(p0, p1, 0.1)
-p2
-norm(p2)
-
-function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=30)
+function sample_landings(N, threshold_d)
 
     if sqrt(4 * pi * 1^2 / N) < (pi * threshold_d^2)
         @warn "The requested number of points will not fit"
     end
 
-
     #initial sample
-    s = sample_random(N + k)
+    s = sample_random(N)
     sold = s
 
-    indices = trues(N + k) # all assumed good
-    dimers = .!indices
+    toremove = .!trues(N) # all assumed good
+    dimers = .!trues(N)
 
     # first pass, checking distances
-    for i in 1:(N+k) # points to test
-        for j in (i+1):(N+k)
+    for i in 1:N # points to test
+        for j in (i+1):N
             dist = norm(s[i] - s[j])
             if (dist < threshold_d)  # this i point is bad
-                indices[i] = false
+                toremove[j] = true
+                dimers[i] = true
                 break # bad point, no need to test further
             end
         end
     end
 
-    todo = (sum(indices) < N)
+    # deleteat!(s, j) # remove item j since it was absorbed into the dimer
+    # deleteat!(dimers, j) # remove item j since it was absorbed into the dimer
 
-    # if more than N, we're done without dimers, return first N positions 
-    if !todo
-        @info "no iteration needed, zero dimers"
-        return (s=s[1:N], dimers=dimers[1:N])
-    end
-
-    # otherwise, move pairs too close to set dimer distance and try again
-    iter = 0
-    while todo
-
-        number_bad = sum(.!indices)
-
-        @info "iteration $iter, $number_bad bad"
-        for i in 1:(N+k) # points to test
-            for j in (i+1):(N+k)
-                dist = norm(s[i] - s[j])
-                if (dist < threshold_d)  # this pair of points is too close, make it a dimer
-                    dimers[i] = true
-                    dimers[j] = true
-                    # now assume this pair is fine until proven otherwise below
-                    indices[i] = true
-                    indices[j] = true
-                    # shift j along the great circle to fixed separation d
-                    newp = slerp(s[i], s[j], dimer_d)
-                    WAT = norm(newp)
-                    # @info "norm is $WAT"
-                    # if abs(WAT - 1.0) > 0.001
-                    #     p0 = s[i]
-                    #     p1 = s[j]
-                    #     p2 = newp
-                    #     # @info "$p0, $p1, $p2"
-                    # end
-                    s[j] = newp
-                end
-            end
-        end
-
-        # redo pass, checking distances
-        for i in 1:(N+k) # points to test
-            for j in (i+1):(N+k)
-                dist = norm(s[i] - s[j])
-                if (dist < threshold_d)  # this i point is bad
-                    indices[i] = false
-                    indices[j] = false
-                    break # bad point, no need to test further
-                end
-            end
-        end
-
-        number_bad = sum(.!indices)
-        @info "now $number_bad bad"
-        # if more than N, we're done
-        if sum(indices) >= N
-            @info "iterations successful"
-            pick = findall(indices)
-            return (s=s[pick[1:N]], dimers=dimers[pick[1:N]])
-        end
-
-        if iter >= maxiter
-            @warn "max number of iterations reached"
-        end
-
-        todo = (sum(indices) < N) && (iter < maxiter)
-        iter = iter + 1
-    end
-
-    # we should not get here ideally
-    return (s=s[1:N], dimers=dimers[1:N])
+    return (s=s[.!toremove], dimers=dimers[.!toremove])
 
 end
 
 
-function cluster_shell_landings(N, a, R, threshold_d=0.5, dimer_d=0.8; monomer_mat="NileBlueM", dimer_mat="NileBlueD", type="point")
+function cluster_shell_landings(N, a, R, threshold_d=0.5; monomer_mat="NileBlueM", dimer_mat="NileBlueD", type="point")
 
     # logic: simulate random landings
     # then check for pairs too close
@@ -478,7 +411,7 @@ function cluster_shell_landings(N, a, R, threshold_d=0.5, dimer_d=0.8; monomer_m
     # while loop until no more collisions
     # tag dimers as such
 
-    s, dimers = sample_landings(N, threshold_d, dimer_d)
+    s, dimers = sample_landings(N, threshold_d / R)
 
     positions = R .* s
 
