@@ -468,7 +468,8 @@ function cluster_shell_landings(N, a, R, threshold_d=0.5, dimer_d=0.8; monomer_m
     sizes = [SVector(trace / 3, trace / 3, trace / 3) for _ ∈ 1:N] # identical particles
     rotations = [@SVector rand(3) for _ ∈ 1:N]
 
-    materials = [material for _ ∈ 1:N]
+    materials = [monomer_mat for _ ∈ 1:N]
+    materials[dimers] .= dimer_mat
 
     quaternions = [inv(QuatRotation(RotZYZ(r[1], r[2], r[3]))) for r in rotations]
 

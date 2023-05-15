@@ -50,6 +50,7 @@ export cluster_helix
 export cluster_chain
 export cluster_array
 export cluster_shell
+export cluster_shell_landings
 # CrossSections
 export extinction!
 export absorption!

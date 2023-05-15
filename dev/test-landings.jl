@@ -26,7 +26,7 @@ function slerp(p0, p1, d)
 end
 
 
-function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=30)
+function sample_landings(N, threshold_d, dimer_d; maxiter=1e3, k=0)
 
     if sqrt(4 * pi * 1^2 / N) < (pi * threshold_d^2)
         @warn "The requested number of points will not fit"
@@ -118,4 +118,4 @@ end
 R = 14
 threshold_d = 0.3
 dimer_d = 0.5
-sample_landings(3000, threshold_d / R, dimer_d / R)
+sample_landings(3000, threshold_d / R, dimer_d / R, k=30)
