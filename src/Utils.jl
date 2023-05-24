@@ -104,6 +104,16 @@ julia> cubature_sphere(6)
 
 """
 function cubature_sphere(N, method="gl")
+
+    if N == 3 && method == "cheap"
+        nodes = [
+            SVector(0, pi / 2, 0),
+            SVector(pi / 2, 0, 0),
+            SVector(pi / 2, pi / 2, 0)
+        ]
+        return (nodes=nodes[:], weights=[1, 1, 1] ./ 3)
+    end
+
     #might have slightly more than N total points
     rndN = Integer(ceil(sqrt(N / 2.0)))
 
@@ -116,7 +126,7 @@ function cubature_sphere(N, method="gl")
     ]
     weights = hcat([a * b for b in cθ.weights, a in φ.weights]...)
 
-    (nodes=nodes[:], weights=1 / (2π) * weights[:])
+    return (nodes=nodes[:], weights=1 / (2π) * weights[:])
 end
 
 function spheroid_ar(a₀, χ)
@@ -125,6 +135,18 @@ function spheroid_ar(a₀, χ)
     c = χ * a
 
     return a, c
+end
+
+function spheroid_projected_area(a₀, χ)
+
+    a = a₀ * χ^(-1 / 3)
+    c = χ * a
+    e = sqrt(1 - (a^2 / c^2))
+    if e < 1e-15
+        e = 1e-15
+    end
+    S = 2 * pi * a^2 * (1 + c / (a * e) * asin(e))
+    return S / 4.0
 end
 
 

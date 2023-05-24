@@ -98,6 +98,7 @@ export euler_unitvector
 export axis_angle
 export RotZYZ
 export spheroid_ar
+export spheroid_projected_area
 export is_inside
 export ellipsoid
 # Visual
